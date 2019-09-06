@@ -1,0 +1,22 @@
+<!--Created by LiuLei on 2019/9/3-->
+<template>
+    <div class="app-main">
+        <router-view/>
+    </div>
+</template>
+
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+
+@Component({
+  name: 'AppMain'
+})
+export default class SideBar extends Vue {
+}
+</script>
+
+<style lang="scss" scoped>
+    .app-main {
+        background-color: blueviolet;
+    }
+</style>
