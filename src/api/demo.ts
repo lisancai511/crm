@@ -1,4 +1,4 @@
-import request from 'axios'
+import request from '@/plugins/axios'
 
 export function getDemo (data:any) {
   return request({

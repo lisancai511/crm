@@ -34,7 +34,7 @@ export default class Layout extends Vue {
 <style lang="scss" scoped>
     .dd-layout {
         height: 100%;
-        background-color: #42b983;
+        background-color: #EEF3F7;
 
         .header {
         }

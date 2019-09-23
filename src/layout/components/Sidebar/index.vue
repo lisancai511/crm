@@ -10,7 +10,6 @@
         <template v-for="item in menu">
           <el-menu-item :index="item.path"
                         :key="item.meta.title"
-                        background-color="red"
                         v-if="!item.children">
             <i :class="item.icon"></i>
             <span slot="title">{{ item.meta.title }}</span>
@@ -25,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import router from './side'
+import router from '@/router/modules/backstage/index'
 import Menu from './menu.vue'
 import { Component, Vue } from 'vue-property-decorator'
 @Component({
@@ -35,7 +34,6 @@ import { Component, Vue } from 'vue-property-decorator'
 export default class SideBar extends Vue {
   menu: any = router;
   mounted () {
-    console.log(router)
   }
 }
 </script>
@@ -47,18 +45,28 @@ export default class SideBar extends Vue {
   padding-top: 31px;
   background: rgba(255, 255, 255, 1);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.03);
-  border-right: 1px solid rgba(236, 238, 243, 1);
   &__wrap {
     z-index: 1;
     position: absolute;
     width: $dd--side-bar-width;
     top: $dd--nav-bar-height;
     bottom: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
   /deep/ .el-menu {
+    border-right: none;
     .el-submenu.is-active {
       .el-submenu__title {
         background-color: #3a85ff !important;
+        span {
+          color: #fff;
+        }
+      }
+    }
+    .el-menu {
+      .is-active {
+        background: #D8E7FF!important;
       }
     }
   }

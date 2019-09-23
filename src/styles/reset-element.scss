@@ -1,0 +1,42 @@
+.dd-table{
+	&--card{
+		.el-table{
+			&__header{
+				thead{
+					tr{
+						th{
+							&:first-child{
+								.cell{
+									padding-left: 20px;
+								}
+							}
+							&:nth-last-child(2){
+								.cell{
+									padding-right: 20px;
+								}
+							}
+						}
+					}
+				}
+			}
+			&__body{
+				tbody{
+					tr{
+						td{
+							&:first-child{
+								.cell{
+									padding-left: 20px;
+								}
+							}
+							&:last-child{
+								.cell{
+									padding-right: 20px;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

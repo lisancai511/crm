@@ -25,5 +25,8 @@ module.exports = {
       filename: 'js/dd.[hash:8].js'
       // chunkFilename: 'js/vs-[name].[hash:8].js',
     }
+  },
+  devServer: {
+    proxy: 'http://192.168.3.107:8001'
   }
 }

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Layout from '@/layout/index.vue'
+import router from '@/router/modules/backstage/index'
 
 import formDesignerRouter from '@/router/modules/backstage/formDesigner'
 
@@ -13,29 +14,9 @@ export default new Router({
     {
       path: '/',
       component: Layout,
-      children: [
-        {
-          name: 'Dashboard',
-          path: '/',
-          component: () => import(/* webpackChunkName: "dashboard" */ '@/views/Home.vue')
-        },
-        {
-          name: 'personalSetting',
-          path: '/personalSetting',
-          component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/general-setting/personal-setting.vue')
-        },
-        {
-          name: 'companySetting',
-          path: '/companySetting',
-          component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/general-setting/company-setting.vue')
-        },
-        {
-          name: 'About',
-          path: '/about',
-          component: () => import(/* webpackChunkName: "about" */ '@/views/About.vue')
-        }
-      ]
+      children: router
     },
+    formDesignerRouter,
     {
       name: 'Login',
       path: '/login',
@@ -45,17 +26,6 @@ export default new Router({
       name: 'Register',
       path: '/register',
       component: () => import(/* webpackChunkName: "register" */ '@/views/register/index.vue')
-    },
-    {
-      name: 'Test',
-      path: '/test',
-      component: () => import(/* webpackChunkName: "test" */ '@/views/test.vue')
-    },
-    {
-      name: 'Test1',
-      path: '/test1',
-      component: () => import(/* webpackChunkName: "test" */ '@/views/test1.vue')
-    },
-    formDesignerRouter
+    }
   ]
 })

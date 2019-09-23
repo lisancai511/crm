@@ -7,3 +7,48 @@ $dd--background-color: #F0F0F0;
 // SIZE
 $dd--nav-bar-height: 60px;
 $dd--side-bar-width: 171px;
+
+//
+$directions: ("t":"top", "b":"bottom", "l":"left", "r":"right", "a":'');
+$dimensions: ("p":"padding", "m":"margin");
+//获取padding margin间隔
+@each $dim in $dimensions {
+	//循环四个方向
+	@each $dir in $directions {
+		@for $i from 1 through 6 {
+			$size: $i*5;
+			@if (nth($dir,2) != '') {
+				.#{nth($dim,1)}-#{nth($dir,1)}-#{$size} {
+					#{nth($dim,2)}-#{nth($dir,2)}: #{$size}px;
+				}
+			} @else {
+				.#{nth($dim,1)}-#{$size} {
+					#{nth($dim,2)}: #{$size}px;
+				}
+			}
+		}
+	}
+}
+
+//
+$fontsize: ('fs':'font-size');
+//获取padding margin间隔
+@each $fs in $fontsize {
+	@for $i from 6 through 18 {
+		$size: $i*2;
+		.#{nth($fs,1)}-#{$size} {
+			#{nth($fs,2)}: #{$size}px;
+		}
+	}
+}
+
+//Mixins
+@mixin dd-fence() {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: transparent;
+	border: 1px dashed $dd--primary-color;
+}

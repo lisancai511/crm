@@ -17,6 +17,7 @@ export default class SideBar extends Vue {
 
 <style lang="scss" scoped>
     .app-main {
-        background-color: blueviolet;
+        background-color: #EEF3F7;
+        padding: 20px;
     }
 </style>
