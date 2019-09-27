@@ -35,40 +35,38 @@
       </el-table-column>
     </el-table>
     <div style="margin:40px 0 0 24px">
-      <el-button type="primary" @click="goBack">保存</el-button>
+      <el-button type="primary" @click="saveData">保存</el-button>
       <el-button>保存并继续添加</el-button>
     </div>
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-
+import { localFieldToServerField } from '@/views/designer/config/presetLayouts/index.ts'
+import Api from '@/api'
 @Component({
   name: 'AutoNumber'
 })
 export default class AutoNumber extends Vue {
-  @Prop() saveData:any
-  private tableData:any =[{
-    date: '2016-05-02',
-    name: '王小虎',
-    address: '上海市普陀区金沙江路 1518 弄'
-  }, {
-    date: '2016-05-04',
-    name: '王小虎',
-    address: '上海市普陀区金沙江路 1517 弄'
-  }, {
-    date: '2016-05-01',
-    name: '王小虎',
-    address: '上海市普陀区金沙江路 1519 弄'
-  }, {
-    date: '2016-05-03',
-    name: '王小虎',
-    address: '上海市普陀区金沙江路 1516 弄'
-  }]
+  @Prop() Data:any
+  private tableData:any =[]
   created () {
+
   }
-  goBack () {
-    this.$router.go(-1)
+  async saveData () {
+    const objectId = this.$route.query.id
+    const fieldId = this.Data.id
+    try {
+      if (fieldId) {
+        await Api.bizObjects.updateFields(objectId, fieldId, localFieldToServerField(this.Data))
+      } else {
+        await Api.bizObjects.addFields(localFieldToServerField(this.Data), objectId)
+      }
+      this.$router.go(-1)
+    } catch (err) {
+
+    }
+    this.$emit('changeShowNext', true)
   }
 }
 </script>

@@ -1,56 +1,34 @@
 <template>
   <div class="singleLine">
-    <div v-if="SearchMore==='one'">
-      <div class="title">查找多选</div>
-      <div class="title_second">创建一个将此对象链接到另一对象的关系，支持多选</div>
-      <el-form label-position="right" label-width="80px" :model="formLabelAlign">
-        <el-row>
-          <el-col :span="12" :offset="1">
+      <el-form label-position="right" label-width="80px" :model="data">
               <el-form-item label="相关项">
-                <el-input v-model="formLabelAlign.name"></el-input>
+                <el-input v-model="data.name"></el-input>
               </el-form-item>
               <el-form-item label="标签">
-                <el-input v-model="formLabelAlign.name"></el-input>
+                <el-input v-model="data.name"></el-input>
               </el-form-item>
               <el-form-item label="API名称">
-                <el-input v-model="formLabelAlign.type"></el-input>
+                <el-input v-model="data.type"></el-input>
               </el-form-item>
               <el-form-item label="备注">
-                <el-input type="textarea" :rows="6" v-model="formLabelAlign.type"></el-input>
+                <el-input type="textarea" :rows="6" v-model="data.type"></el-input>
               </el-form-item>
               <el-form-item label="帮助文本">
-                <el-input v-model="formLabelAlign.type"></el-input>
+                <el-input v-model="data.type"></el-input>
               </el-form-item>
-              <el-button type="primary" @click="changeTabs" style="margin:40px 80px">下一步</el-button>
-          </el-col>
-        </el-row>
       </el-form>
-    </div>
-
-    <OneStep :saveData="formLabelAlign" v-if="SearchMore==='two'"></OneStep>
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import OneStep from './OneStep.vue'
-import { State, Getter, Action, Mutation, namespace } from 'vuex-class'
-const missionModule = namespace('daoda/tabs')
+import { Component, Vue, Prop } from 'vue-property-decorator'
+import { IField } from '@/views/designer/config/components'
 
 @Component({
-  name: 'LangText',
-  components: { OneStep }
+  name: 'LangText'
 })
 export default class LangText extends Vue {
-  private formLabelAlign = {
-    name: 'li', region: '13', type: 'sd'
-  }
-  @missionModule.Mutation('changeTab') changeTab:any
-  @missionModule.State('SearchMore') SearchMore:any
-
-  changeTabs () {
-    this.$store.commit('daoda/tabs/changeTab', 'SearchMore')
-    this.changeTab('SearchMore')
-  }
+  @Prop({ required: true, type: Object }) readonly data!: IField
+  @Prop({ default: 'right', type: String }) readonly position !: string
 }
 </script>
 <style lang="scss" scoped>

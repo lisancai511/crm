@@ -8,7 +8,8 @@
           <el-input v-model="data.attrs.maxlength"></el-input>
         </el-form-item>
         <el-form-item label="API名称">
-          <el-input v-model="data.apiName"></el-input>
+          <el-input :disabled="!!data.id"
+                    v-model="data.apiName"></el-input>
         </el-form-item>
         <el-form-item label="备注">
           <el-input type="textarea" :rows="6" v-model="data.remark"></el-input>
@@ -24,13 +25,13 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import { field } from '@/views/form-designer/config/components'
+import { IField } from '@/views/designer/config/components'
 
 @Component({
   name: 'TextField'
 })
 export default class TextField extends Vue {
-  @Prop({ required: true, type: Object }) readonly data!: field
+  @Prop({ required: true, type: Object }) readonly data!: IField
   @Prop({ default: 'right', type: String }) readonly position !: string
 }
 </script>

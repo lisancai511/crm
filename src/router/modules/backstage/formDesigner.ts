@@ -1,15 +1,15 @@
 import { RouteConfig } from 'vue-router'
-import Layout from '@/views/form-designer/layout/index.vue'
+import Layout from '@/views/designer/layout/index.vue'
 
 const formDesignerRouter: RouteConfig = {
-  path: '/form-designer',
+  path: '/designer',
   redirect: { name: 'FormDesignerPc' },
   component: Layout,
   children: [
     {
       name: 'FormDesignerPc',
       path: 'pc',
-      component: () => import('@/views/form-designer/pc.vue'),
+      component: () => import('@/views/designer/pc.vue'),
       meta: {
         title: 'PC布局设计器'
       }
@@ -17,7 +17,7 @@ const formDesignerRouter: RouteConfig = {
     {
       name: 'FormDesignerMobile',
       path: 'mobile',
-      component: () => import('@/views/form-designer/mobile.vue'),
+      component: () => import('@/views/designer/mobile.vue'),
       meta: {
         title: '移动端布局设计器'
       }
@@ -25,7 +25,7 @@ const formDesignerRouter: RouteConfig = {
     {
       name: 'FormDesignerHover',
       path: 'hover',
-      component: () => import('@/views/form-designer/hover.vue'),
+      component: () => import('@/views/designer/hover.vue'),
       meta: {
         title: '悬停布局设计器'
       }
@@ -33,9 +33,9 @@ const formDesignerRouter: RouteConfig = {
     {
       name: 'FormDesignerLinear',
       path: 'linear',
-      component: () => import('@/views/form-designer/linear.vue'),
+      component: () => import('@/views/designer/linear.vue'),
       meta: {
-        title: '线式布局设计器'
+        title: '行式布局设计器'
       }
     }
   ]

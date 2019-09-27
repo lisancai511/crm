@@ -21,8 +21,10 @@
           label="描述">
         </el-table-column>
         <el-table-column
-          prop="address"
           label="启用状态">
+          <template slot-scope="scope">
+               <span>{{scope.row.enable?'已启用':'未启用'}}</span>
+          </template>
         </el-table-column>
         <el-table-column
           prop="lastModifier"
@@ -32,8 +34,8 @@
           prop="time">
           <template slot-scope="scope">
             <div v-show="scope.row.flag">
-               <span class="dd-click" @click="handleClick(scope.row)"><dd-icon name="edit"></dd-icon> 编辑 </span>
-               <span class="dd-click" @click="dialogVisible = true"> <dd-icon name="delete"></dd-icon> 删除</span>
+               <span class="dd-click m-r-10" @click="handleClick(scope.row)"><dd-icon name="edit"></dd-icon> 编辑 </span>
+               <span class="dd-click m-r-10" @click="deleteData(scope.row)"> <dd-icon name="delete"></dd-icon> 删除</span>
             </div>
           </template>
         </el-table-column>
@@ -55,7 +57,7 @@
             <el-checkbox v-model="checked">是，我要删除此自定义字段。</el-checkbox>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="shoreDelete">确 定</el-button>
         <el-button @click="dialogVisible = false">取 消</el-button>
       </span>
     </el-dialog>
@@ -63,7 +65,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import * as ApiBizObejcts from '@/api/biz-objects'
+import Api from '@/api'
 @Component({
   name: 'TypeRecord'
 })
@@ -71,6 +73,7 @@ export default class TypeRecord extends Vue {
   private tableData:any = []
   private dialogVisible:boolean = false
   private checked:boolean = false
+  private activeRow:any = ''
   created () {
     if (this.$route.query.id) {
       this.getData()
@@ -78,13 +81,19 @@ export default class TypeRecord extends Vue {
   }
   goToAdd () {
     localStorage.setItem('activeName', 'second')
-    this.$router.push('/backstage/customized/standard-edit/add')
+    this.$router.push({
+      path: '/backstage/customized/standard-edit/add',
+      query: {
+        id: this.$route.query.id
+      }
+    })
   }
   goToLayOut () {
     this.$router.push('/backstage/customized/standard-edit/layout')
   }
   async getData () {
-    this.tableData = await ApiBizObejcts.getAllRecordTypes(this.$route.query.id)
+    const { data } = await Api.bizObjects.getAllRecordTypes(this.$route.query.id)
+    this.tableData = data
     this.tableData.forEach((item:any) => {
       item.flag = true
     })
@@ -95,8 +104,33 @@ export default class TypeRecord extends Vue {
   mouseLeave (a:any) {
     a.flag = false
   }
-  handleClick () {
-    this.$router.push('/backstage/customized/standard-edit/add')
+  handleClick (row:any) {
+    this.$router.push({
+      path: '/backstage/customized/standard-edit/add',
+      query: {
+        id: JSON.stringify(row)
+      }
+    })
+  }
+  deleteData (row:any) {
+    this.dialogVisible = true
+    this.activeRow = row
+  }
+  async shoreDelete () {
+    if (this.checked) {
+      try {
+        await Api.bizObjects.deleteRecordTypes(this.$route.query.id, this.activeRow.id)
+        this.dialogVisible = false
+        this.checked = false
+        this.$message.success('删除成功')
+        this.getData()
+      } catch (err) {
+        this.$message.error('删除失败')
+        throw err
+      }
+    } else {
+      this.$message('请确认是否删除')
+    }
   }
 }
 </script>

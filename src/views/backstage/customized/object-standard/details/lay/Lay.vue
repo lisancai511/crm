@@ -10,29 +10,26 @@
         @cell-mouse-leave="mouseLeave"
         :data="tableData">
         <el-table-column
+          prop="name"
           label="名称">
-          <template slot-scope="scope">
-              <span @click="goToEdit(scope.row)">{{scope.row.date}}</span>
-          </template>
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="description"
           label="描述">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="creator"
           label="创建人">
         </el-table-column>
         <el-table-column
-          prop="pelple"
+          prop="lastModifier"
           label="最后修改人">
         </el-table-column>
-        <el-table-column
-          prop="time">
+        <el-table-column>
           <template slot-scope="scope">
             <div v-show="scope.row.flag">
-               <span class="dd-click" @click="handleClick(scope.row)"><dd-icon name="edit"></dd-icon> 编辑 </span>
-               <span class="dd-click"> <dd-icon name="delete"></dd-icon> 删除</span>
+               <span class="dd-click m-r-10" @click="handleClick(scope.row)"><dd-icon name="edit"></dd-icon> 编辑 </span>
+               <span class="dd-click m-r-10"> <dd-icon name="delete"></dd-icon> 删除</span>
             </div>
           </template>
         </el-table-column>
@@ -42,18 +39,22 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { mapState } from 'vuex'
+import Api from '@/api'
 @Component({
   name: 'Lay'
 })
 export default class Lay extends Vue {
-  private tableData:any = [{
-    name: '123', address: '顶顶顶顶', flag: false
-  }, {
-    name: '123', address: '顶顶顶顶', flag: false
-  }]
+  private tableData:any = []
+  private mounted () {
+    this.getData()
+  }
   goToNewField () {
-    this.$router.push('/backstage/customized/standard-edit/newLay')
+    this.$router.push({
+      path: '/backstage/customized/standard-edit/newLay',
+      query: {
+        id: this.$route.query.id
+      }
+    })
   }
   mouseEnter (a:any, b:any, c:any) {
     a.flag = true
@@ -63,6 +64,10 @@ export default class Lay extends Vue {
   }
   handleClick () {
     this.$router.push('/backstage/customized/standard-edit/newField')
+  }
+  async getData () {
+    const { data } = await Api.bizObjects.getLayouts(this.$route.query.id)
+    this.tableData = data
   }
 }
 </script>

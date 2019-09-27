@@ -128,7 +128,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import * as ApiBizObejcts from '@/api/biz-objects'
+import Api from '@/api'
 @Component({
   name: 'EssentialInformation'
 })
@@ -151,12 +151,21 @@ export default class EssentialInformation extends Vue {
     this.showIconFlag = false
   }
   async getData () {
-    this.sizeForm = await ApiBizObejcts.getSingleBizObjects(this.$route.query.id)
+    const { data } = await Api.bizObjects.getSingleBizObjects(this.$route.query.id)
+    this.sizeForm = data
   }
   async saveData () {
-    this.showEdit = !this.showEdit
-    await ApiBizObejcts.updateBizObjects(this.sizeForm)
-    this.mounted()
+    try {
+      await Api.bizObjects.updateBizObjects(this.sizeForm)
+      this.showEdit = !this.showEdit
+      this.$message({
+        message: '保存成功',
+        type: 'success'
+      })
+    } catch (err) {
+      this.$message('请求失败')
+    }
+    this.getData()
   }
 }
 </script>

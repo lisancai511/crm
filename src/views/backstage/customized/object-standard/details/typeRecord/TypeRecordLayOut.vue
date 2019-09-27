@@ -2,6 +2,7 @@
   <div>
     <el-card>
       <div class="typeRecordAdd">
+          <div @click="$router.go(-1)" class="close"><dd-icon name="close"/></div>
           <h3 style="margin:10px 0 25px">
             分配页面布局
           </h3>
@@ -74,7 +75,13 @@ export default class FiledList extends Vue {
   margin:0 0 8px;
 }
 .typeRecordAdd {
+  position: relative;
   display: flex;
   flex-direction: column;
+}
+.close {
+  position: absolute;
+  right: 0px;
+  cursor: pointer;
 }
 </style>

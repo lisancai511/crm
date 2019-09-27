@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import * as ApiBizObejcts from '@/api/biz-objects'
+import Api from '@/api'
 
 @Component({
   name: 'Standard'
@@ -59,7 +59,8 @@ export default class Standard extends Vue {
     })
   }
   async getData () {
-    this.tableData = await ApiBizObejcts.getBizObjects()
+    const { data } = await Api.bizObjects.getBizObjects()
+    this.tableData = data
   }
 }
 </script>

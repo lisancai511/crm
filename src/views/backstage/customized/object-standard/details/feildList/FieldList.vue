@@ -12,19 +12,19 @@
         <el-table-column
           label="字段名称">
           <template slot-scope="scope">
-              <span @click="goToEdit(scope.row)">{{scope.row.id}}</span>
+              <span @click="goToEdit(scope.row)">{{scope.row.name}}</span>
           </template>
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="apiName"
           label="API">
         </el-table-column>
         <el-table-column
-          prop="standard"
+          prop="mandatory"
           label="启用状态">
         </el-table-column>
         <el-table-column
-          prop="description"
+          prop="dataType"
           label="字段类型">
         </el-table-column>
         <el-table-column
@@ -35,8 +35,8 @@
           prop="time">
           <template slot-scope="scope">
             <div v-show="scope.row.flag">
-               <span class="dd-click" @click="handleClick(scope.row)"><dd-icon name="edit"></dd-icon> 编辑 </span>
-               <span class="dd-click" @click="dialogVisible = true"> <dd-icon name="delete"></dd-icon> 删除</span>
+               <span class="dd-click m-r-10" @click="handleClick(scope.row)"><dd-icon name="edit"></dd-icon> 编辑 </span>
+               <span class="dd-click m-r-10" @click="deleteRow(scope.row)"> <dd-icon name="delete"></dd-icon> 删除</span>
             </div>
           </template>
         </el-table-column>
@@ -58,7 +58,7 @@
             <el-checkbox v-model="checked">是，我要删除此自定义字段。</el-checkbox>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="shoreDelete">确 定</el-button>
         <el-button @click="dialogVisible = false">取 消</el-button>
       </span>
     </el-dialog>
@@ -66,28 +66,76 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import Api from '@/api'
 @Component({
   name: 'FiledList'
 })
 export default class FiledList extends Vue {
-  private tableData:any = [{
-    name: '123', address: '顶顶顶顶', flag: false
-  }, {
-    name: '123', address: '顶顶顶顶', flag: false
-  }]
+  private tableData:any = []
   private dialogVisible:boolean = false
   private checked:boolean = false
+  private activeRow:any =''
+  private created () {
+    if (this.$route.query.id) {
+      this.getData()
+    }
+  }
   goToNewField () {
-    this.$router.push('/backstage/customized/standard-edit/newField')
+    this.$router.push({
+      path: '/backstage/customized/standard-edit/newField',
+      query: {
+        id: this.$route.query.id
+      }
+    })
   }
   mouseEnter (a:any, b:any, c:any) {
-    a.flag = true
+    this.$nextTick(() => {
+      a.flag = true
+    })
   }
   mouseLeave (a:any) {
     a.flag = false
   }
-  handleClick () {
-    this.$router.push('/backstage/customized/standard-edit/newField')
+  handleClick (row:any) {
+    this.$router.push({
+      path: '/backstage/customized/standard-edit/newField',
+      query: {
+        id: this.$route.query.id,
+        fieldId: row.id
+      }
+    })
+  }
+  deleteRow (row:any) {
+    this.dialogVisible = true
+    this.activeRow = row
+  }
+  async shoreDelete () {
+    if (this.checked) {
+      try {
+        const { data } = await Api.bizObjects.deleteFields(this.$route.query.id, this.activeRow.id)
+        if (data.status === 226) {
+          this.$message.error(`字段存在依赖关系，无法删除`)
+          this.dialogVisible = false
+        } else {
+          this.$message.success('删除成功')
+          this.dialogVisible = false
+          this.checked = false
+          this.getData()
+        }
+      } catch (err) {
+        console.log(err, 999)
+      }
+    } else {
+      this.$message.error('取消删除')
+      this.dialogVisible = false
+    }
+  }
+  async getData () {
+    const { data } = await Api.bizObjects.getFields(this.$route.query.id as string)
+    this.tableData = data
+    this.tableData.forEach((item:any) => {
+      item.flag = true
+    })
   }
 }
 </script>

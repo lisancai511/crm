@@ -2,14 +2,21 @@
   <div>
     <el-card>
       <div class="typeRecordAdd">
+          <div @click="$router.go(-1)" class="close"><dd-icon name="close"/></div>
           <h3 style="margin:10px 0 25px">
             新建记录类型
           </h3>
-          <div class="dd-title">记录类型标签</div>
-          <el-input style="width:500px" v-model="input" placeholder="请输入内容"></el-input>
-          <el-checkbox style="margin-top:23px;" v-model="tableData">备选项</el-checkbox>
-          <span style="margin:23px 0 8px">备注</span>
-          <el-input type="textarea" style="width:1000px" :rows="6"></el-input>
+          <el-form label-position="top" label-width="100px" :model="formLabelAlign">
+            <el-form-item label="记录类型标签">
+              <el-input style="width:500px" v-model="formLabelAlign.name" placeholder="请输入内容"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-checkbox v-model="formLabelAlign.enable">启用</el-checkbox>
+            </el-form-item>
+            <el-form-item label="备注">
+              <el-input type="textarea" style="width:1000px" v-model="formLabelAlign.description" :rows="6"></el-input>
+            </el-form-item>
+          </el-form>
           <h3 style="margin:30px 0 17px">设置可以使用的角色及页面布局</h3>
           <el-table
             :data="tableData"
@@ -43,6 +50,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { mapState } from 'vuex'
+import Api from '@/api'
 @Component({
   name: 'FiledList',
   computed: {
@@ -50,14 +58,21 @@ import { mapState } from 'vuex'
   }
 })
 export default class FiledList extends Vue {
-  private tableData:any = [{
-    name: '123', address: '顶顶顶顶', flag: false
-  }, {
-    name: '123', address: '顶顶顶顶', flag: false
-  }]
+  private tableData:any = []
   private input:string = ''
-  submit () {
-    this.$router.go(-1)
+  private formLabelAlign:any = {}
+  created () {
+    this.formLabelAlign = JSON.parse(this.$route.query.id as string)
+    console.log(this.formLabelAlign, 8898)
+  }
+  async submit () {
+    try {
+      await Api.bizObjects.addRecordTypes(this.formLabelAlign, this.$route.query.id)
+      this.$message.success('添加成功')
+      this.$router.go(-1)
+    } catch (err) {
+      this.$message.error('添加失败')
+    }
   }
 }
 </script>
@@ -71,7 +86,13 @@ export default class FiledList extends Vue {
   margin:0 0 8px;
 }
 .typeRecordAdd {
+  position: relative;
   display: flex;
   flex-direction: column;
+}
+.close {
+  position: absolute;
+  right: 0px;
+  cursor: pointer;
 }
 </style>

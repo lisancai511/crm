@@ -4,7 +4,7 @@
         <side-bar/>
         <div class="dd-main__wrap">
             <div class="dd-main">
-                <bread-crumb/>
+                <!-- <bread-crumb/> -->
                 <app-main/>
             </div>
         </div>

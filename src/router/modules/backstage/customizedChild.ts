@@ -12,7 +12,7 @@ const customizedChild: any = [
     path: `/backstage/customized/standard-edit/add`,
     component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/details/typeRecord/TypeRecordAdd.vue'),
     meta: {
-      breadcrumb: [{ title: '平台标准对象', path: '/backstage/customized/standard-object' }, { title: '平台标准对象详情', path: '/backstage/customized/standard-edit' }, { title: '新建记录类型', path: '/backstage/customized/standard-edit/add' }]
+      breadcrumb: [{ title: '平台标准对象', path: '/backstage/customized/standard-object' }]
     }
   },
   {
@@ -20,7 +20,7 @@ const customizedChild: any = [
     path: `/backstage/customized/standard-edit/layout`,
     component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/details/typeRecord/TypeRecordLayOut.vue'),
     meta: {
-      breadcrumb: [{ title: '平台标准对象', path: '/backstage/customized/standard-object' }, { title: '平台标准对象详情', path: '/backstage/customized/standard-edit' }, { title: '分配页面布局', path: '/backstage/customized/standard-edit/layout' }]
+      breadcrumb: [{ title: '平台标准对象', path: '/backstage/customized/standard-object' }, { title: '分配页面布局', path: '/backstage/customized/standard-edit/layout' }]
     }
   },
   {
@@ -28,7 +28,7 @@ const customizedChild: any = [
     path: `/backstage/customized/standard-edit/newField`,
     component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/details/feildList/newField/index.vue'),
     meta: {
-      breadcrumb: [{ title: '平台标准对象', path: '/backstage/customized/standard-object' }, { title: '平台标准对象详情', path: '/backstage/customized/standard-edit' }, { title: '新建字段', path: '/backstage/customized/standard-object' }]
+      breadcrumb: [{ title: '平台标准对象', path: '/backstage/customized/standard-object' }, { title: '新建字段', path: '/backstage/customized/standard-object' }]
     }
   },
   {

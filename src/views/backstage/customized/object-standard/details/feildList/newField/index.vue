@@ -1,104 +1,259 @@
 <template>
   <div>
-    <el-card :body-style="{padding:0}">
+    <el-card :body-style="{padding:0,position:'relative'}">
+      <div @click="$router.go(-1)" class="close m-r-20"><dd-icon name="close"/></div>
       <h3 style="margin:30px 0 30px 20px">新建字段</h3>
-      <el-tabs class="tabs" @tab-click="handleClick" tab-position="left">
+      <el-tabs v-model="activeName" class="tabs" @tab-click="handleClick" tab-position="left">
         <el-tab-pane v-for="field in basicFields"
                      :key="field.type"
-                     v-once
+                     :name="field.type"
                      :label="field.name">
-          <template v-if="field.type === LayoutTypes.TextField">
-            <div class="title">单行文本</div>
-            <div class="title_second">适用于填写简短的文字，如"姓名"</div>
-            <TextField class="title_public" position='right' :data="field"/>
+          <template v-if="field.type === ComponentTypes.TextField">
+            <div v-if="showNext">
+               <div class="title">单行文本</div>
+               <div class="title_second">适用于填写简短的文字，如"姓名"</div>
+               <TextField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
           </template>
-          <template v-else-if="field.type === LayoutTypes.LongTextField">
-            <div class="title">长文本</div>
-            <div class="title_second">用于填写大段的文字，如“备注”、“建议”</div>
-            <LongTextField class="title_public" position='right' :data="field"/>
+
+          <template v-else-if="field.type === ComponentTypes.LongTextField">
+            <div v-if="showNext">
+                <div class="title">长文本</div>
+                <div class="title_second">用于填写大段的文字，如“备注”、“建议”</div>
+                <LongTextField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
           </template>
-          <template v-else-if="field.type === LayoutTypes.DateField">
-            <div class="title">日期</div>
-            <div class="title_second">用于选择特定的日期，比如2088-08-08</div>
-            <DateField class="title_public" position='right' :data="field"/>
+
+          <template v-else-if="field.type === ComponentTypes.NumberField">
+            <div v-if="showNext">
+                <div class="title">数字</div>
+                <div class="title_second">用于填写大段的文字，如“备注”、“建议”</div>
+                <NumberField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
           </template>
-          <template v-else-if="field.type === LayoutTypes.DateTimeField">
-            <div class="title">日期时间</div>
-            <div class="title_second">用于选择特定的时间，比如2088-08-08 18:08:08</div>
-            <DateTimeField class="title_public" position='right' :data="field"/>
+
+          <template v-else-if="field.type === ComponentTypes.DateField">
+            <div v-if="showNext">
+                <div class="title">日期</div>
+                <div class="title_second">用于填写大段的文字，如“备注”、“建议”</div>
+                <DateField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
           </template>
-          <template v-else-if="field.type === LayoutTypes.PhoneField">
-            <div class="title">电话</div>
-            <div class="title_second">允许用户输入任何电话号码，可直接拨打。</div>
-            <PhoneField class="title_public" position='right' :data="field"/>
+
+          <template v-else-if="field.type === ComponentTypes.DateTimeField">
+            <div v-if="showNext">
+                <div class="title">日期时间</div>
+                <div class="title_second">用于填写大段的文字，如“备注”、“建议”</div>
+                <DateTimeField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
           </template>
-          <el-button type="primary" style="margin:40px 80px" @click="changeTabs">下一步</el-button>
+
+          <template v-else-if="field.type === ComponentTypes.EmailField">
+            <div v-if="showNext">
+                <div class="title">电子邮件</div>
+                <div class="title_second">用于输入邮件地址</div>
+                <EmailField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
+          </template>
+
+          <template v-else-if="field.type === ComponentTypes.PhoneField">
+            <div v-if="showNext">
+                <div class="title">电话</div>
+                <div class="title_second">用于填写大段的文字，如“备注”、“建议”</div>
+                <PhoneField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
+          </template>
+
+          <template v-else-if="field.type === ComponentTypes.WebsiteField">
+            <div v-if="showNext">
+                <div class="title">网址</div>
+                <div class="title_second">用于填写大段的文字，如“备注”、“建议”</div>
+                <WebsiteField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
+          </template>
+
+          <template v-else-if="field.type === ComponentTypes.CheckBoxField">
+            <div v-if="showNext">
+                <div class="title">复选框</div>
+                <div class="title_second">用于填写大段的文字，如“备注”、“建议”</div>
+                <CheckBoxField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
+          </template>
+
+          <template v-else-if="field.type === ComponentTypes.LookUpField">
+            <div v-if="showNext">
+                <div class="title">查找</div>
+                <div class="title_second">创建一个将此对象链接到另一对象的关系，仅单选</div>
+                <LookUpField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
+          </template>
+
+          <template v-else-if="field.type === ComponentTypes.LookUpMoreField">
+            <div v-if="showNext">
+                <div class="title">查找多选</div>
+                <div class="title_second">创建一个将此对象链接到另一对象的关系，支持多选</div>
+                <LookUpField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
+          </template>
+
+          <template v-else-if="field.type === ComponentTypes.OptionListField">
+            <div v-if="showNext">
+                <div class="title">选项列表</div>
+                <div class="title_second">允许用户从自定义的列表中选择值。</div>
+                <OptionListField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
+          </template>
+
+          <template v-else-if="field.type === ComponentTypes.MoreOptionListField">
+            <div v-if="showNext">
+                <div class="title">选项列表（多选）</div>
+                <div class="title_second">用于填写大段的文字，如“备注”、“建议”</div>
+                <MoreOptionListField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
+          </template>
+
+          <template v-else-if="field.type === ComponentTypes.AutoNumberField">
+            <div v-if="showNext">
+                <div class="title">自动编号</div>
+                <div class="title_second">系统按照规则自动生成编码，不可修改。</div>
+                <AutoNumberField class="title_public" position='right' :data="dataObj"/>
+            </div>
+            <OneStep :saveData='dataObj' @changeShowNext='changeShowNext' v-else></OneStep>
+          </template>
+
+          <el-button type="primary" v-show="showNext" style="margin:40px 80px" @click="changeTabs">下一步</el-button>
         </el-tab-pane>
       </el-tabs>
     </el-card>
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
+import { IField, fieldComponents } from '@/views/designer/config/components'
 import TextField from '../components/fields/TextField.vue'
-import LongTextField from '../components/fields/LongTextField.vue'
-import Number from '../components/fields/Number.vue'
+import LongTextField from '../components/fields/LongTextField'
+import NumberField from '../components/fields/NumberField.vue'
 import DateField from '../components/fields/DateField.vue'
 import DateTimeField from '../components/fields/DateTimeField.vue'
-import Email from '../components/fields/Email.vue'
+import EmailField from '../components/fields/EmailField.vue'
 import PhoneField from '../components/fields/PhoneField.vue'
-import WebSite from '../components/fields/WebSite.vue'
-import CheckBox from '../components/fields/CheckBox.vue'
-import Search from '../components/fields/Search.vue'
-import SearchMore from '../components/fields/SearchMore.vue'
-import OptionList from '../components/fields/OptionList.vue'
-import MoreOptionList from '../components/fields/MoreOptionList.vue'
-import AutoNumber from '../components/fields/AutoNumber.vue'
-import { namespace } from 'vuex-class'
-import { fieldComponents } from '@/views/form-designer/config/components'
-import LayoutTypes from '@/views/form-designer/config/LayoutTypes'
-import { field } from '../../../../../../form-designer/config/components'
+import WebsiteField from '../components/fields/WebsiteField.vue'
+import CheckBoxField from '../components/fields/CheckBox.vue'
+import LookUpField from '../components/fields/LookUp.vue'
+import SearchMoreField from '../components/fields/SearchMore.vue'
+import OptionListField from '../components/fields/OptionList.vue'
+import MoreOptionListField from '../components/fields/MoreOptionList.vue'
+import AutoNumberField from '../components/fields/AutoNumberField.vue'
+import OneStep from './OneStep.vue'
 
-const missionModule = namespace('daoda/tabs')
+import AutoNumber from '../components/fields/AutoNumber.vue'
+
+import ComponentTypes from '@/views/designer/config/ComponentTypes'
+import Api from '@/api'
+import { serverFieldToLocalField } from '@/views/designer/config/presetLayouts/index.ts'
+import lodash from 'lodash'
 
 @Component({
   name: 'NewField',
   components: {
     TextField,
     LongTextField,
-    Number,
+    NumberField,
     DateField,
     DateTimeField,
-    Email,
+    EmailField,
     PhoneField,
-    WebSite,
-    CheckBox,
-    Search,
-    SearchMore,
-    OptionList,
-    MoreOptionList,
-    AutoNumber
+    WebsiteField,
+    CheckBoxField,
+    LookUpField,
+    SearchMoreField,
+    OptionListField,
+    MoreOptionListField,
+    AutoNumberField,
+    OneStep
   }
 })
 
 export default class NewField extends Vue {
-  private activeName: any = ''
+  private activeName: any = 'TextField'
   private basicFields:any = ''
+  private showNext:any = true
+  private dataObj:any = {
+    attrs: {}
+  }
+  private valueCandidates:any = {}
 
   created () {
     this.basicFields = fieldComponents
+    if (this.$route.query.fieldId) {
+      this.getData()
+    } else {
+      this.dataObj = lodash.cloneDeep(fieldComponents[0])
+    }
   }
 
-  get LayoutTypes () {
-    return LayoutTypes
+  mounted () {
+  }
+
+  get ComponentTypes () {
+    return ComponentTypes
   }
 
   handleClick (tab: any, event: any) {
-    console.log(tab, 898989)
+    this.showNext = true
+    this.basicFields.forEach((item:any) => {
+      if (item.type === tab.name) {
+        this.dataObj = lodash.cloneDeep(item)
+      }
+    })
+    if (this.dataObj.type === 'OptionListField' || this.dataObj.type === 'MoreOptionListField') {
+      this.valueCandidates = this.dataObj.valueCandidates
+      let ary:any = []
+      this.dataObj.valueCandidates.forEach((item:any) => {
+        ary.push(item.v)
+      })
+      this.dataObj.valueCandidates = ary.join('\n')
+    }
   }
 
   changeTabs () {
-    console.log(this.basicFields)
+    if (this.dataObj.type === 'OptionListField' || this.dataObj.type === 'MoreOptionListField') {
+      let arr = this.dataObj.valueCandidates.split(/\n/)
+      let newArr:any = []
+      arr.forEach((item:any, index:any) => {
+        let obj:any = {}
+        if (this.valueCandidates[index] && this.valueCandidates[index].id) {
+          obj.v = item
+          obj.id = this.valueCandidates[index].id
+        } else {
+          obj.v = item
+        }
+        newArr.push(obj)
+      })
+      this.dataObj.valueCandidates = newArr
+    }
+    this.showNext = false
+  }
+  changeShowNext (data:any) {
+    this.showNext = true
+  }
+  async getData () {
+    const { data } = await Api.bizObjects.getSingleFields(this.$route.query.id as string, this.$route.query.fieldId)
+    this.dataObj = serverFieldToLocalField(data)
+    this.activeName = this.dataObj.type
   }
 }
 </script>
@@ -124,6 +279,11 @@ export default class NewField extends Vue {
     width: 700px;
     margin-left: 60px;
   }
+}
+.close {
+  position: absolute;
+  right: 0px;
+  cursor: pointer;
 }
 
 /deep/ .el-tabs--left .el-tabs__active-bar.is-left {

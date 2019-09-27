@@ -2,6 +2,9 @@
 
 import Vue from 'vue'
 import axios from 'axios'
+import JSONbig from 'json-bigint'
+
+const JSONbigString = JSONbig({ storeAsString: true })
 
 // Full config:  https://github.com/axios/axios#request-config
 // axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || '';
@@ -9,9 +12,18 @@ import axios from 'axios'
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 let config = {
-  baseURL: process.env.VUE_APP_API || ''
+  // baseURL: process.env.VUE_APP_API || ''
   // timeout: 60 * 1000, // Timeout
   // withCredentials: true, // Check cross-site Access-Control
+  transformResponse: [
+    function (data: object) {
+      try {
+        return JSONbigString.parse(data)
+      } catch (e) {
+        return data
+      }
+    }
+  ]
 }
 
 const _axios = axios.create(config)
@@ -31,7 +43,7 @@ _axios.interceptors.request.use(
 _axios.interceptors.response.use(
   function (response) {
     // Do something with response data
-    return response.data
+    return response
   },
   function (error) {
     // Do something with response error

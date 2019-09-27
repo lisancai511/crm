@@ -10,19 +10,19 @@
         @cell-mouse-leave="mouseLeave"
         :data="tableData">
         <el-table-column
-          prop="name"
+          prop="dependencyFields[0]"
           label="控制字段">
         </el-table-column>
         <el-table-column
-          prop="address"
+          prop="dependencyFields[1]"
           label="依赖字段">
         </el-table-column>
         <el-table-column
           prop="time">
           <template slot-scope="scope">
             <div v-show="scope.row.flag">
-               <span class="dd-click" @click="handleClick(scope.row)"><dd-icon name="edit"></dd-icon> 编辑 </span>
-               <span class="dd-click" @click="dialogVisible = true"> <dd-icon name="delete"></dd-icon> 删除</span>
+               <span class="dd-click m-r-10" @click="handleClick(scope.row)"><dd-icon name="edit"></dd-icon> 编辑 </span>
+               <span class="dd-click m-r-10" @click="dialogVisible = true"> <dd-icon name="delete"></dd-icon> 删除</span>
             </div>
           </template>
         </el-table-column>
@@ -52,19 +52,24 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import Api from '@/api'
 @Component({
   name: 'Depend'
 })
 export default class Depend extends Vue {
-  private tableData:any = [{
-    name: '123', address: '顶顶顶顶', flag: false
-  }, {
-    name: '123', address: '顶顶顶顶', flag: false
-  }]
+  private tableData:any = []
+  private mounted () {
+    this.getData()
+  }
   private dialogVisible:boolean = false
   private checked:boolean = false
   goToNewField () {
-    this.$router.push('/backstage/customized/standard-edit/addDepend')
+    this.$router.push({
+      path: '/backstage/customized/standard-edit/addDepend',
+      query: {
+        id: this.$route.query.id
+      }
+    })
   }
   mouseEnter (a:any, b:any, c:any) {
     a.flag = true
@@ -74,6 +79,10 @@ export default class Depend extends Vue {
   }
   handleClick () {
     this.$router.push('/backstage/customized/standard-edit/addDepend')
+  }
+  async getData () {
+    const { data } = await Api.bizObjects.getFieldDependencies(this.$route.query.id)
+    this.tableData = data
   }
 }
 </script>
