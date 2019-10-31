@@ -4,16 +4,19 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <%= VUE_APP_ENV_SCRIPT %>
+    <link rel="icon" href="<%= BASE_URL %>favicon-20191014010958358.ico">
     <link href="https://cdn.bootcss.com/normalize/8.0.1/normalize.min.css" rel="stylesheet">
-    <title>daoda</title>
-    <script src="//at.alicdn.com/t/font_1370207_xbrtbiov5b.js"></script>
+    <link href="https://cdn.bootcss.com/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+    <title>到答云</title>
+    <script src="//at.alicdn.com/t/font_1370207_tp02o6kx96.js"></script>
   </head>
   <body>
     <noscript>
       <strong>We're sorry but daoda doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app"></div>
+    <div id="daoda"></div>
     <!-- built files will be auto injected -->
+    <%= VUE_APP_EXTERNALS_SCRIPT %>
   </body>
 </html>

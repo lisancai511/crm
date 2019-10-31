@@ -1,35 +1,60 @@
-import request from '@/plugins/axios'
+import axios from '@/plugins/axios'
+import { requestFail, requestSuccess, responseFail, responseSuccess } from '@/plugins/axios/interceptors'
+
+const request = axios.create({
+  baseURL: window.TENANT_REGION_ADDRESS + '/api/v1/paas-metadata/biz-objects'
+})
+
+request.interceptors.request.use(requestSuccess, requestFail)
+request.interceptors.response.use(responseSuccess, responseFail)
 
 // 获取标准对象列表
-export function getBizObjects () {
+export function getObjects (isStandard?: boolean) {
+  const params: { standard?: number } = {}
+  if (isStandard !== undefined) {
+    params.standard = isStandard ? 1 : 0
+  }
   return request({
     method: 'get',
-    url: '/biz-objects'
+    url: '',
+    params
   })
 }
 
-// 获取单个对象
-export function getSingleBizObjects (id: any) {
+/**
+ * @description 获得指定对象
+ * @param {string} objectId
+ */
+export function getObjectById (objectId: string) {
   return request({
     method: 'get',
-    url: `/biz-objects/${id}`
+    url: `${objectId}`
   })
 }
 
 // 更新修改对象
-export function updateBizObjects (data: any) {
+export function updateObjects (data: any) {
   return request({
     method: 'put',
-    url: `/biz-objects/${data.id}`,
+    url: `/${data.id}`,
+    data
+  })
+}
+
+// 创建对象
+export function addObjects (data: any) {
+  return request({
+    method: 'post',
+    url: `/`,
     data
   })
 }
 
 // 删除对象
-export function deleteBizObjects (id: any) {
+export function deleteObjects (id: any) {
   return request({
     method: 'delete',
-    url: `/biz-objects/${id}`
+    url: `/${id}`
   })
 }
 
@@ -37,111 +62,183 @@ export function deleteBizObjects (id: any) {
 export function getAllRecordTypes (id: any) {
   return request({
     method: 'get',
-    url: `/biz-objects/${id}/record-types`
+    url: `/${id}/record-types`
   })
 }
 
-// 创建记录类型
-export function addRecordTypes (data: any, id:any) {
+/**
+ * @description 创建记录类型
+ * @param {object} recordType
+ * @param {string} objectId
+ */
+export function addRecordTypes (recordType: any, objectId: string) {
   return request({
     method: 'post',
-    url: `/biz-objects/${id}/record-types`,
-    data
+    url: `/${objectId}/record-types`,
+    data: recordType
   })
 }
 
 // 删除指定记录类型
-export function deleteRecordTypes (objectId:any, recordTypeId:any) {
+export function deleteRecordTypes (objectId: any, recordTypeId: any) {
   return request({
     method: 'delete',
-    url: `/biz-objects/${objectId}/record-types/${recordTypeId}`
+    url: `/${objectId}/record-types/${recordTypeId}`
+  })
+}
+
+// 获取指定记录类型
+export function getSingleRecordTypes (objectId: any, recordTypeId: any) {
+  return request({
+    method: 'get',
+    url: `/${objectId}/record-types/${recordTypeId}`
+  })
+}
+
+// 修改指定记录类型
+export function updateRecordTypes (objectId: any, recordTypeId: any, data: any) {
+  return request({
+    method: 'put',
+    url: `/${objectId}/record-types/${recordTypeId}`,
+    data
   })
 }
 
 /**
  * @description 获取指定对象的所有字段
- * @param {number|string} id 对象id
+ * @param {string} objectId 对象id
+ * @param {string} [fieldType] 字段类型
+ * @param {string} [layoutId] 布局id
  */
-export function getFields (id: string | number) {
+export function getFields (
+  objectId: string,
+  fieldType?: string | null,
+  layoutId?: string | null
+) {
+  const params: any = {}
+  if (fieldType) {
+    params.fieldType = fieldType
+  }
+  if (layoutId) {
+    params.layoutId = layoutId
+  }
+  // TODO 暂时添加size
+  params.size = 10000
   return request({
     method: 'get',
-    url: `/biz-objects/${id}/fields`
+    url: `/${objectId}/fields`,
+    params
   })
 }
 
 // 获取单个字段
-export function getSingleFields (objectId: string | number, fieldId: any) {
+export function getFieldDetails (objectId: string | number, fieldId: any) {
   return request({
     method: 'get',
-    url: `/biz-objects/${objectId}/fields/${fieldId}`
+    url: `/${objectId}/fields/${fieldId}`
   })
 }
 
-/**
- * @description 获取指定对象的所有按钮
- * @param {number|string} id 对象id
- */
-export function getButtons (id: string | number) {
-  // TODO 暂时不支持此接口
-  return { data: [] }
-  // return request({
-  //   method: 'get',
-  //   url: `/biz-objects/${id}/buttons`
-  // })
-}
-
 // 创建字段
-export function addFields (data: any, id:any) {
+export function addFields (data: any, id: any) {
   return request({
     method: 'post',
-    url: `/biz-objects/${id}/fields`,
+    url: `/${id}/fields`,
     data
   })
 }
 
 // 修改字段
-export function updateFields (objectId:any, fieldId:any, data:any) {
+export function updateFields (objectId: any, fieldId: any, data: any) {
   return request({
     method: 'put',
-    url: `/biz-objects/${objectId}/fields/${fieldId}`,
+    url: `/${objectId}/fields/${fieldId}`,
     data
   })
 }
 
 // 删除字段
-export function deleteFields (objectId:any, fieldId:any) {
+export function deleteFields (objectId: any, fieldId: any) {
   return request({
     method: 'delete',
-    url: `/biz-objects/${objectId}/fields/${fieldId}`
-  })
-}
-
-// 获取所有布局
-export function getLayouts (id:any) {
-  return request({
-    method: 'get',
-    url: `/biz-objects/${id}/layouts`
-  })
-}
-
-// 获取字段依赖关系
-export function getFieldDependencies (id:any) {
-  return request({
-    method: 'get',
-    url: `/biz-objects/${id}/field-dependencies`
-  })
-}
-
-// 获得指定对象指定字段候选值列表
-export function getObjDepend (objectId:any, fieldId:any) {
-  return request({
-    method: 'get',
-    url: `/biz-objects/${objectId}/fields/${fieldId}/value-candidate`
+    url: `/${objectId}/fields/${fieldId}`
   })
 }
 
 /**
- * 创建布局UI
+ * @description 获取对象全部布局
+ * @param {string} objectId
+ */
+export function getLayouts (objectId: string) {
+  return request({
+    method: 'get',
+    url: `/${objectId}/layouts`
+  })
+}
+
+// 删除指定布局
+export function deleteLayouts (objectId: any, layoutId: any) {
+  return request({
+    method: 'delete',
+    url: `/${objectId}/layouts/${layoutId}`
+  })
+}
+
+// 修改布局
+export function updateLayouts (objectId: any, layoutId: any, data: any) {
+  return request({
+    method: 'put',
+    url: `/${objectId}/layouts/${layoutId}`,
+    data
+  })
+}
+
+// 获取字段依赖关系
+export function getFieldDependencies (id: any) {
+  return request({
+    method: 'get',
+    url: `/${id}/field-dependencies`
+  })
+}
+
+// interface IFieldValueCandidateFunc {
+//   (objectId: string, fieldId: string): AxiosPromise<any>
+// }
+// interface IFieldValueCandidateFunc {
+//   (objectApiName: string, fieldApi: string): AxiosPromise<any>
+// }
+/**
+ * @description 获得指定对象指定字段候选值列表
+ * @param {string} objectIdOrApiName
+ * @param {string} fieldIdOrApiName
+ */
+export function getFieldValueCandidate (
+  objectIdOrApiName: string,
+  fieldIdOrApiName: string
+) {
+  return request({
+    method: 'get',
+    url: `/${objectIdOrApiName}/fields/${fieldIdOrApiName}/value-candidate`
+  })
+}
+
+/**
+ * @description 获得指定布局的UI列表
+ * @param {number|string} layoutId
+ * @param {number|string} objectId
+ */
+export function getLayoutUIs (
+  objectId: string | number,
+  layoutId: string | number
+) {
+  return request({
+    method: 'get',
+    url: `/${objectId}/layouts/${layoutId}/uis`
+  })
+}
+
+/**
+ * @description创建布局UI
  * @param {number|string} layoutId
  * @param {number|string} objectId
  * @param {object} layout
@@ -153,25 +250,141 @@ export function createLayoutUIs (
 ) {
   return request({
     method: 'post',
-    url: `/biz-objects/${objectId}/layouts/${layoutId}/uis`,
+    url: `/${objectId}/layouts/${layoutId}/uis`,
     data: layout
   })
 }
 
+/**
+ * @description修改布局UI
+ * @param {number|string} uiId
+ * @param {number|string} layoutId
+ * @param {number|string} objectId
+ * @param {object} layout
+ */
+export function updateLayoutUIs (
+  uiId: string | number,
+  objectId: string | number,
+  layoutId: string | number,
+  layout: any
+) {
+  return request({
+    method: 'put',
+    url: `/${objectId}/layouts/${layoutId}/uis/${uiId}`,
+    data: layout
+  })
+}
+
+/**
+ * @description 获得指定的UI
+ * @param {number|string} uiId
+ * @param {number|string} layoutId
+ * @param {number|string} objectId
+ */
+export function getLayoutUIDetails (
+  uiId: string | number,
+  objectId: string | number,
+  layoutId: string | number
+) {
+  return request({
+    method: 'get',
+    url: `/${objectId}/layouts/${layoutId}/uis/${uiId}`
+  })
+}
+
 // 创建依赖
-export function addDepend (objectId:any, data:any) {
+export function addFieldDependence (objectId: string, data: any) {
   return request({
     method: 'post',
-    url: `/biz-objects/${objectId}/field-dependencies`,
+    url: `/${objectId}/field-dependencies`,
     data
   })
 }
 
+// 修改依赖
+export function updateFieldDependence (objectId: string, dependencyId: string, data: any) {
+  return request({
+    method: 'put',
+    url: `/${objectId}/field-dependencies/${dependencyId}`,
+    data
+  })
+}
+
+// 删除依赖
+export function deleteFieldDependence (objectId: string, dependencyId: any) {
+  return request({
+    method: 'delete',
+    url: `/${objectId}/field-dependencies/${dependencyId}`
+  })
+}
+
+// 获取依赖
+export function getFieldDependence (objectId: string, dependencyId: any) {
+  return request({
+    method: 'get',
+    url: `/${objectId}/field-dependencies/${dependencyId}`
+  })
+}
+
 // 创建布局
-export function addLayots (objectId:any, data:any) {
+export function addLayouts (objectId: string, data: any) {
   return request({
     method: 'post',
-    url: `/biz-objects/${objectId}/layouts`,
+    url: `/${objectId}/layouts`,
     data
+  })
+}
+
+/**
+ * @description 获取对象相关列表
+ * @param {string} objectId 对象ID
+ */
+export function getLookups (objectId: string) {
+  return request({
+    method: 'get',
+    url: `/${objectId}/lookup`
+  })
+}
+
+/**
+ * @description 修改布局分配
+ * @param {string} objectId 对象ID
+ * @param {any} data
+ */
+export function updateLayoutDistribution (data: any, objectId: string) {
+  return request({
+    method: 'put',
+    url: `/${objectId}/layout-assignments`,
+    data
+  })
+}
+
+/**
+ * @description 获取指定对象布局分配
+ * @param {string} objectId 对象ID
+ */
+export function getLayoutDistribution (objectId: string) {
+  return request({
+    method: 'get',
+    url: `/${objectId}/layout-assignments`
+  })
+}
+
+/**
+ * @description 获得指定对象全部操作列表
+ * @param {string} objectId 对象ID
+ * @param {string} type
+ */
+export function getOperators (objectId: string, type?: 'button' | '') {
+  // TODO objectId 暂时只能为1
+  objectId = '1'
+  const params:any = {}
+  if (type) {
+    params.type = type
+  }
+  return request({
+    method: 'get',
+    url: `/${objectId}/operators`,
+    params
   })
 }

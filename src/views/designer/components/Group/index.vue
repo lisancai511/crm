@@ -1,6 +1,9 @@
 <!--Created by LiuLei on 2019/9/25-->
 <template>
-  <el-main :class="{isSelect:layout.isSelect}"
+  <el-main :class="{
+  isSelect:layout.isSelect,
+  'designer--mobile':designer.isMobile
+  }"
            class="FdComponentsGroup">
     <div class="group__title">
       <span v-show="!editing">{{layout.name}}</span>
@@ -26,7 +29,7 @@ import { IField } from '@/views/designer/config/components'
 })
 export default class FdComponentsGroup extends Vue {
   @Prop({ required: true, type: Object }) readonly layout!: IField
-  @Inject('designer') readonly designer!: boolean
+  @Inject('designer') readonly designer!: any
 
   editing: boolean = false
 
@@ -46,7 +49,8 @@ export default class FdComponentsGroup extends Vue {
   border-radius: 12px;
   margin-bottom: 20px;
   padding: 0;
-  &.isSelect{
+
+  &.isSelect {
     border: 1px dashed $dd--primary-color;
   }
 
@@ -74,6 +78,15 @@ export default class FdComponentsGroup extends Vue {
       &__button {
         cursor: pointer;
       }
+    }
+  }
+
+  &.designer--mobile {
+    border-radius: 0;
+    border-color: #fff;
+
+    &.isSelect {
+      border: 1px dashed $dd--primary-color;
     }
   }
 }

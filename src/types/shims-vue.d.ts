@@ -5,5 +5,5 @@ declare module '*.vue' {
 
 // TODO: remove this part after vuedraggable has its typescript file
 declare module 'vuedraggable'
-declare module 'nanoid'
 declare module 'json-bigint'
+declare module 'element-ui/src/utils/dom'

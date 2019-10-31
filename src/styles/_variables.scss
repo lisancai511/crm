@@ -1,8 +1,32 @@
 /* Variables */
 
 // COLOR
-$dd--primary-color: #3A85FF;
-$dd--background-color: #F0F0F0;
+$dd--primary-color: #ed722e;
+$dd--success-color: #0CBB5E;
+$dd--warning-color: #FF8479;
+$dd--info-color: #778BFF;
+
+/// color|1|Font Color|2
+$dd--color-text-primary: #222222 !default;
+/// color|1|Font Color|2
+$dd--color-text-regular: #606266 !default;
+/// color|1|Font Color|2
+$dd--color-text-secondary: #666 !default;
+/// color|1|Font Color|2
+$dd--color-text-placeholder: #999 !default;
+/// color|1|Border Color|3
+$dd--border-color-base: #F2F3F6 !default;
+/// color|1|Border Color|3
+$dd--border-color-light: #E4E7ED !default;
+/// color|1|Border Color|3
+$dd--border-color-lighter: #EBEEF5 !default;
+/// color|1|Border Color|3
+$dd--border-color-extra-light: #F2F6FC !default;
+
+// Background
+/// color|1|Background Color|4
+$dd--background-color-base: #F0F0F0;
+$dd--background-color-header-nav: #FFF;
 
 // SIZE
 $dd--nav-bar-height: 60px;

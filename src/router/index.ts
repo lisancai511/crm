@@ -1,31 +1,30 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Layout from '@/layout/index.vue'
-import router from '@/router/modules/backstage/index'
-
-import formDesignerRouter from '@/router/modules/backstage/formDesigner'
+import globalRouter from '@/router/modules/global'
+import backstageRouter from '@/router/modules/backstage'
+import designerRouter from '@/router/modules/designer'
+import portalRouter from '@/router/modules/portal'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
-    {
-      path: '/',
-      component: Layout,
-      children: router
-    },
-    formDesignerRouter,
-    {
-      name: 'Login',
-      path: '/login',
-      component: () => import(/* webpackChunkName: "login" */ '@/views/login/index.vue')
-    },
-    {
-      name: 'Register',
-      path: '/register',
-      component: () => import(/* webpackChunkName: "register" */ '@/views/register/index.vue')
-    }
+    portalRouter,
+    backstageRouter,
+    designerRouter,
+    globalRouter
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.meta && to.meta.title) {
+    document.title = to.meta.title
+  } else {
+    document.title = '到答云'
+  }
+  next()
+})
+
+export default router

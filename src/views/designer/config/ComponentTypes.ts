@@ -1,4 +1,6 @@
 enum ComponentTypes {
+  // 移动端AppBar
+  MobileAppBar = 'MobileAppBar',
   // 外层容器
   Container = 'Container',
   // 顶栏容器
@@ -11,6 +13,8 @@ enum ComponentTypes {
   Footer = 'Footer',
   // 分组容器
   Group = 'Group',
+  // 动画容器
+  Transition = 'Transition',
   // Row
   Row = 'Row',
   // Col
@@ -33,6 +37,8 @@ enum ComponentTypes {
   InfoTabFile = 'InfoTabFile',
   // Tab跟随记录页面
   InfoTabFollowUp = 'InfoTabFollowUp',
+  // Tab相关列表页面单个相关列表组件
+  InfoTabRelatedListItem = 'InfoTabRelatedListItem',
   // 字段类型
   // 单行文本
   TextField = 'TextField',
@@ -62,7 +68,10 @@ enum ComponentTypes {
   // 选项列表
   OptionListField = 'OptionListField',
   // 选项列表（多选）
-  MoreOptionListField = 'MoreOptionListField'
+  MoreOptionListField = 'MoreOptionListField',
+
+  //  按钮
+  // ButtonField = 'ButtonField'
 }
 
 export default ComponentTypes

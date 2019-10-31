@@ -1,0 +1,154 @@
+#!/bin/bash -e
+
+#========================================
+# Tools
+#========================================
+source ./tools/colorizer.sh
+source ./tools/node.sh
+source ./tools/shlog.sh
+source ./tools/utils.sh
+
+#========================================
+# App Variables
+#========================================
+source .devtoolrc
+
+function _set_environments (){
+  [[ -f "${ENV_PROD_FILE}" ]] && rm "${ENV_PROD_FILE}"
+  cp "${ENV_FILE}" "${ENV_PROD_FILE}"
+
+  _substitute "s|^.*versionNumber.*$|    versionNumber: '${APP_VERSION}',|" "${ENV_PROD_FILE}"
+  _substitute "s|^.*production.*$|    production: true,|" "${ENV_PROD_FILE}"
+  _substitute "s|^.*published.*$|    published: true,|" "${ENV_PROD_FILE}"
+
+  cat "${ENV_PROD_FILE}"
+}
+
+function doBuildApp (){
+  #echo "========================================"
+  #echo "update environment.ts"
+  #echo "========================================"
+  #_set_environments
+  source ~/.bashrc
+  #nvm use v8.9.0
+
+  # install
+  echo "========================================"
+  echo "yarn install"
+  echo "========================================"
+  CYPRESS_INSTALL_BINARY=https://npm.taobao.org/mirrors/cypress yarn
+
+  # build
+  echo "========================================"
+  echo "build from source"
+  echo "========================================"
+  yarn run build
+}
+
+#########################################
+# Main
+#########################################
+function initTag() {
+  TAG=$1
+  if [[ "${BRANCH}" == "" ]]; then
+    TAG='latest'
+  else
+    TAG=${BRANCH:7}
+  fi
+}
+
+function doBuildDockerImage (){
+  _info "Build docker image for ${APP_NAME}"
+
+  initTag
+
+  pushd docker 1> /dev/null
+
+  cp -r ../dist ./
+  docker build --rm -t "${REGISTRY_HOST}/${REGISTRY_PROJECT}/${APP_NAME}:${TAG}" .
+  docker tag "${REGISTRY_HOST}/${REGISTRY_PROJECT}/${APP_NAME}:${TAG}" "${REGISTRY_HOST}/${REGISTRY_PROJECT}/${APP_NAME}:${TAG}-${APP_VERSION}"
+
+  popd 1> /dev/null
+}
+
+function doReleaseDokcerImage (){
+  readonly local REGISTRY_USERNAME="$2"
+  readonly local REGISTRY_PASSWORD="$3"
+
+  initTag
+
+  _info "Release docker image"
+  if [[ "${REGISTRY_USERNAME}" != "" ]] && [[ "${REGISTRY_PASSWORD}" != "" ]]; then
+    for try in {1..10} ; do
+      readonly RESULT=$(docker login -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}" "${REGISTRY_HOST}")
+
+      if [[ "$(echo ${RESULT}|grep 'Succeeded')" != "" ]]; then
+        break
+      fi
+    done
+  fi
+
+  docker push "${REGISTRY_HOST}/${REGISTRY_PROJECT}/${APP_NAME}:${TAG}"
+  docker push "${REGISTRY_HOST}/${REGISTRY_PROJECT}/${APP_NAME}:${TAG}-${APP_VERSION}"
+}
+
+function doCleanDocker (){
+  initTag
+
+  docker rmi "${REGISTRY_HOST}/${REGISTRY_PROJECT}/${APP_NAME}:${TAG}"
+  docker images | grep "${REGISTRY_HOST}/${REGISTRY_PROJECT}/${APP_NAME}:${TAG}" | awk '{print $3}' | xargs -I {} docker rmi {}
+}
+
+function doHelp (){
+local readonly HELP_DOC=$(cat <<EOF
+usage: $(basename $0) $(_underline "subcommand") $(_underline "args")
+  $(_bold "build:app")
+        $(_white "description:")
+            build app
+
+  $(_bold "build:docker")
+        $(_white "description:")
+            build docker image
+
+  $(_bold "release:docker") $(_underline "username") $(_underline "password")
+        $(_white "description:")
+            push docker image
+        $(_white "parameters:")
+            $(_underline "username:") used for harbor to push image
+            $(_underline "password:") used for harbor to push image
+
+  $(_bold "clean:docker")
+        $(_white "description:")
+            remove docker images
+EOF
+)
+
+  echo "${HELP_DOC}"
+}
+
+#########################################
+# Process Args
+#########################################
+COMMAND=$1
+shift 1 || true
+
+case "${COMMAND}" in
+  build:app)
+    doBuildApp
+    ;;
+  build:docker)
+    doBuildDockerImage $@
+    ;;
+  release:docker)
+    doReleaseDokcerImage $@
+    ;;
+  clean:docker)
+    doCleanDocker $@
+    ;;
+  help)
+    doHelp
+    ;;
+  *)
+    doHelp
+    ;;
+esac

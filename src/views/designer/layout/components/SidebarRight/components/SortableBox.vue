@@ -19,10 +19,15 @@
         <li
           class="sort-box__item"
           v-for="element in data[attribute]"
-          :key="element.key"
+          v-show="filter(element)"
+          :key="element[itemKey]"
         >
-          {{ element.name }}
-          <dd-icon name="edit"/>
+          <span class="sort-box__item-label">
+            <slot v-bind="element">
+            <the-item-label :label="element[itemName]"/>
+          </slot>
+          </span>
+          <dd-icon name="change1"/>
         </li>
       </transition-group>
     </draggable>
@@ -32,14 +37,25 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import nanoid from 'nanoid'
+import TheItemLabel from '@/views/designer/components/Transfer/TheItemLabel.vue'
 
 @Component({
-  name: 'SortableBox'
+  name: 'SortableBox',
+  components: { TheItemLabel }
 })
 export default class SortableBox extends Vue {
   @Prop({ type: Object, required: true }) readonly data !: object
   @Prop({ type: String, default: 'children' }) readonly attribute !: string
   @Prop({ type: String, default: '' }) readonly title !: string
+  @Prop({ type: String, default: 'key' }) readonly itemKey !: string
+  @Prop({ type: String, default: 'name' }) readonly itemName !: string
+  @Prop({
+    type: Function,
+    default () {
+      return true
+    }
+  }) readonly filter !: Function
+
   isDragging = false
 
   get dragOptions () {
@@ -73,7 +89,8 @@ export default class SortableBox extends Vue {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    &__text{
+
+    &__text {
       padding: 12px 0
     }
   }
@@ -87,6 +104,13 @@ export default class SortableBox extends Vue {
     justify-content: space-between;
     align-items: center;
     cursor: move;
+
+    &-label {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
 
     &-ghost {
       /*opacity: 0.5;*/
@@ -107,5 +131,11 @@ export default class SortableBox extends Vue {
   .no-move {
     transition: transform 0s;
   }
+
+  /*.list-complete-item {*/
+  /*  transition: all 1s;*/
+  /*  display: inline-block;*/
+  /*  margin-right: 10px;*/
+  /*}*/
 }
 </style>

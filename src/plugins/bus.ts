@@ -6,6 +6,6 @@ Object.defineProperty(Vue.prototype, '$bus', {
   get (): any {
     return bus
   },
-  set (v: any): void {
+  set (): void {
   }
 })

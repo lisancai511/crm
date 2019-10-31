@@ -1,7 +1,9 @@
 <!--Created by LiuLei on 2019/9/16-->
 <template>
-  <div class="fd-components-tab-details">
-    <el-form class="fd-components-tab-details__form">
+  <div class="fd-components-tab-details"
+       :class="{'designer--mobile':designer.isMobile}">
+    <el-form class="fd-components-tab-details__form"
+             :label-position="designer.isMobile ? 'left' :'top'">
       <!-- TODO PCLayout Row and Col-->
       <PCLayout v-for="(component,index) in layout"
                 v-bind="component.attrs"
@@ -15,12 +17,18 @@
                 :col="component.type === ComponentTypes.Col"
                 :layout="component"
                 :key="index"></PCLayout>
+      <div class="ButtonField">
+        <el-button
+          v-if="designer.isMobile"
+          type="text" icon="el-icon-edit">编辑资料
+        </el-button>
+      </div>
     </el-form>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { Component, Vue, Prop, Inject } from 'vue-property-decorator'
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
 
 @Component({
@@ -31,6 +39,7 @@ import ComponentTypes from '@/views/designer/config/ComponentTypes'
 })
 export default class FdComponentsTabDetails extends Vue {
   @Prop({ required: true, type: Array }) readonly layout!: []
+  @Inject('designer') readonly designer!: any
 
   get ComponentTypes () {
     return ComponentTypes
@@ -50,13 +59,15 @@ export default class FdComponentsTabDetails extends Vue {
         overflow: hidden;
       }
 
-      /deep/ .el-row{
-        &::before{
+      /deep/ .el-row {
+        &::before {
           display: none;
         }
-        &::after{
+
+        &::after {
           display: none;
         }
+
         display: flex;
         flex-basis: auto;
       }
@@ -65,12 +76,37 @@ export default class FdComponentsTabDetails extends Vue {
         flex-basis: auto;
         float: none;
         display: block;
-        width: 50%;
+        /*width: 50%;*/
         min-height: 200px;
       }
 
-      /deep/ .el-main{
+      /deep/ .el-main {
         height: 100%;
+      }
+    }
+  }
+
+  &.designer--mobile {
+    .fd-components-tab-details {
+      &__form {
+        .ButtonField {
+          position: relative;
+          &::after {
+            content: '';
+            display: table;
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            top: 0;
+            left: 10px;
+            background-color: rgba(230, 230, 230, 1);
+
+          }
+        }
+
+        .el-button {
+          width: 100%;
+        }
       }
     }
   }

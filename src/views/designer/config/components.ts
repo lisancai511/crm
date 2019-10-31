@@ -1,22 +1,53 @@
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
 
 export interface IButton {
+  id: string,
   key: string,
   name: string
 }
 
+// export interface IRelated {
+//   id: string,
+//   usedFields: IButton[],
+//   usedButtons: IButton[],
+//   sort: {}
+// }
+
 export interface IAttrs {
   maxlength?: number | string | null
-  value?: any
+  // 容器组件的默认值
+  tabValue?: any
   disabled?: boolean
   required?: boolean
   usedButtons?: IButton[]
   usedFields?: IButton[]
+  usedOptions?: any[]
   direction?: string
   height?: string
   title?: string
   subTitle?: string
   isDefaultFieldContainer?: boolean
+  // 整数位数
+  integerDigit?: number,
+  // 小数位数
+  decimalDigit?: number,
+  // 网址模式
+  urlModel?: string
+  valueCandidates?: any,
+  valueCandidateConfig?: any,
+  lookupConfig?: {
+    lookupObjectId: string,
+    relatedListTitle: string,
+    canCreateRelatedObject: boolean
+  }
+  // 相关列表对象ID
+  relatedListTitle?: string
+  objectId?: string
+  sortOrderBy?: string
+  sortDirection?: 'DESC' | 'ASC'
+
+  // defaultValue?: number | string | null,
+  [propName: string]: any
 }
 
 export interface IDraggableOptions {
@@ -26,30 +57,45 @@ export interface IDraggableOptions {
   disabled?: boolean
 }
 
-export interface IField {
-  id?: number,
+export interface IBasicComponent {
   type: string,
   name: string,
   icon?: string,
-  key?: string,
-  apiName?: string,
-  remark?: string,
-  helpText?: string,
-  defaultValue?: number | string | null,
-  // 整数位数
-  integerDigit?: number,
-  // 小数位数
-  decimalDigit?: number,
-  attrs: IAttrs
-  draggable?: IDraggableOptions,
-  rules?: [],
+  key: string,
+  attrs: IAttrs,
   children?: IField[],
-  isSelect?: boolean,
-  show?: boolean,
-  valueCandidates?: any,
 }
 
-export const layoutComponents: IField[] = [
+export interface ILayoutComponent extends IBasicComponent {
+  show: boolean
+}
+
+export interface IField extends IBasicComponent {
+  id: string,
+  apiName: string,
+  remark: string,
+  helpText: string,
+  modal: any,
+  rules?: [],
+  // 配置规则
+  configRules?: { [propName: string]: any },
+  // 动态配置规则
+  dynamicConfigRules?: (payload: {
+    otherUsedFieldNames: string[],
+    otherUsedFieldApiNames: string[]
+  }) => {},
+  draggable?: IDraggableOptions,
+  show?: boolean,
+  isEdit?: boolean
+  isSelect?: boolean,
+  isError?: boolean,
+  autoNumberConfig?: any,
+  addToLayouts?: any,
+  description?: string
+}
+
+// 布局组件
+export const layoutComponents: ILayoutComponent[] = [
   {
     type: ComponentTypes.Container,
     key: ComponentTypes.Container,
@@ -107,8 +153,8 @@ export const layoutComponents: IField[] = [
     show: false
   }
 ]
-
-export const fictitiousComponents: IField[] = [
+// 虚拟组件
+export const fictitiousComponents: ILayoutComponent[] = [
   {
     type: ComponentTypes.Group,
     key: ComponentTypes.Group,
@@ -118,15 +164,31 @@ export const fictitiousComponents: IField[] = [
     show: true
   }
 ]
-
-export const tabDetailsComponents: IField[] = [
+// 动画组件
+export const TransitionComponents: ILayoutComponent[] = [
+  {
+    type: ComponentTypes.Transition,
+    key: ComponentTypes.Transition,
+    icon: 'edit',
+    name: '动画容器',
+    attrs: {
+      // objectId: '',
+      relatedListTitle: '',
+      usedFields: [],
+      usedButtons: []
+    },
+    show: true
+  }
+]
+// 详情页Tab组件
+export const tabDetailsComponents: ILayoutComponent[] = [
   {
     type: ComponentTypes.InfoTabDetails,
     key: ComponentTypes.InfoTabDetails,
     icon: 'edit',
     name: '详情',
     attrs: {},
-    show: false
+    show: true
   },
   {
     type: ComponentTypes.InfoTabActivity,
@@ -134,15 +196,17 @@ export const tabDetailsComponents: IField[] = [
     icon: 'edit',
     name: '活动',
     attrs: {},
-    show: false
+    show: true
   },
   {
     type: ComponentTypes.InfoTabRelatedList,
     key: ComponentTypes.InfoTabRelatedList,
     icon: 'edit',
     name: '相关列表',
-    attrs: {},
-    show: false
+    attrs: {
+      relatedList: []
+    },
+    show: true
   },
   {
     type: ComponentTypes.InfoTabFile,
@@ -150,32 +214,55 @@ export const tabDetailsComponents: IField[] = [
     icon: 'edit',
     name: '文件',
     attrs: {},
-    show: false
+    show: true
   }, {
     type: ComponentTypes.InfoTabFollowUp,
     key: ComponentTypes.InfoTabFollowUp,
     icon: 'edit',
     name: '跟进记录',
     attrs: {},
-    show: false
+    show: true
   }
 
 ]
-
-export const basicComponents: IField[] = [
+// 详情页Tab相关列表组件
+export const tabDetailsRelatedListComponents: ILayoutComponent[] = [
+  {
+    type: ComponentTypes.InfoTabRelatedListItem,
+    key: ComponentTypes.InfoTabRelatedListItem,
+    icon: 'edit',
+    name: '相关列表项',
+    attrs: {
+      usedButtons: [],
+      usedFields: [],
+      relatedListTitle: '',
+      objectId: '',
+      sortDirection: 'ASC',
+      sortOrderBy: ''
+    },
+    show: false
+  }
+]
+// 基础组件
+export const basicComponents: ILayoutComponent[] = [
   {
     type: ComponentTypes.FormHeader,
     key: ComponentTypes.FormHeader,
     icon: 'Folder',
     name: '表单标题',
-    attrs: {}
+    attrs: {
+      usedFields: [],
+      usedButtons: []
+    },
+    show: true
   },
   {
     type: ComponentTypes.InfoTab,
     key: ComponentTypes.InfoTab,
     icon: 'Bankcard',
     name: 'Tab页面',
-    attrs: {}
+    attrs: {},
+    show: true
   }
 ]
 
@@ -196,201 +283,440 @@ export const basicComponents: IField[] = [
 //   }
 // ]
 
+function dynamicConfigRules (
+  payload: {
+    otherUsedFieldNames: string[],
+    otherUsedFieldApiNames: string[]
+  }
+) {
+  const {
+    otherUsedFieldApiNames,
+    otherUsedFieldNames
+  } = payload
+  return {
+    name: {
+      validator: (rule: any, value: any, callback: any) => {
+        if (otherUsedFieldNames.includes(value)) {
+          callback(new Error('存在相同名称的字段'))
+        } else {
+          callback()
+        }
+      }
+    },
+    apiName: {
+      validator: (rule: any, value: any, callback: any) => {
+        if (otherUsedFieldApiNames.includes(value)) {
+          callback(new Error('存在相同名称的ApiName'))
+        } else {
+          callback()
+        }
+      }
+    }
+  }
+}
+
+// 字段组件
 export const fieldComponents: IField[] = [
   {
+    id: '',
     type: ComponentTypes.TextField,
     key: ComponentTypes.TextField,
     apiName: '',
-    icon: 'edit',
+    modal: '',
+    icon: 'text',
     name: '单行文本',
     helpText: '',
     remark: '',
-    defaultValue: '',
     attrs: {
-      maxlength: null,
+      maxlength: 50,
       disabled: false,
       required: false
-    }
+    },
+    configRules: {
+      name: [
+        { required: true, message: '请输入标签' }
+      ],
+      attrs: {
+        maxlength: [
+          { type: 'number', required: true, message: '请输入数字类型的长度' }
+        ]
+      },
+      apiName: [
+        { required: true, message: '请输入API名称' }
+      ]
+    },
+    dynamicConfigRules,
+    description: '适用于填写简短的文字，如“姓名”'
   },
   {
+    id: '',
+    apiName: '',
+    modal: '',
     type: ComponentTypes.LongTextField,
     key: ComponentTypes.LongTextField,
-    icon: 'edit',
+    icon: 'mtext-copy',
     name: '多行文本',
     helpText: '',
     remark: '',
-    defaultValue: '',
     attrs: {
-      maxlength: null,
+      maxlength: 200,
       disabled: false,
       required: false
-    }
+    },
+    configRules: {
+      name: [
+        { required: true, message: '请输入标签' }
+      ],
+      attrs: {
+        maxlength: [
+          { type: 'number', required: true, message: '请输入数字类型的长度' }
+        ]
+      },
+      apiName: [
+        { required: true, message: '请输入API名称' }
+      ]
+    },
+    dynamicConfigRules,
+    description: '用于填写大段的文字，如“备注”、“建议”'
   },
   {
+    id: '',
+    apiName: '',
+    modal: '',
     type: ComponentTypes.NumberField,
     key: ComponentTypes.NumberField,
-    icon: 'edit',
+    icon: 'number',
     name: '数字',
     helpText: '',
     remark: '',
-    defaultValue: '',
     attrs: {
-      maxlength: null
-    }
+      integerDigit: 8
+    },
+    configRules: {
+      name: [
+        { required: true, message: '请输入标签' }
+      ],
+      apiName: [
+        { required: true, message: '请输入API名称' }
+      ],
+      attrs: {
+        integerDigit: [
+          { type: 'number', required: true, message: '请输入数字类型的整数位数' }
+        ]
+      }
+    },
+    dynamicConfigRules
   },
   {
+    id: '',
+    apiName: '',
+    modal: '',
     type: ComponentTypes.DateField,
     key: ComponentTypes.DateField,
-    icon: 'edit',
+    icon: 'date',
     name: '日期',
     helpText: '',
     remark: '',
-    defaultValue: '',
     attrs: {
       disabled: false,
       required: false
-    }
+    },
+    configRules: {
+      name: [
+        { required: true, message: '请输入标签' }
+      ],
+      apiName: [
+        { required: true, message: '请输入API名称' }
+      ]
+    },
+    dynamicConfigRules,
+    description: '用于选择特定的日期，比如2088-08-08'
   },
   {
+    id: '',
+    apiName: '',
+    modal: '',
     type: ComponentTypes.DateTimeField,
     key: ComponentTypes.DateTimeField,
-    icon: 'edit',
+    icon: 'time',
     name: '日期时间',
     helpText: '',
     remark: '',
-    defaultValue: '',
     attrs: {
       disabled: false,
       required: false
-    }
+    },
+    configRules: {
+      name: [
+        { required: true, message: '请输入标签' }
+      ],
+      apiName: [
+        { required: true, message: '请输入API名称' }
+      ]
+    },
+    dynamicConfigRules,
+    description: '用于选择特定的时间，比如2088-08-08 18:08:08'
   },
   {
+    id: '',
+    apiName: '',
+    modal: '',
     type: ComponentTypes.PhoneField,
     key: ComponentTypes.PhoneField,
-    icon: 'edit',
+    icon: 'phone',
     name: '电话',
     helpText: '',
     remark: '',
     attrs: {
       disabled: false,
       required: false
-    }
+    },
+    configRules: {
+      name: [
+        { required: true, message: '请输入标签' }
+      ],
+      apiName: [
+        { required: true, message: '请输入API名称' }
+      ]
+    },
+    dynamicConfigRules,
+    description: '允许用户输入任何电话号码，可直接拨打。'
   },
 
   {
+    id: '',
     type: ComponentTypes.EmailField,
     key: ComponentTypes.EmailField,
     apiName: '',
-    icon: 'edit',
+    modal: '',
+    icon: 'mail1',
     name: '电子邮件',
     helpText: '',
     remark: '',
-    defaultValue: '',
     attrs: {
       maxlength: null,
       disabled: false,
       required: false
-    }
+    },
+    configRules: {
+      name: [
+        { required: true, message: '请输入标签' }
+      ],
+      apiName: [
+        { required: true, message: '请输入API名称' }
+      ]
+    },
+    dynamicConfigRules
   },
   {
+    id: '',
     type: ComponentTypes.WebsiteField,
     key: ComponentTypes.WebsiteField,
     apiName: '',
-    icon: 'edit',
+    modal: '',
+    icon: 'website',
     name: '网址',
     helpText: '',
     remark: '',
-    defaultValue: '',
     attrs: {
       maxlength: null,
       disabled: false,
-      required: false
-    }
+      required: false,
+      urlModel: '_self'
+    },
+    configRules: {
+      name: [
+        { required: true, message: '请输入标签' }
+      ],
+      attrs: {
+        maxlength: [
+          { type: 'number', required: true, message: '请输入数字类型的长度' }
+        ]
+      },
+      apiName: [
+        { required: true, message: '请输入API名称' }
+      ]
+    },
+    dynamicConfigRules
   },
   {
+    id: '',
     type: ComponentTypes.CheckBoxField,
     key: ComponentTypes.CheckBoxField,
     apiName: '',
-    icon: 'edit',
+    modal: 1,
+    icon: 'checkbox',
     name: '复选框',
     helpText: '',
     remark: '',
-    defaultValue: '',
     attrs: {
       disabled: false,
       required: false
-    }
+    },
+    configRules: {
+      name: [
+        { required: true, message: '请输入标签' }
+      ],
+      apiName: [
+        { required: true, message: '请输入API名称' }
+      ]
+    },
+    dynamicConfigRules
   },
   {
+    id: '',
     type: ComponentTypes.LookUpField,
     key: ComponentTypes.LookUpField,
     apiName: '',
-    icon: 'edit',
+    modal: '',
+    icon: 'searchfor',
     name: '查找',
     helpText: '',
     remark: '',
-    defaultValue: '',
     attrs: {
       disabled: false,
-      required: false
-    }
+      required: false,
+      lookupConfig: {
+        lookupObjectId: '',
+        relatedListTitle: '',
+        canCreateRelatedObject: true
+      }
+    },
+    configRules: {
+      name: [
+        { required: true, message: '请输入标签' }
+      ],
+      apiName: [
+        { required: true, message: '请输入API名称' }
+      ],
+      attrs: {
+        lookupConfig: {
+          lookupObjectId: [
+            { required: true, message: '请选择相关项' }
+          ],
+          relatedListTitle: [
+            { required: true, message: '请输入相关列表标签' }
+          ]
+        }
+      }
+    },
+    dynamicConfigRules
   },
+  // {
+  //   type: ComponentTypes.LookUpMoreField,
+  //   key: ComponentTypes.LookUpMoreField,
+  //   apiName: '',
+  //   icon: 'edit',
+  //   name: '查找多选',
+  //   helpText: '',
+  //   remark: '',
+  //   attrs: {
+  //     disabled: false,
+  //     required: false,
+  //     lookupConfig: {
+  //       lookupObjectId: '',
+  //       relatedListTitle: '',
+  //       canCreateRelatedObject: true
+  //     }
+  //   }
+  // },
   {
-    type: ComponentTypes.LookUpMoreField,
-    key: ComponentTypes.LookUpMoreField,
-    apiName: '',
-    icon: 'edit',
-    name: '查找多选',
-    helpText: '',
-    remark: '',
-    defaultValue: '',
-    attrs: {
-      disabled: false,
-      required: false
-    }
-  },
-  {
+    id: '',
     type: ComponentTypes.OptionListField,
     key: ComponentTypes.OptionListField,
     apiName: '',
-    icon: 'edit',
+    modal: '',
+    icon: 'multipleselectlist',
     name: '选项列表',
     helpText: '',
     remark: '',
-    defaultValue: '',
     attrs: {
       disabled: false,
-      required: false
+      required: false,
+      valueCandidates: ''
     },
-    valueCandidates: []
-  },
-  {
-    type: ComponentTypes.MoreOptionListField,
-    key: ComponentTypes.MoreOptionListField,
-    apiName: '',
-    icon: 'edit',
-    name: '选项列表（多选）',
-    helpText: '',
-    remark: '',
-    defaultValue: '',
-    attrs: {
-      disabled: false,
-      required: false
+    configRules: {
+      name: [
+        { required: true, message: '请输入标签' }
+      ],
+      apiName: [
+        { required: true, message: '请输入API名称' }
+      ],
+      attrs: {
+        valueCandidates: [
+          { required: true, message: '请输入选项列表值' }
+        ]
+      }
     },
-    valueCandidates: []
+    dynamicConfigRules
   },
+  // {
+  //   id: '',
+  //   type: ComponentTypes.MoreOptionListField,
+  //   key: ComponentTypes.MoreOptionListField,
+  //   apiName: '',
+  //   modal: '',
+  //   icon: 'multipleselectlist',
+  //   name: '选项列表（多选）',
+  //   helpText: '',
+  //   remark: '',
+  //   attrs: {
+  //     disabled: false,
+  //     required: false
+  //   },
+  //   valueCandidates: '',
+  //   configRules: {},
+  //   dynamicConfigRules
+  // },
   {
+    id: '',
     type: ComponentTypes.AutoNumberField,
     key: ComponentTypes.AutoNumberField,
     apiName: '',
-    icon: 'edit',
+    modal: '',
+    icon: 'serialnumber',
     name: '自动编号',
     helpText: '',
     remark: '',
-    defaultValue: '',
     attrs: {
       disabled: false,
-      required: false
-    }
+      required: false,
+      maxlength: 3
+    },
+    autoNumberConfig: {
+      prefix: '',
+      beginNumber: 1
+    },
+    configRules: {
+      name: [
+        { required: true, message: '请输入标签' }
+      ],
+      apiName: [
+        { required: true, message: '请输入API名称' }
+      ],
+      attrs: {
+        maxlength: [
+          { type: 'number', required: true, message: '请输入数字类型的长度' }
+        ]
+      },
+      autoNumberConfig: {
+        prefix: [
+          {
+            required: true,
+            message: '请选择编号格式'
+          }
+        ],
+        beginNumber: [
+          {
+            type: 'number',
+            required: true,
+            message: '请输入数字类型的起始编号'
+          }
+        ]
+      }
+    },
+    dynamicConfigRules
   }
 ]
+
+export const FIELD = 'FIELD'

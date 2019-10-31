@@ -3,7 +3,31 @@ Write your variables here. All available variables can be
 found in element-ui/packages/theme-chalk/src/common/var.scss.
 For example, to overwrite the theme color:
 */
+/// color|1|Functional Color|1
 $--color-primary: $dd--primary-color;
+/// color|1|Functional Color|1
+$--color-success: $dd--success-color !default;
+/// color|1|Functional Color|1
+$--color-warning: $dd--warning-color !default;
+/// color|1|Functional Color|1
+$--color-info: $dd--info-color !default;
+
+/// color|1|Font Color|2
+$--color-text-primary: $dd--color-text-primary !default;
+/// color|1|Font Color|2
+$--color-text-regular: $dd--color-text-regular !default;
+/// color|1|Font Color|2
+$--color-text-secondary: $dd--color-text-secondary !default;
+/// color|1|Font Color|2
+$--color-text-placeholder: $dd--color-text-placeholder !default;
+/// color|1|Border Color|3
+$--border-color-base: $dd--border-color-base !default;
+/// color|1|Border Color|3
+$--border-color-light: $dd--border-color-light !default;
+/// color|1|Border Color|3
+$--border-color-lighter: $dd--border-color-lighter !default;
+/// color|1|Border Color|3
+$--border-color-extra-light: $dd--border-color-extra-light !default;
 
 /* icon font path, required */
 $--font-path: '~element-ui/lib/theme-chalk/fonts';

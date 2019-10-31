@@ -7,11 +7,11 @@
       <el-main class="section__wrap section__wrap section__components">
         <h6 class="section__title">组件</h6>
         <div class="section__body">
-          <field v-for="field in basicComponents"
+          <field-button v-for="field in basicComponents"
                  class="form-designer__field"
                  :icon="field.icon"
                  :title="field.name"
-                 :key="field.name"/>
+                 :key="field.key"/>
         </div>
       </el-main>
       <el-main class="section__wrap section__fields">
@@ -24,42 +24,47 @@
           >{{type.name}}
           </el-radio-button>
         </el-radio-group>
-        <div class="section__body">
+        <div
+          v-show="curFieldTab === 'base'"
+          class="section__body">
           <draggable
-            v-show="curFieldTab === 'base'"
             tag="div"
             v-bind="fieldDraggableProps"
             :list="fieldComponents"
             class="section__body">
-            <field v-for="field in fieldComponents"
+            <field-button v-for="field in fieldComponents"
                    class="form-designer__field"
                    :class="[field.type]"
                    :icon="field.icon"
                    :title="field.name"
-                   :key="field.name"/>
+                   :key="field.key"/>
           </draggable>
           <draggable
-            v-show="curFieldTab === 'base'"
             tag="div"
             v-bind="fictitiousDraggableProps"
             :list="fictitiousComponents"
             class="section__body">
-            <field v-for="field in fictitiousComponents"
+            <field-button v-for="field in fictitiousComponents"
                    class="form-designer__field"
                    :class="[field.type]"
                    :icon="field.icon"
                    :title="field.name"
-                   :key="field.name"/>
+                   :key="field.key"/>
           </draggable>
         </div>
-        <div class="section__body">
-          <field v-show="curFieldTab === 'unUsed'" v-for="field in unusedFields"
+        <draggable
+          v-show="curFieldTab === 'unUsed'"
+          tag="div"
+          v-bind="fieldDraggableProps"
+          :list="unusedFields"
+          class="section__body">
+          <field-button v-for="field in unusedFields"
                  class="form-designer__field"
                  :class="[field.type]"
                  :icon="field.icon"
                  :title="field.name"
-                 :key="field.name"/>
-        </div>
+                 :key="field.key"/>
+        </draggable>
       </el-main>
     </el-container>
   </el-aside>
@@ -67,38 +72,25 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import Field from './Field.vue'
-import ComponentTypes from '@/views/designer/config/ComponentTypes'
+import FieldButton from './FieldButton.vue'
 import {
   basicComponents,
-  layoutComponents,
   fieldComponents,
   fictitiousComponents,
-  IField
+  IField, ILayoutComponent
 } from '@/views/designer/config/components'
 import DraggableClassNames from '@/views/designer/config/DraggableClassNames'
 import DraggableGroupTypes from '@/views/designer/config/DraggableGroupTypes'
+import designerStore from '@/store/modules/designer'
 
 @Component({
   name: 'FormDesignSidebarLeft',
-  components: { Field }
+  components: { FieldButton }
 })
 export default class SidebarLeft extends Vue {
-  basicComponents: IField[] = basicComponents
+  basicComponents: ILayoutComponent[] = basicComponents
   fieldComponents: IField[] = fieldComponents
-  fictitiousComponents: IField[] = fictitiousComponents
-  unusedFields: IField[] = [
-    {
-      name: '测试字段',
-      icon: 'edit',
-      type: ComponentTypes.TextField,
-      key: ComponentTypes.TextField + 'asdkljaslkf',
-      attrs: {
-        maxlength: 20
-      }
-    }
-  ]
-
+  fictitiousComponents: ILayoutComponent[] = fictitiousComponents
   fieldTabs = [
     {
       key: 'base',
@@ -110,6 +102,10 @@ export default class SidebarLeft extends Vue {
     }
   ]
   curFieldTab = this.fieldTabs[0].key
+
+  get unusedFields (): any[] {
+    return designerStore.unusedFields
+  }
 
   get fieldDraggableProps () {
     return {

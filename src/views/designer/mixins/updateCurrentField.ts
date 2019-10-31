@@ -5,18 +5,20 @@ import { IField } from '@/views/designer/config/components'
   name: 'UpdateCurrentField'
 })
 export default class extends Vue {
-  @Inject('designer') readonly designer!: boolean
+  @Inject('designer') readonly designer!: any
   @Prop({ required: true, type: Object }) readonly layout!: IField
 
   updateCurrentField (layout: IField | null) {
-    if (!this.designer) {
+    // console.log(2212121)
+    if (!this.designer.isBackstage) {
       return
     }
-    this.$bus.$emit('selectLayout', layout)
+    this.$bus.$emit('designer/updateSelectLayout', layout)
   }
 
   deleteCurField (index: number) {
-    if (!this.designer) {
+    // 如果不是后台设置页面则返回
+    if (!this.designer.isBackstage) {
       return
     }
     (this.layout.children as []).splice(index, 1)

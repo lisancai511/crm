@@ -1,45 +1,63 @@
 <!--Created by LiuLei on 2019/9/12-->
 <template>
-  <div class="form-title p-25">
+  <div class="form-title p-25"
+       :class="{'designer--mobile':designer.isMobile}">
     <div
       :class="{'dd-fence':layout.isSelect}"
       class="dd-fence-mask">
     </div>
-    <div class="form-title-top">
-      <div class="form-title__name__wrap">
-        <div class="form-title__name fs-18">
-          <strong>{{title}}</strong>
+    <template v-if="!designer.isMobile">
+      <div class="form-title-top">
+        <div class="form-title__name__wrap">
+          <div class="form-title__name fs-18">
+            <strong>{{designer.object.name}}</strong>
+          </div>
+          <div class="form-title__name--sub">
+            {{designer.object.description}}
+          </div>
         </div>
-        <div class="form-title__name--sub">
-          {{subTitle}}
-        </div>
+        <the-buttons
+          :usedButtons="usedButtons"/>
       </div>
-      <the-buttons
-        :usedButtons="usedButtons"/>
-    </div>
-    <div class="form-title-bottom m-t-30">
+      <div class="form-title-bottom m-t-30">
+        <transition-group
+          class="form-title-info"
+          name="list-complete"
+          tag="div">
+          <div class="form-title-info-item"
+               v-for="usedField in usedFields"
+               :key="usedField.key"
+          >
+            <div class="form-title-info-item__title">
+              {{usedField.name}}
+            </div>
+            <div class="form-title-info-item__value">
+              <strong>xxxx</strong>
+            </div>
+          </div>
+        </transition-group>
+      </div>
+    </template>
+    <template v-if="designer.isMobile">
       <transition-group
-        class="form-title-info"
+        class="form-title-info-item__title"
         name="list-complete"
         tag="div">
         <div class="form-title-info-item"
              v-for="usedField in usedFields"
              :key="usedField.key"
         >
-          <div class="form-title-info-item__title">
+          <div class="form-title-info-item__name">
             {{usedField.name}}
-          </div>
-          <div class="form-title-info-item__value">
-            <strong>xxxx</strong>
           </div>
         </div>
       </transition-group>
-    </div>
+    </template>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Inject } from 'vue-property-decorator'
 import TheButtons from '@/views/designer/components/FormTitle/TheButtons.vue'
 import { IField } from '@/views/designer/config/components'
 
@@ -51,8 +69,8 @@ export default class FdComponentsFormHeader extends Vue {
   @Prop({ type: Object, required: true }) readonly layout!: IField
   @Prop({ type: Array, default: () => [] }) readonly usedButtons!: []
   @Prop({ type: Array, default: () => [] }) readonly usedFields!: []
-  @Prop({ type: String, default: '' }) readonly title!: string
-  @Prop({ type: String, default: '' }) readonly subTitle!: string
+
+  @Inject('designer') readonly designer!: any
 }
 </script>
 
@@ -99,6 +117,38 @@ export default class FdComponentsFormHeader extends Vue {
 
       &__value {
         text-align: center;
+      }
+    }
+  }
+
+  &.designer--mobile {
+    /*background: #FE723F;*/
+    padding: 15px;
+    box-shadow: none;
+    margin-bottom: 10px;
+
+    .form-title-info-item {
+      margin-left: 0;
+      margin-bottom: 6px;
+
+      &:first-child {
+        font-size: 18px;
+
+        .form-title-info-item__name {
+          color: #333;
+          font-weight: bold;
+        }
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &__title {
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   }

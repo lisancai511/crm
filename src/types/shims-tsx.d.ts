@@ -10,4 +10,8 @@ declare global {
       [elem: string]: any
     }
   }
+  interface Window {
+    GLOBAL_REGION_ADDRESS: string;
+    TENANT_REGION_ADDRESS: string;
+  }
 }

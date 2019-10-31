@@ -7,10 +7,11 @@ import '@/styles/reset-element.scss'
 import '@/plugins/bus'
 import '@/plugins/dd-components'
 import '@/plugins/element'
+import '@/plugins/moment'
 import '@/plugins/draggable'
 import '@/permission'
-
 Vue.config.productionTip = false
+Vue.prototype.$store = store
 
 new Vue({
   router,

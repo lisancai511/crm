@@ -4,15 +4,15 @@
     class="form-title__button__wrap p-15">
     <div class="form-title__button__inner">
       <transition-group name="list-complete" tag="span">
-      <el-button
-        v-for="button in displayedButtons"
-        :key="button.key"
-        size="small"
-        type="primary"
-        plain
-        class="form-title__button">
-        {{button.name}}
-      </el-button>
+        <el-button
+          v-for="button in displayedButtons"
+          :key="button.apiName"
+          size="small"
+          type="primary"
+          plain
+          class="form-title__button">
+          {{(buttonByApiName[button.apiName] || {}).name}}
+        </el-button>
       </transition-group>
       <el-dropdown v-if="hiddenButtons.length > 0"
                    class="m-l-10">
@@ -27,7 +27,7 @@
           <el-dropdown-item
             v-for="button in hiddenButtons"
             :key="button.key"
-          >{{button.name}}
+          >{{(buttonByApiName[button.apiName] || {}).name}}
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -37,6 +37,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
+import designerStore from '@/store/modules/designer'
 
 @Component({
   name: 'TheButtons'
@@ -44,7 +45,11 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
 export default class TheButtons extends Vue {
   @Prop({ type: Array, required: true }) readonly usedButtons!: []
 
-  defaultShowLength = 3
+  defaultShowLength: number = 3
+
+  get buttonByApiName (): any {
+    return designerStore.buttonByApiName
+  }
 
   get displayedButtons () {
     if (this.usedButtons.length <= this.defaultShowLength) {

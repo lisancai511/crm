@@ -23,6 +23,16 @@ const externals = [
     name: 'element-ui',
     externalName: 'ELEMENT',
     url: 'https://cdn.bootcss.com/element-ui/2.11.1/index.js'
+  },
+  {
+    name: 'lodash',
+    externalName: '_',
+    url: 'https://cdn.bootcss.com/lodash.js/4.17.15/lodash.min.js'
+  },
+  {
+    name: 'moment',
+    externalName: 'moment',
+    url: 'https://cdn.bootcss.com/moment.js/2.24.0/moment.min.js'
   }
 ]
 

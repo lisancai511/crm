@@ -1,0 +1,5 @@
+readonly APP_NAME='paas-portal-web'
+readonly APP_VERSION="0.0.1-${BUILD_NUMBER:-SNAPSHOT}"
+readonly REGISTRY_PROTO='http'
+readonly REGISTRY_HOST='harbor.idaoda.cn:8082'
+readonly REGISTRY_PROJECT='paas'

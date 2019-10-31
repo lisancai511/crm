@@ -59,6 +59,12 @@
                 @click.native.stop="updateCurrentField(component)"
                 :key="component.key"
                 :layout="component"/>
+      <!--如果是Transition-->
+      <PCLayout v-else-if="component.type === ComponentTypes.Transition"
+                v-bind="component.attrs"
+                transition
+                :key="component.key"
+                :layout="component"/>
       <!--如果是表头-->
       <fd-components-form-header v-else-if="component.type === ComponentTypes.FormHeader"
                                  @click.native="updateCurrentField(component)"
@@ -66,6 +72,12 @@
                                  v-bind="component.attrs"
                                  :key="component.key"
       />
+      <!--如果是MobileAppBar-->
+      <!--<fd-mobile-components-app-bar v-else-if="component.type === ComponentTypes.MobileAppBar"
+                v-bind="component.attrs"
+                @click.native.stop="updateCurrentField(component)"
+                :key="component.key"
+                :layout="component"/>-->
       <!--如果是Tabs-->
       <fd-components-tab v-else-if="component.type === ComponentTypes.InfoTab"
                          @click.native.stop="updateCurrentField(component)"
@@ -74,7 +86,7 @@
       <!--如果是各种Form表单组件-->
       <fd-form-item v-else
                     @click.native.stop="updateCurrentField(component)"
-                    @delete="deleteCurField(component,index)"
+                    @delete="deleteCurField(index)"
                     :layout="component"
                     :key="component.key"/>
     </template>
@@ -89,6 +101,7 @@ import FdComponentsFormHeader from '@/views/designer/components/FormTitle/index.
 import FdComponentsTab from '@/views/designer/components/Tab/index.vue'
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
 import FdComponentsGroup from '@/views/designer/components/Group/index.vue'
+import FdComponentsTransition from '@/views/designer/components/Transition/index.vue'
 
 import {
   Container,
@@ -100,13 +113,15 @@ import {
   Col
 } from 'element-ui'
 import FdFormItem from '@/views/designer/components/PCLayout/FdFormItem.vue'
-import { IDraggableOptions, IField } from '@/views/designer/config/components'
+import { IDraggableOptions, IField, fieldComponents } from '@/views/designer/config/components'
 import nanoid from 'nanoid'
 import updateCurrentField from '@/views/designer/mixins/updateCurrentField'
 import DraggableGroupTypes from '@/views/designer/config/DraggableGroupTypes'
 import DraggableClassNames from '@/views/designer/config/DraggableClassNames'
+import { arrToMap } from '@/utils'
 
 Vue.component('FdComponentsGroup', FdComponentsGroup)
+Vue.component('FdComponentsTransition', FdComponentsTransition)
 
 @Component({
   name: 'PCLayout',
@@ -132,6 +147,7 @@ export default class PCLayout extends mixins(updateCurrentField) {
   @Prop({ type: Boolean, default: false }) readonly row!: boolean
   @Prop({ type: Boolean, default: false }) readonly col!: boolean
   @Prop({ type: Boolean, default: false }) readonly group!: boolean
+  @Prop({ type: Boolean, default: false }) readonly transition!: boolean
   @Prop({ type: Boolean, default: false }) readonly container!: boolean
   @Prop({ type: Boolean, default: false }) readonly main!: boolean
   @Prop({ type: Boolean, default: false }) readonly header!: boolean
@@ -140,7 +156,7 @@ export default class PCLayout extends mixins(updateCurrentField) {
   @Prop({ type: Boolean, default: false }) readonly form!: boolean
   @Prop({ type: Boolean, default: false }) readonly draggable!: boolean
 
-  @Inject('designer') readonly designer!: boolean
+  @Inject('designer') readonly designer!: any
 
   get ComponentTypes () {
     return ComponentTypes
@@ -155,6 +171,8 @@ export default class PCLayout extends mixins(updateCurrentField) {
       return Main.name
     } else if (this.group) {
       return FdComponentsGroup.name
+    } else if (this.transition) {
+      return FdComponentsTransition.name
     } else if (this.aside) {
       return Aside.name
     } else if (this.footer) {
@@ -174,7 +192,7 @@ export default class PCLayout extends mixins(updateCurrentField) {
       return this.getContainerProps(Header)
     } else if (this.main) {
       return this.getContainerProps(Main)
-    } else if (this.group) {
+    } else if (this.group || this.transition) {
       return {
         ...this.getContainerProps(Main),
         layout: this.layout
@@ -211,6 +229,10 @@ export default class PCLayout extends mixins(updateCurrentField) {
     }
   }
 
+  get fieldComponentByType () {
+    return arrToMap(fieldComponents, 'type')
+  }
+
   getContainerProps (Components: any) {
     if (!Components.props) {
       return {}
@@ -222,7 +244,7 @@ export default class PCLayout extends mixins(updateCurrentField) {
   }
 
   handleDraggableAdd (evt: any) {
-    if (!this.designer) {
+    if (!this.designer.isBackstage) {
       return
     }
     const newIndex = evt.newIndex
@@ -232,64 +254,98 @@ export default class PCLayout extends mixins(updateCurrentField) {
     let tempLayout = {}
     // 如果是分组容器 添加默认子元素
     if (curLayout[newIndex].type === ComponentTypes.Group) {
-      tempLayout = {
-        name: `分组_${nanoid(13)}`,
-        children: [
-          {
-            type: ComponentTypes.Row,
-            key: ComponentTypes.Row + '_' + nanoid(),
-            children: [
-              {
-                type: ComponentTypes.Col,
-                key: ComponentTypes.Col + '_' + nanoid(),
-                attrs: {
-                  span: 12
-                },
-                draggable: {
-                  group: DraggableGroupTypes.FormField,
-                  ghostClass: DraggableClassNames.FormField
-                },
-                children: []
+      if (this.designer.isMobile) {
+        tempLayout = {
+          name: `分组_${nanoid(13)}`,
+          children: [
+            {
+              type: ComponentTypes.Row,
+              key: ComponentTypes.Row + '_' + nanoid(),
+              children: [
+                {
+                  type: ComponentTypes.Col,
+                  key: ComponentTypes.Col + '_' + nanoid(),
+                  attrs: {
+                    span: 24
+                  },
+                  draggable: {
+                    group: DraggableGroupTypes.FormField,
+                    ghostClass: DraggableClassNames.FormField
+                  },
+                  children: []
+                }
+              ]
+            }
+          ]
+        }
+      } else {
+        tempLayout = {
+          name: `分组_${nanoid(13)}`,
+          children: [
+            {
+              type: ComponentTypes.Row,
+              key: ComponentTypes.Row + '_' + nanoid(),
+              attrs: {
+                gutter: 70
               },
-              {
-                type: ComponentTypes.Col,
-                key: ComponentTypes.Col + '_' + nanoid(),
-                attrs: {
-                  span: 12
+              children: [
+                {
+                  type: ComponentTypes.Col,
+                  key: ComponentTypes.Col + '_' + nanoid(),
+                  attrs: {
+                    span: 12
+                  },
+                  draggable: {
+                    group: DraggableGroupTypes.FormField,
+                    ghostClass: DraggableClassNames.FormField
+                  },
+                  children: []
                 },
-                draggable: {
-                  group: DraggableGroupTypes.FormField,
-                  ghostClass: DraggableClassNames.FormField
-                },
-                children: []
-              }
-            ]
-          }
-        ]
+                {
+                  type: ComponentTypes.Col,
+                  key: ComponentTypes.Col + '_' + nanoid(),
+                  attrs: {
+                    span: 12
+                  },
+                  draggable: {
+                    group: DraggableGroupTypes.FormField,
+                    ghostClass: DraggableClassNames.FormField
+                  },
+                  children: []
+                }
+              ]
+            }
+          ]
+        }
       }
     }
-    this.$set(curLayout, newIndex, {
+    const newLayout = {
       ..._.cloneDeep(curLayout[newIndex]),
       ..._.cloneDeep(tempLayout),
       key,
       // 绑定键值
       // model: this.data.list[newIndex].type + '_' + key,
       rules: []
-    })
+    }
+    // TODO 提取公共函数
+    if (!newLayout.id) {
+      newLayout.apiName = ''
+      // if (_.isObject(newLayout.attrs) && newLayout.attrs.hasOwnProperty('maxlength')) {
+      //   newLayout.attrs.maxlength = this.fieldComponentByType[newLayout.type].attrs.maxlength
+      // }
+    }
+    this.$set(curLayout, newIndex, newLayout)
 
-    this.$bus.$emit('selectLayout', curLayout[newIndex])
+    this.$bus.$emit('designer/updateSelectLayout', curLayout[newIndex])
   }
 
-  handleDraggableUpdate (evt
-    :
-    any
-  ) {
-    if (!this.designer) {
+  handleDraggableUpdate (evt: any) {
+    if (!this.designer.isBackstage) {
       return
     }
     const newIndex = evt.newIndex
     const curLayout = this.layout.children as IField[]
-    this.$bus.$emit('selectLayout', curLayout[newIndex])
+    this.$bus.$emit('designer/updateSelectLayout', curLayout[newIndex])
   }
 }
 </script>

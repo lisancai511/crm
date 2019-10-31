@@ -1,4 +1,7 @@
 const externalsConfig = require('./externals.config')
+const staticEnvConfig = require('./static.env.config')
+process.env.VUE_APP_EXTERNALS_SCRIPT = externalsConfig.externalsScript
+process.env.VUE_APP_ENV_SCRIPT = staticEnvConfig.script
 const css = process.env.NODE_ENV === 'development'
   ? {} : { extract: { filename: 'css/dd.[hash:8].css' } }
 
@@ -27,6 +30,36 @@ module.exports = {
     }
   },
   devServer: {
-    proxy: 'http://192.168.3.107:8001'
+    // proxy: process.env.VUE_APP_API || ''
+    proxy: {
+      '/biz-objects': {
+        target: 'http://192.168.3.107:8001',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '/paas-metadata': ''
+        }
+      },
+      '/paas-portal': {
+        target: 'http://192.168.3.132:8000',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '/paas-portal': ''
+        }
+      },
+      '/main-data': {
+        target: 'http://192.168.3.128:9100',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '/main-data': '/'
+        }
+      }
+
+      // '/': {
+      //   target: 'http://192.168.3.105:8100/api/v1'
+      // }
+    }
   }
 }
