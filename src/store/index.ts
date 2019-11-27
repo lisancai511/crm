@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import { IDesignerState } from '@/store/modules/designer'
 import backstageStore from '@/store/modules/backstage'
 import user from '@/store/modules/user'
+import app from '@/store/modules/app'
 
 Vue.use(Vuex)
 
@@ -14,6 +15,7 @@ export interface IRootState {
 export default new Vuex.Store<IRootState>({
   modules: {
     backstage: backstageStore,
-    user
+    user,
+    app
   }
 })

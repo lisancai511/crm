@@ -5,7 +5,12 @@ import { Component, Vue } from 'vue-property-decorator'
 import designerStore from '@/store/modules/designer'
 import LayoutTypes from '@/views/designer/config/LayoutTypes'
 import api from '@/api'
-import { base64DecompressToString, serverLayoutToLocal } from '@/views/designer/utils'
+import {
+  compressStringToBase64,
+  decompressBase64ToString,
+  localLayoutToServer,
+  serverLayoutToLocal
+} from '@/views/designer/utils'
 import PredefinedLayouts from '@/views/designer/config/PredefinedLayouts'
 
 @Component({
@@ -37,49 +42,50 @@ export default class extends Vue {
 
   async initLayout () {
     const defaultUI = designerStore.layout[this.layoutType]
-    if (defaultUI.id) {
-      //  编辑
-      // 获取UI详情
-      try {
-        const { data: { data } } = await api.bizObjects.getLayoutUIDetails(
-          defaultUI.id,
-          designerStore.object.id,
-          designerStore.layoutId
+    //  编辑
+    // 获取UI详情
+    try {
+      const { data: { data } } = await api.bizObjects.getLayoutUIDetails(
+        defaultUI.id,
+        designerStore.object.id,
+        designerStore.layoutId
+      )
+      if (!data.define) {
+        // data.define = designerStore.updateLayoutByType({
+        //   layout: PredefinedLayouts.layout1({
+        //     buttons: designerStore.buttons,
+        //     fields: designerStore.fields
+        //     // standObject: designerStore.object
+        //   })[this.layoutType],
+        //   type: this.layoutType
+        // })
+        data.define = compressStringToBase64(
+          JSON.stringify(localLayoutToServer(
+            PredefinedLayouts.layout1({
+              buttons: designerStore.buttons,
+              fields: designerStore.fields
+              // standObject: designerStore.object
+            })[this.layoutType].define
+          ))
         )
-        // JSON.parse(base64DecompressToString(data.define)),
-        // data.needAddFields,
-        // designerStore.fieldByApiName,
-        // designerStore.fieldById,
-        // defaultUI.id
-        const localDefine = serverLayoutToLocal({
-          serverLayout: JSON.parse(base64DecompressToString(data.define)),
-          needAddFields: data.needAddFields,
-          fieldByApiName: designerStore.fieldByApiName,
-          fieldById: designerStore.fieldById,
-          lookupById: designerStore.lookupById,
-          uiId: defaultUI.id
-        })
-        designerStore.updateLayoutByType({
-          layout: {
-            ...data,
-            needAddFields: [],
-            define: localDefine
-          },
-          type: this.layoutType
-        })
-      } catch (e) {
-        console.error(e)
       }
-    } else {
-      //  新建
+      const localDefine = serverLayoutToLocal({
+        serverLayout: JSON.parse(decompressBase64ToString(data.define)),
+        needAddFields: data.needAddFields,
+        fields: designerStore.fields,
+        lookups: designerStore.lookups,
+        uiId: defaultUI.id
+      })
       designerStore.updateLayoutByType({
-        layout: PredefinedLayouts.layout1({
-          buttons: designerStore.buttons,
-          fields: designerStore.fields,
-          standObject: designerStore.object
-        })[this.layoutType],
+        layout: {
+          ...data,
+          needAddFields: [],
+          define: localDefine
+        },
         type: this.layoutType
       })
+    } catch (e) {
+      console.error(e)
     }
   }
 }

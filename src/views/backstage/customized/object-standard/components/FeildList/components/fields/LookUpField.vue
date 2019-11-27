@@ -3,10 +3,11 @@
     <el-form
       ref="fieldAttrForm"
       :label-position="position"
-      label-width="80px"
+      label-width="120px"
       :rules="rules"
       :model="data">
       <el-form-item
+        v-if="data.attrs && data.attrs.lookupConfig"
         prop="attrs.lookupConfig.lookupObjectId"
         label="相关项">
         <el-select
@@ -28,6 +29,7 @@
         <el-input v-model="data.name"></el-input>
       </el-form-item>
       <el-form-item
+        v-if="data.attrs && data.attrs.lookupConfig"
         prop="attrs.lookupConfig.relatedListTitle"
         label="相关列表标签">
         <el-input v-model="data.attrs.lookupConfig.relatedListTitle"></el-input>

@@ -56,9 +56,10 @@ import SortableBox from '@/views/designer/layout/components/SidebarRight/compone
 import { IField } from '@/views/designer/config/components'
 import designerStore from '@/store/modules/designer'
 import edit from '@/views/designer/layout/components/SidebarRight/components/mixins/edit'
+import { ButtonPositions } from '@/sdk/button-sdk/PredefinedButton'
 
 @Component({
-  name: 'FormHeaderAttrs.vue',
+  name: 'FormHeaderAttrs',
   components: { SortableBox }
 })
 export default class TheFormHeaderAttrs extends Mixins(edit) {
@@ -74,7 +75,7 @@ export default class TheFormHeaderAttrs extends Mixins(edit) {
   }
 
   get buttons (): any[] {
-    return designerStore.buttons
+    return designerStore.buttons.filter((button: any) => button.position.includes(ButtonPositions.detail))
   }
 
   get fieldByApiName (): any {

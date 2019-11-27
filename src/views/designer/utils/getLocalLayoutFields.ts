@@ -11,6 +11,7 @@ export default function getLocalLayoutFields (
   layout: any
   // isFormOnly?: boolean
 ): IField[] {
+  // console.log('layout', layout)
   // debugger
   const usedFields: any[] = []
 

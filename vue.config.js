@@ -30,33 +30,41 @@ module.exports = {
     }
   },
   devServer: {
+    host: '0.0.0.0',
     // proxy: process.env.VUE_APP_API || ''
     proxy: {
-      '/biz-objects': {
-        target: 'http://192.168.3.107:8001',
+      // '/biz-objects': {
+      //   target: 'http://192.168.3.107:8001',
+      //   ws: true,
+      //   changeOrigin: true,
+      //   pathRewrite: {
+      //     '/paas-metadata': ''
+      //   }
+      // },
+      // '/paas-portal': {
+      //   target: 'http://192.168.3.132:8000',
+      //   ws: true,
+      //   changeOrigin: true,
+      //   pathRewrite: {
+      //     '/paas-portal': ''
+      //   }
+      // },
+      // '/main-data': {
+      //   target: 'http://192.168.3.128:9100',
+      //   ws: true,
+      //   changeOrigin: true,
+      //   pathRewrite: {
+      //     '/main-data': '/'
+      //   }
+      // },
+      '/jili-score': {
+        target: 'http://192.168.3.143:9201',
         ws: true,
         changeOrigin: true,
         pathRewrite: {
-          '/paas-metadata': ''
-        }
-      },
-      '/paas-portal': {
-        target: 'http://192.168.3.132:8000',
-        ws: true,
-        changeOrigin: true,
-        pathRewrite: {
-          '/paas-portal': ''
-        }
-      },
-      '/main-data': {
-        target: 'http://192.168.3.128:9100',
-        ws: true,
-        changeOrigin: true,
-        pathRewrite: {
-          '/main-data': '/'
+          '/jili-score': ''
         }
       }
-
       // '/': {
       //   target: 'http://192.168.3.105:8100/api/v1'
       // }

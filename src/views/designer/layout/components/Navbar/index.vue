@@ -134,8 +134,6 @@ export default class FormDesignNavBar extends mixins(initLayoutBaseData) {
       return
     }
     this.isEdit = true
-    // console.log('oldVal', JSON.parse(JSON.stringify(oldVal)))
-    // console.log('newVal', JSON.parse(JSON.stringify(newVal)))
   }
 
   @Watch('$route', { deep: true, immediate: true })
@@ -297,6 +295,7 @@ export default class FormDesignNavBar extends mixins(initLayoutBaseData) {
       return
     }
     // console.log(getLocalLayoutNeedAddFields(ui.define))
+    console.log(localLayoutToServer(ui.define))
     const layoutUI = {
       ...ui,
       usedFields: getLocalLayoutUsedFields(ui.define).map((field: IField) => {
@@ -312,6 +311,7 @@ export default class FormDesignNavBar extends mixins(initLayoutBaseData) {
         .map(field => localFieldToServerField(field)),
       define: compressStringToBase64(JSON.stringify(localLayoutToServer(ui.define)))
     }
+    // return
     await this.saveUI(layoutUI)
     this.$bus.$emit(`designer/updateSelectLayout`, null)
   }

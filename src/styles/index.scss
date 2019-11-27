@@ -6,7 +6,7 @@ body {
 	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
 	color: $dd--color-text-primary;
 	background-color: $dd--background-color-base;
-	min-width: 800px;
+	min-width: 1200px;
 }
 
 html {
@@ -37,7 +37,7 @@ a {
 /*滑动轨道*/
 ::-webkit-scrollbar-track {
 	border-radius: 0;
-	background: rgba(0, 0, 0, .25);
+	//background: rgba(0, 0, 0, .25);
 }
 
 /*滑块*/
@@ -76,6 +76,53 @@ a {
 .dd-link {
 	color: $dd--info-color;
 	cursor: pointer;
+	text-decoration-line: underline;
+}
+
+.dd-text-center {
+	text-align: center;
+}
+
+.dd-card {
+	background-color: #fff;
+	box-shadow: 0 12px 20px 0 rgba(1, 8, 19, 0.12);
+	border-radius: 4px;
+}
+
+.p-h-0 {
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+}
+
+.p-v-0 {
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+}
+
+.p-0 {
+	padding: 0 !important;
+}
+
+.m-h-0 {
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+}
+
+.m-v-0 {
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+
+.m-0 {
+	margin: 0 !important;
+}
+
+.fr {
+	float: right;
+}
+
+.fl {
+	float: left;
 }
 
 //动画过渡

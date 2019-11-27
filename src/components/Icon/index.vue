@@ -4,7 +4,12 @@
     class="dd-icon"
     aria-hidden="true"
   >
-    <use :xlink:href="`#dd-icon-${fullName || name}`"></use>
+    <use
+      v-if="fullName"
+      :xlink:href="`#${fullName || name}`"></use>
+    <use
+      v-else
+      :xlink:href="`#dd-icon-${name}`"></use>
   </svg>
 </template>
 
@@ -15,8 +20,8 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
   name: 'DdIcon'
 })
 export default class DdIcon extends Vue {
-  @Prop({ type: String, required: true }) readonly name!: string
-  @Prop({ type: String, required: false }) readonly fullName!: string
+  @Prop({ type: String, required: false, default: '' }) readonly name!: string
+  @Prop({ type: String, required: false, default: '' }) readonly fullName!: string
 }
 </script>
 

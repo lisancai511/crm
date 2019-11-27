@@ -5,15 +5,19 @@ enum PredefinedFieldApiNames {
   // 名称
   name = 'name',
   // 创建时间
-  createTime = 'create_time',
+  createTime = 'created_time',
   // 最后修改时间
   lastModifiedTime = 'last_modified_time',
   // 创建人
-  createdBy = 'created_by',
+  createdBy = 'creator',
   // 最后修改人
-  lastModifiedBy = 'last_modified_by',
+  lastModifiedBy = 'last_modifier',
   // 所有人
-  owner = 'owner'
+  owner = 'owner',
+  ownerId = 'owner__id',
+  // 记录类型
+  recordType = 'record_type',
+  recordTypeId = 'record_type__id',
 }
 
 export default PredefinedFieldApiNames

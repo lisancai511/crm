@@ -16,7 +16,7 @@ export default function localFieldToServerField (field: IField) {
     dataType: field.type,
     description: field.remark,
     tooltip: field.helpText,
-    defaultValue: field.modal,
+    defaultValue: field.model,
     addToLayouts: field.addToLayouts
     //  TODO 帮助文本 and 其他属性
   }

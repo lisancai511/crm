@@ -94,7 +94,7 @@ import edit from '@/views/designer/layout/components/SidebarRight/components/mix
 import designerStore from '@/store/modules/designer'
 import SortableBox from '@/views/designer/layout/components/SidebarRight/components/SortableBox.vue'
 import { arrToMap } from '@/utils'
-import PredefinedButtonApiNames from '@/views/designer/config/PredefinedButtonApiNames'
+import { PredefinedButtonApiNames } from '@/sdk/button-sdk/PredefinedButton'
 import TheItemLabel from '@/views/designer/components/Transfer/TheItemLabel.vue'
 
 @Component({

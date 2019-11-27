@@ -3,7 +3,7 @@
     <el-form
       ref="fieldAttrForm"
       label-position="right"
-      label-width="80px"
+      label-width="120px"
       :model="data">
       <el-form-item label="相关项">
         <el-input v-model="data.name"></el-input>

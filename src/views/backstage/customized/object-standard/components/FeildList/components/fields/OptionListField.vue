@@ -4,7 +4,7 @@
       ref="fieldAttrForm"
       :rules="rules"
       :label-position="position"
-      label-width="80px"
+      label-width="120px"
       :model="data">
       <el-form-item prop="name" label="标签">
         <el-input v-model="data.name"></el-input>
@@ -26,7 +26,7 @@
         <el-input v-model="data.helpText"></el-input>
       </el-form-item>
       <el-form-item label="默认值">
-        <el-input type="textarea" :rows="1" v-model="data.modal"></el-input>
+        <el-input type="textarea" :rows="1" v-model="data.model"></el-input>
       </el-form-item>
     </el-form>
   </div>

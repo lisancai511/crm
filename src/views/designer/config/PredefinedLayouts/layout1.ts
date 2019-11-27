@@ -17,12 +17,12 @@ import LayoutTypes from '@/views/designer/config/LayoutTypes'
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
 import { version } from '.'
 import { serverFieldToLocalField } from '@/views/designer/utils'
-import { ILayout, initStandObject, IStandardObject } from '@/store/modules/designer'
+import { ILayout } from '@/store/modules/designer'
 import { arrToMap } from '@/utils'
 import nanoid from 'nanoid'
-import _ from 'lodash'
 import { fieldComponents } from '@/views/designer/config/components'
 import { DraggableOptionsFormField, DraggableOptionsFormFieldGroup } from '@/views/designer/config/DraggableOptions'
+import { ButtonPositions } from '@/sdk/button-sdk/PredefinedButton'
 
 const fieldComponentByType = arrToMap(fieldComponents, 'type')
 
@@ -32,29 +32,48 @@ const fieldComponentByType = arrToMap(fieldComponents, 'type')
 interface ILayoutParams {
   buttons: any[],
   fields: any[],
-  standObject: IStandardObject
+  exceptApiNames?: string[],
+  exceptFieldTypes?: string[]
+  // standObject: IStandardObject
 }
 
 function layout1 (options: ILayoutParams = {
   buttons: [],
   fields: [],
-  standObject: {
-    ..._.cloneDeep(initStandObject)
-  }
+  exceptApiNames: [],
+  exceptFieldTypes: []
+  // standObject: {
+  //   ..._.cloneDeep(initStandObject)
+  // }
 }): ILayout {
-  let { buttons, fields } = options
+  let { buttons, fields, exceptApiNames = [], exceptFieldTypes = [] } = options
+
+  interface IButton {
+    id: number,
+    name: string,
+    apiName: string,
+    position: string
+  }
+
+  const usedButtons: any[] = buttons
+    .filter((button: IButton) => {
+      return button.position.includes(ButtonPositions.detail)
+    })
+    .map((button: IButton) => ({
+      // key: button.id + '_' + nanoid(),
+      // name: '' + button.name,
+      // id: button.id,
+      apiName: button.apiName
+    })).slice(0, 5)
   // TODO 根据type格式化所有的FIELD
-  fields = [...fields].filter(field => (!!field && !!fieldComponentByType[field.dataType]))
-  // TODO 过滤掉迭代1不支持的类型
-  //   .filter(field => [
-  //     ComponentTypes.TextField,
-  //     ComponentTypes.LongTextField,
-  //     ComponentTypes.DateField,
-  //     ComponentTypes.DateTimeField,
-  //     ComponentTypes.PhoneField
-  //   ].includes(field.dataType))
+  fields = [...fields].filter(field =>
+    (!!field && !!fieldComponentByType[field.dataType || field.type]) &&
+    !exceptApiNames.includes(field.apiName) &&
+    !exceptFieldTypes.includes(field.dataType || field.type)
+  )
     .slice(0, 5)
     .map(field => serverFieldToLocalField(field))
+
   return {
     [LayoutTypes.PC]: {
       name: 'layout1_' + LayoutTypes.PC + '_' + nanoid(),
@@ -90,16 +109,13 @@ function layout1 (options: ILayoutParams = {
                 name: '表单标题',
                 attrs: {
                   // TODO 暂时显示全部按钮
-                  usedButtons: buttons.map((button: { id: number, name: string }) => ({
-                    key: button.id + '_' + nanoid(),
-                    name: '' + button.name,
-                    id: button.id
-                  })),
+                  usedButtons,
                   // TODO 先默认显示5个字段
-                  usedFields: fields.map((field: { id: number, name: string }) => ({
+                  usedFields: fields.map((field: { id: number, name: string, apiName: string }) => ({
                     key: '' + field.id + '_' + nanoid(),
                     name: '' + field.name,
-                    id: field.id
+                    id: field.id,
+                    apiName: field.apiName
                   }))
                 }
               }
@@ -245,11 +261,7 @@ function layout1 (options: ILayoutParams = {
         // apiName: 'api' + '_' + LayoutTypes.PC + '_' + nanoid(),
         attrs: {
           direction: 'vertical',
-          usedButtons: buttons.map((button: { id: number, name: string }) => ({
-            key: button.id + '_' + nanoid(),
-            name: '' + button.name,
-            id: button.id
-          }))
+          usedButtons
         },
         children: [
           {
@@ -269,16 +281,13 @@ function layout1 (options: ILayoutParams = {
                 name: '表单标题',
                 attrs: {
                   // TODO 暂时显示全部按钮
-                  usedButtons: buttons.map((button: { id: number, name: string }) => ({
-                    key: button.id + '_' + nanoid(),
-                    name: '' + button.name,
-                    id: button.id
-                  })),
+                  usedButtons,
                   // TODO 先默认显示5个字段
-                  usedFields: fields.map((field: { id: number, name: string }) => ({
+                  usedFields: fields.map((field: { id: number, name: string, apiName: string }) => ({
                     key: '' + field.id + '_' + nanoid(),
                     name: '' + field.name,
-                    id: field.id
+                    id: field.id,
+                    apiName: field.apiName
                   }))
                 }
               }

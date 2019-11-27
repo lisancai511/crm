@@ -352,7 +352,7 @@ class Designer extends VuexModule implements IDesignerState {
   async getAllButtons () {
     try {
       // @ts-ignore
-      const { data: { data } } = await api.bizObjects.getOperators(this.object.id, 'button')
+      const { data: { data } } = await api.bizObjects.getOperators(this.object.id, 'Button')
       this.UPDATE_BUTTONS((data).map((item: any) => ({ key: '' + item.id, ...item })))
     } catch (e) {
       console.error(e)

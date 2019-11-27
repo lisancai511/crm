@@ -3,7 +3,9 @@ import Router from 'vue-router'
 import globalRouter from '@/router/modules/global'
 import backstageRouter from '@/router/modules/backstage'
 import designerRouter from '@/router/modules/designer'
-import portalRouter from '@/router/modules/portal'
+import { newFormRouter, newIndexRouter } from '@/router/modules/backstage/office-setting'
+import appRouter from '@/router/modules/app'
+import Error404 from '@/layout/error-404.vue'
 
 Vue.use(Router)
 
@@ -11,10 +13,26 @@ const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
-    portalRouter,
+    {
+      name: 'HOME',
+      path: '/',
+      redirect: '/app'
+    },
     backstageRouter,
     designerRouter,
-    globalRouter
+    globalRouter,
+    newFormRouter,
+    appRouter,
+    newIndexRouter,
+    { path: '*', component: Error404 },
+    {
+      name: 'share',
+      path: '/share',
+      meta: {
+        title: '邀请成员'
+      },
+      component: () => import(/* webpackChunkName: "dashboard" */ '@/views/share/index.vue')
+    }
   ]
 })
 

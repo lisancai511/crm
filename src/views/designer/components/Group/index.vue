@@ -2,16 +2,20 @@
 <template>
   <el-main :class="{
   isSelect:layout.isSelect,
-  'designer--mobile':designer.isMobile
+  'designer--mobile':designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.MOBILE
   }"
            class="FdComponentsGroup">
     <div class="group__title">
       <span v-show="!editing">{{layout.name}}</span>
-      <el-input v-show="editing"
-                @blur="blur"
-                size="mini" class="group__title__input"
-                v-model="layout.name"/>
-      <dd-icon name="edit" class="group__title__button" @click.native.stop="edit"></dd-icon>
+      <el-input
+        v-if="designer.setting"
+        v-show="editing"
+        @blur="blur"
+        size="mini" class="group__title__input"
+        v-model="layout.name"/>
+      <dd-icon
+        v-if="designer.setting"
+        name="edit" class="group__title__button" @click.native.stop="edit"></dd-icon>
     </div>
     <slot/>
   </el-main>
@@ -21,8 +25,10 @@
 import { Component, Vue, Prop, Inject } from 'vue-property-decorator'
 import { Main } from 'element-ui'
 import { IField } from '@/views/designer/config/components'
+import { DESIGNER_PLATFORMS } from '@/views/designer/config/Designer'
 
 @Component({
+  name: 'FdComponentsGroup',
   props: {
     ...(Main as any).props
   }
@@ -30,6 +36,10 @@ import { IField } from '@/views/designer/config/components'
 export default class FdComponentsGroup extends Vue {
   @Prop({ required: true, type: Object }) readonly layout!: IField
   @Inject('designer') readonly designer!: any
+
+  get DESIGNER_PLATFORMS () {
+    return DESIGNER_PLATFORMS
+  }
 
   editing: boolean = false
 

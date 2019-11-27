@@ -29,6 +29,7 @@ import FormDesignSidebarRight from '@/views/designer/layout/components/SidebarRi
 import designerStore from '@/store/modules/designer'
 import LayoutTypes from '@/views/designer/config/LayoutTypes'
 import initLayout from '@/views/designer/mixins/initLayout'
+import { DESIGNER_PLATFORMS, DESIGNER_TYPES } from '@/views/designer/config/Designer'
 
 @Component({
   name: 'FormDesignPC',
@@ -43,7 +44,10 @@ import initLayout from '@/views/designer/mixins/initLayout'
 
 export default class FormDesignPC extends mixins(initLayout) {
   @Provide() designer = {
-    isBackstage: true,
+    setting: {
+      type: DESIGNER_TYPES.PASS,
+      platform: DESIGNER_PLATFORMS.PC
+    },
     object: designerStore.object
   }
 

@@ -1,10 +1,11 @@
 <template>
   <div class="dd-layout">
     <!--        <nav-bar class="header"/>-->
-    <side-bar/>
+    <router-view name="sideBar"></router-view>
+    <side-bar :menus="backstageRouter.children"/>
     <div class="dd-main__wrap">
       <div class="dd-main">
-        <bread-crumb/>
+        <bread-crumb :cut-out-length="2"/>
         <app-main/>
       </div>
     </div>
@@ -13,9 +14,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import SideBar from './components/Sidebar/index.vue'
-import BreadCrumb from './components/Breadcrumb.vue'
-import AppMain from './components/AppMain.vue'
+import SideBar from '../components/SideBar/index.vue'
+import BreadCrumb from '../components/Breadcrumb.vue'
+import AppMain from '../components/AppMain.vue'
+import backstageRouter from '@/router/modules/backstage'
 
 @Component({
   name: 'Layout',
@@ -26,11 +28,15 @@ import AppMain from './components/AppMain.vue'
   }
 })
 export default class Layout extends Vue {
+  get backstageRouter () {
+    return backstageRouter
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 .dd-layout {
+  position: relative;
   height: 100%;
   background-color: #EEF3F7;
 

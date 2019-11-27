@@ -2,23 +2,26 @@ import axios from '@/plugins/axios'
 import { requestFail, requestSuccess, responseFail, responseSuccess } from '@/plugins/axios/interceptors'
 
 const request = axios.create({
-  baseURL: window.TENANT_REGION_ADDRESS + '/api/v1/paas-metadata/biz-objects'
+  baseURL: window.TENANT_REGION_ADDRESS + '/paas-metadata/api/v1/biz-objects'
 })
 
 request.interceptors.request.use(requestSuccess, requestFail)
 request.interceptors.response.use(responseSuccess, responseFail)
 
 // 获取标准对象列表
-export function getObjects (isStandard?: boolean) {
+export function getObjects (
+  isStandard?: boolean,
+  cancelToken?: any
+) {
   const params: { standard?: number } = {}
   if (isStandard !== undefined) {
     params.standard = isStandard ? 1 : 0
   }
-  return request({
-    method: 'get',
-    url: '',
-    params
-  })
+  const data: any = { params }
+  if (cancelToken) {
+    data.cancelToken = cancelToken
+  }
+  return request.get('', data)
 }
 
 /**
@@ -59,10 +62,10 @@ export function deleteObjects (id: any) {
 }
 
 // 获取所有记录类型
-export function getAllRecordTypes (id: any) {
+export function getAllRecordTypes (objectId: string) {
   return request({
     method: 'get',
-    url: `/${id}/record-types`
+    url: `/${objectId}/record-types`
   })
 }
 
@@ -109,11 +112,13 @@ export function updateRecordTypes (objectId: any, recordTypeId: any, data: any) 
  * @param {string} objectId 对象id
  * @param {string} [fieldType] 字段类型
  * @param {string} [layoutId] 布局id
+ * @param {string} [cancelToken]
  */
 export function getFields (
   objectId: string,
   fieldType?: string | null,
-  layoutId?: string | null
+  layoutId?: string | null,
+  cancelToken?: any
 ) {
   const params: any = {}
   if (fieldType) {
@@ -124,11 +129,11 @@ export function getFields (
   }
   // TODO 暂时添加size
   params.size = 10000
-  return request({
-    method: 'get',
-    url: `/${objectId}/fields`,
-    params
-  })
+  const data: any = { params }
+  if (cancelToken) {
+    data.cancelToken = cancelToken
+  }
+  return request.get(`/${objectId}/fields`, data)
 }
 
 // 获取单个字段
@@ -374,17 +379,108 @@ export function getLayoutDistribution (objectId: string) {
  * @description 获得指定对象全部操作列表
  * @param {string} objectId 对象ID
  * @param {string} type
+ * @param {string} [cancelToken]
  */
-export function getOperators (objectId: string, type?: 'button' | '') {
-  // TODO objectId 暂时只能为1
-  objectId = '1'
-  const params:any = {}
+export function getOperators (
+  objectId: string,
+  type?: 'Button' | '',
+  cancelToken?: any
+):any {
+  // // TODO objectId 暂时只能为1
+  // objectId = '1'
+  const params: any = {}
   if (type) {
     params.type = type
   }
-  return request({
-    method: 'get',
-    url: `/${objectId}/operators`,
-    params
+  const data: any = { params }
+  if (cancelToken) {
+    data.cancelToken = cancelToken
+  }
+  return new Promise((resolve, reject) => {
+    request({
+      method: 'get',
+      url: `/${objectId}/operators`,
+      data
+    }).then((res: any) => {
+      res.data.data = res.data.data.map((item: any) => {
+        return {
+          ...item,
+          position: item.position.split(',')
+        }
+      })
+      resolve(res)
+    }).catch(reject)
   })
+}
+
+/**
+ * 获取应用视图
+ * @param objectId
+ * @param appId
+ * @param cancelToken
+ */
+export function getAppListView (
+  objectId: string,
+  appId: string,
+  cancelToken?: any
+) {
+  const data: any = {}
+  if (cancelToken) {
+    data.cancelToken = cancelToken
+  }
+  return request.get(`/${objectId}/app/${appId}/list-views`, data)
+}
+
+/**
+ * 修改应用视图
+ * @param objectId
+ * @param appId
+ * @param viewId
+ * @param view
+ */
+export function putAppListView (
+  objectId: string,
+  appId: String,
+  viewId: string,
+  view: {
+    standard?: boolean,
+    showAll?: boolean,
+    name?: string,
+    sed?: number,
+    listConfig?: {
+      fieldWidthConfig?: string,
+      showFieldConfig?: string,
+      orderByConfig?: string,
+    },
+    fields?: { apiName: string }[]
+  }
+) {
+  return request.put(`/${objectId}/app/${appId}/list-views/${viewId}`, view)
+}
+
+/**
+ * @param objectId
+ * @param appId
+ * @param view
+ */
+export function newAppListView (
+  objectId: string,
+  appId: String,
+  view: {
+    standard: boolean,
+    showAll: boolean,
+    name: string,
+    conditions: {
+      fieldApiName: string,
+      operator: 'EQ' | 'NOT_EQ' | 'GT' | 'GTE' | 'LT' | 'LTE' | 'LIKE' | 'NOT_LIKE' | 'IN' | 'NOT_IN' | 'START_WITH' | 'END_WITH' | 'IS_NULL' | 'IS_NOT_NULL',
+      values: []
+    }[],
+    listConfig: {
+      fieldWidthConfig?: string,
+      showFieldConfig?: string,
+      orderByConfig?: string
+    }
+  }
+) {
+  return request.post(`/${objectId}/app/${appId}/list-views`, view)
 }

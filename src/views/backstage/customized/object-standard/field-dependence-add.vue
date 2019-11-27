@@ -72,10 +72,11 @@ export default class FieldDependenceAdd extends Vue {
   }
 
   created () {
-    if (this.$route.name === 'ObjectFieldDependenceEdit') {
+    console.log(this.$route)
+    if (this.$route.name === 'customObjectFieldDependenceEdit') {
       this.controlId = this.$route.query.controlId as any
       this.dependenceId = this.$route.query.dependenceId as any
-      this.toNext = !this.toNext
+      // this.toNext = !this.toNext
     } else {
       this.getData()
     }

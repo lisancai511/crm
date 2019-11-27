@@ -83,6 +83,9 @@ export default class LayDistribution extends Vue {
       Api.bizObjects.getAllRecordTypes(this.objectId),
       Api.bizObjects.getLayoutDistribution(this.objectId)
     ])
+    if (this.recordTypesList.length === 0) {
+      this.recordTypesList.push({ id: -1, name: '默认' })
+    }
     this.roleList.forEach((item: any) => {
       let arr: any = []
       this.recordTypesList.forEach((item0: any) => {

@@ -1,0 +1,74 @@
+.form-design-mobile {
+	min-height: 100%;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	padding: 20px 0 0 0;
+
+	&__frame {
+		height: 670px;
+		width: 346px;
+		margin: 0 auto;
+		background-image: url("~@/assets/images/designer-mobile-bg.png");
+		background-size: 346px 670px;
+		padding: 50px 12px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__inner {
+		display: flex;
+		flex-direction: column;
+		overflow-y: auto;
+		flex: 1;
+		position: relative;
+		//美化滚动条
+		/*整体部分*/
+		&::-webkit-scrollbar {
+			width: 4px;
+			height: 10px;
+		}
+
+		/*滑动轨道*/
+		&::-webkit-scrollbar-track {
+			border-radius: 0;
+			background: rgba(200, 200, 200, .7);
+		}
+
+		/*滑块*/
+		&::-webkit-scrollbar-thumb {
+			border-radius: 2px;
+			-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .2);
+			background-color: rgba(85, 85, 85, 0.4);
+		}
+
+		/*滑块效果*/
+		&::-webkit-scrollbar-thumb:hover {
+			border-radius: 2px;
+			-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .2);
+			background-color: rgba(0, 0, 0, .45)
+		}
+
+		/deep/ .Ghost_FormField {
+			border: 1px dashed $dd--primary-color;
+			height: 46px;
+			overflow: hidden;
+			width: 100%;
+
+			/*&.LongTextField {*/
+			/*  height: 205px;*/
+			/*}*/
+		}
+
+		/deep/ .Ghost_FormGroup {
+			border: 1px dashed $dd--primary-color;
+
+			&.Group {
+				height: 242px;
+				width: 100%;
+				margin-bottom: 20px;
+				border-radius: 12px;
+			}
+		}
+	}
+}

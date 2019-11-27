@@ -1,6 +1,8 @@
 import { RouteConfig } from 'vue-router'
 import objectStandardRouter, { objectStandardNavRouter } from './object-standard'
 import objectCustomRouter, { objectCustomNavRouter } from './object-custom'
+import appRouter, { appNavRouter } from './application'
+import menuRouter, { menuNavRouter } from './module'
 
 const customizedRouter: RouteConfig = {
   name: 'Customized',
@@ -15,24 +17,10 @@ const customizedRouter: RouteConfig = {
     objectStandardRouter,
     objectCustomNavRouter,
     objectCustomRouter,
-    {
-      name: 'Menu',
-      path: '/backstage/customized/menu',
-      component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/menu/index.vue'),
-      meta: {
-        title: '菜单',
-        inNav: true
-      }
-    },
-    {
-      name: 'Application',
-      path: '/backstage/customized/application',
-      component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/application/index.vue'),
-      meta: {
-        title: '应用程序',
-        inNav: true
-      }
-    }
+    menuNavRouter,
+    menuRouter,
+    appNavRouter,
+    appRouter
   ]
 }
 

@@ -44,7 +44,7 @@ export default class StandardDetails extends Vue {
 
   async getData () {
     await this.$store.dispatch('backstage/customized/getObjects')
-    const { data } = await Api.bizObjects.getOperators('1')
+    const { data } = await Api.mainData.getObjDataScopAuths(this.roleId)
     console.log(data)
   }
 }

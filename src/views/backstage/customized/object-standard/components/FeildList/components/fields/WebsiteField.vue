@@ -4,7 +4,7 @@
       ref="fieldAttrForm"
       :rules="rules"
       :label-position="position"
-      label-width="80px"
+      label-width="120px"
       :model="data">
       <el-form-item prop="name" label="标签">
         <el-input v-model="data.name"></el-input>
@@ -19,6 +19,7 @@
       <el-form-item label="模式">
         <!--        <el-input v-model="data.attrs.urlModel"></el-input>-->
         <el-select
+          style="width: 100%"
           placeholder="请选择"
           v-model="data.attrs.urlModel">
           <el-option
@@ -27,7 +28,7 @@
             :value="target.key"
             v-for="target in targets">
             <span style="float: left">{{ target.label }}</span>
-            <span style="float: right; color: #8492a6; font-size: 12px">{{ target.description }}</span>
+            <!--            <span style="float: right; color: #8492a6; font-size: 12px">{{ target.description }}</span>-->
           </el-option>
         </el-select>
       </el-form-item>
@@ -43,7 +44,7 @@
       <el-form-item label="默认值">
         <el-input type="textarea"
                   :rows="1"
-                  v-model="data.modal"></el-input>
+                  v-model="data.model"></el-input>
       </el-form-item>
     </el-form>
   </div>
@@ -62,13 +63,13 @@ export default class WebsiteField extends mixins(fieldAttrBasicMixins) {
     return [
       {
         key: '_self',
-        label: '_self',
-        description: '在相同的框架中打开被链接文档'
+        label: '在当前页面打开链接'
+        // description: '在相同的框架中打开被链接文档'
       },
       {
         key: '_blank',
-        label: '_blank',
-        description: '在新窗口中打开被链接文档'
+        label: '在新窗口打开链接'
+        // description: '在新窗口中打开被链接文档'
       }
     ]
   }

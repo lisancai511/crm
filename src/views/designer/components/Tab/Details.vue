@@ -1,9 +1,9 @@
 <!--Created by LiuLei on 2019/9/16-->
 <template>
   <div class="fd-components-tab-details"
-       :class="{'designer--mobile':designer.isMobile}">
-    <el-form class="fd-components-tab-details__form"
-             :label-position="designer.isMobile ? 'left' :'top'">
+       :class="{'designer--mobile':designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.MOBILE}">
+    <el-form class="form__wrap"
+             :label-position="(designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.MOBILE) ? 'left' :'top'">
       <!-- TODO PCLayout Row and Col-->
       <PCLayout v-for="(component,index) in layout"
                 v-bind="component.attrs"
@@ -19,7 +19,7 @@
                 :key="index"></PCLayout>
       <div class="ButtonField">
         <el-button
-          v-if="designer.isMobile"
+          v-if="designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.MOBILE"
           type="text" icon="el-icon-edit">编辑资料
         </el-button>
       </div>
@@ -30,6 +30,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, Inject } from 'vue-property-decorator'
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
+import { DESIGNER_PLATFORMS } from '@/views/designer/config/Designer'
 
 @Component({
   name: 'FdComponentsTabDetails',
@@ -44,6 +45,10 @@ export default class FdComponentsTabDetails extends Vue {
   get ComponentTypes () {
     return ComponentTypes
   }
+
+  get DESIGNER_PLATFORMS () {
+    return DESIGNER_PLATFORMS
+  }
 }
 </script>
 
@@ -51,62 +56,28 @@ export default class FdComponentsTabDetails extends Vue {
 .fd-components-tab-details {
   height: 100%;
 
-  &__form {
-    height: 100%;
-
-    > .pc-layout {
-      /deep/ .el-main, .el-row, .el-col {
-        overflow: hidden;
-      }
-
-      /deep/ .el-row {
-        &::before {
-          display: none;
-        }
-
-        &::after {
-          display: none;
-        }
-
-        display: flex;
-        flex-basis: auto;
-      }
-
-      /deep/ .el-col {
-        flex-basis: auto;
-        float: none;
-        display: block;
-        /*width: 50%;*/
-        min-height: 200px;
-      }
-
-      /deep/ .el-main {
-        height: 100%;
-      }
-    }
-  }
+  @import "~@/styles/designer-mobile-form-wrap";
 
   &.designer--mobile {
-    .fd-components-tab-details {
-      &__form {
-        .ButtonField {
-          position: relative;
-          &::after {
-            content: '';
-            display: table;
-            position: absolute;
-            width: 100%;
-            height: 1px;
-            top: 0;
-            left: 10px;
-            background-color: rgba(230, 230, 230, 1);
+    .form__wrap {
+      .ButtonField {
+        position: relative;
 
-          }
-        }
-
-        .el-button {
+        &::after {
+          content: '';
+          display: table;
+          position: absolute;
           width: 100%;
+          height: 1px;
+          top: 0;
+          left: 10px;
+          background-color: rgba(230, 230, 230, 1);
+
         }
+      }
+
+      .el-button {
+        width: 100%;
       }
     }
   }

@@ -1,39 +1,38 @@
 <template>
   <div class="details">
     <div class="m-l-20">
-      <el-button @click="addField" type="primary">新建字段</el-button>
+      <el-button @click="addField"
+                 type="primary">新建字段</el-button>
     </div>
     <div class="m-t-15">
-      <el-table
-        :header-cell-style="{background:'#F8FAFC',borderTop:'1px solid #EBEEF5'}"
-        :data="tableData">
-        <el-table-column
-          label="字段名称">
-          <template slot-scope="scope">
-            <span @click="editField(scope.row)">{{scope.row.name}}</span>
-          </template>
+      <el-table :header-cell-style="{background:'#F8FAFC',borderTop:'1px solid #EBEEF5'}"
+                :data="tableData">
+        <el-table-column prop="name"
+                         label="字段名称">
         </el-table-column>
-        <el-table-column
-          prop="apiName"
-          label="API">
+        <el-table-column prop="apiName"
+                         label="API">
         </el-table-column>
-        <el-table-column
-          prop="dataType"
-          label="字段类型">
+        <el-table-column prop="dataType"
+                         label="字段类型">
           <template slot-scope="scope">
             {{(fieldComponentByType[scope.row.dataType] || {}).name || scope.row.dataType}}
           </template>
         </el-table-column>
-        <el-table-column
-          prop="createdTime"
-          label="标准字段">
+        <el-table-column prop="createdTime"
+                         label="标准字段">
         </el-table-column>
-        <el-table-column
-          label="操作">
+        <el-table-column label="操作">
           <template slot-scope="scope">
             <div>
-              <span class="dd-click m-r-10" @click="editField(scope.row)"><dd-icon name="edit"></dd-icon> 编辑 </span>
-              <span class="dd-click m-r-10" @click="deleteField(scope.row)"> <dd-icon name="delete"></dd-icon> 删除</span>
+              <span class="dd-click m-r-10"
+                    @click="editField(scope.row)">
+                <dd-icon name="edit"></dd-icon> 编辑
+              </span>
+              <span v-if="!scope.row.internal" class="dd-click m-r-10"
+                    @click="deleteField(scope.row)">
+                <dd-icon name="delete"></dd-icon> 删除
+              </span>
             </div>
           </template>
         </el-table-column>
@@ -41,10 +40,9 @@
     </div>
 
     <!-- 删除弹框 -->
-    <el-dialog
-      title="确认删除"
-      :visible.sync="dialogVisible"
-      width="30%">
+    <el-dialog title="确认删除"
+               :visible.sync="dialogVisible"
+               width="30%">
       <div class="details_delete">
         <div class="details_title">删除自定义字段将会</div>
         <ul>
@@ -54,8 +52,10 @@
         </ul>
         <el-checkbox v-model="checked">是，我要删除此自定义字段。</el-checkbox>
       </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="shoreDelete">确 定</el-button>
+      <span slot="footer"
+            class="dialog-footer">
+        <el-button type="primary"
+                   @click="shoreDelete">确 定</el-button>
         <el-button @click="dialogVisible = false">取 消</el-button>
       </span>
     </el-dialog>
@@ -102,7 +102,10 @@ export default class FiledList extends mixins(injectObjectId) {
   async shoreDelete () {
     if (this.checked) {
       try {
-        const res = await Api.bizObjects.deleteFields(this.$route.params.objectId, this.activeRow.id)
+        const res = await Api.bizObjects.deleteFields(
+          this.$route.params.objectId,
+          this.activeRow.id
+        )
         if (res.status === 200) {
           this.$message.success('删除成功')
           this.dialogVisible = false
@@ -120,7 +123,9 @@ export default class FiledList extends mixins(injectObjectId) {
   }
 
   async getData (objectId: string) {
-    const { data: { data } } = await Api.bizObjects.getFields(objectId)
+    const {
+      data: { data }
+    } = await Api.bizObjects.getFields(objectId)
     this.tableData = data
   }
 }

@@ -4,7 +4,7 @@
 import { IField } from '@/views/designer/config/components'
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
 
-// import { IField } from '@/views/designer/config/components'
+// import { IField } from '@/views/designer/const/components'
 
 export interface ILookup {
   id: string

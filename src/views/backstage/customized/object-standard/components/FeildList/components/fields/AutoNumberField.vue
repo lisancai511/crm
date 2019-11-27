@@ -24,7 +24,7 @@
           </el-option>
         </el-select>
         <span v-if="data.autoNumberConfig.prefix" class="fs-12">
-          示例：{{$moment().format(data.autoNumberConfig.prefix)}}{{String(data.autoNumberConfig.beginNumber).padStart(+data.attrs.maxlength,'0')}}
+          示例：{{$moment().format(prefixByValue[data.autoNumberConfig.prefix].label)}}{{String(data.autoNumberConfig.beginNumber).padStart(+data.attrs.maxlength,'0')}}
         </span>
       </el-form-item>
       <el-form-item prop="autoNumberConfig.beginNumber" label="起始编号">
@@ -51,6 +51,7 @@ import { Component } from 'vue-property-decorator'
 import { mixins } from 'vue-class-component'
 import fieldAttrBasicMixins
   from '@/views/backstage/customized/object-standard/components/FeildList/components/fields/mixins/fieldAttrBasicMixins'
+import { arrToMap } from '@/utils'
 
 @Component({
   name: 'AutoNumberField'
@@ -59,18 +60,22 @@ export default class AutoNumberField extends mixins(fieldAttrBasicMixins) {
   get prefixes () {
     return [
       {
-        label: 'YYYYMMDD',
-        value: 'YYYYMMDD'
+        label: 'YYYY-MM-DD',
+        value: 'yyyy-MM-dd'
       },
       {
-        label: 'MMDD',
-        value: 'MMDD'
+        label: 'MM-DD',
+        value: 'MM-dd'
       },
       {
         label: 'DD',
-        value: 'DD'
+        value: 'dd'
       }
     ]
+  }
+
+  get prefixByValue () {
+    return arrToMap(this.prefixes, 'value')
   }
 }
 </script>

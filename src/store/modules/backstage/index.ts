@@ -1,26 +1,57 @@
 /**
  * Created by LiuLei on 2019/10/17
  */
-// import { VuexModule, Module, Action, Mutation, getModule } from 'vuex-module-decorators'
 import BackstageCustomized from '@/store/modules/backstage/modules/customized'
+import { ActionTree, MutationTree } from 'vuex'
+import api from '@/api'
 
-// const name = 'backstage'
+export interface ISRole {
+  id: string,
+  name: string,
+  stardard: boolean,
+  tenantId: string,
+  bizObjOpAuthEntitieDTOs: any,
+  createdTime: string,
+  creator: string,
+  description: string,
+  lastModifiedTime: string,
+  lastModifier: string
+}
 
-// export interface IBackstageState {
-//   customized: IBackstageCustomizedState
-// }
+interface IBackstageStage {
+  roles: ISRole[]
+}
 
-// @Module({
-//   name,
-//   namespaced: true
-// })
-// export default class Vehicle extends VuexModule {
-//   public aaass = 12344
-// }
+const state: IBackstageStage = {
+  roles: []
+}
+
+const mutations: MutationTree<IBackstageStage> = {
+  UPDATE_ROLES (state, roles: ISRole[]) {
+    state.roles = roles
+  }
+}
+
+const actions: ActionTree<IBackstageStage, any> = {
+  async getRoles ({ commit }) {
+    try {
+      const {
+        data: {
+          data: roles
+        }
+      } = await api.mainData.getRoles()
+      commit('UPDATE_ROLES', roles)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+}
 
 export default {
-  name,
   namespaced: true,
+  state,
+  mutations,
+  actions,
   modules: {
     customized: BackstageCustomized
   }

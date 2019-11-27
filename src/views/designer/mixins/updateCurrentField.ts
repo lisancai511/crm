@@ -10,7 +10,7 @@ export default class extends Vue {
 
   updateCurrentField (layout: IField | null) {
     // console.log(2212121)
-    if (!this.designer.isBackstage) {
+    if (!this.designer.setting) {
       return
     }
     this.$bus.$emit('designer/updateSelectLayout', layout)
@@ -18,7 +18,7 @@ export default class extends Vue {
 
   deleteCurField (index: number) {
     // 如果不是后台设置页面则返回
-    if (!this.designer.isBackstage) {
+    if (!this.designer.setting) {
       return
     }
     (this.layout.children as []).splice(index, 1)

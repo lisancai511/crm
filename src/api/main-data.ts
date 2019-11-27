@@ -2,7 +2,7 @@ import axios from '@/plugins/axios'
 import { requestFail, requestSuccess, responseFail, responseSuccess } from '@/plugins/axios/interceptors'
 
 const request = axios.create({
-  baseURL: window.TENANT_REGION_ADDRESS + '/api/v1/paas-maindata/'
+  baseURL: window.TENANT_REGION_ADDRESS + '/paas-maindata/api/v1/'
 })
 
 request.interceptors.request.use(requestSuccess, requestFail)
@@ -84,11 +84,23 @@ export function getObjectOperateAuthsByRole (
  * @param {string | number} roleId
  * @param {object} data
  */
-export function updateRoleObejct (roleId: string | number, data:any) {
+export function updateRoleObejctField (roleId: string | number, data:any) {
   return request({
     method: 'put',
-    url: `/roles/:${roleId}/field-auths`,
+    url: `/roles/${roleId}/field-auths`,
     data
+  })
+}
+
+/**
+ * @description 获取角色对应指定对象的字段权限
+ * @param {string | number} roleId
+ * @param {string | number} objectId
+ */
+export function getRoleObejctField (roleId: string | number, objectId:any) {
+  return request({
+    method: 'get',
+    url: `/roles/${roleId}/field-auths?objectId=${objectId}`
   })
 }
 
@@ -107,10 +119,10 @@ export function addOrganization (data: any) {
 /**
  * @description 获取组织
  */
-export function getOrganizations () {
+export function getOrganizations (type:boolean) {
   return request({
     method: 'get',
-    url: `/organizations?all=1`
+    url: `/organizations?all=${type}`
   })
 }
 
@@ -221,6 +233,17 @@ export function getRoleRecordTypeAuths (roleId:any) {
   })
 }
 
+/**
+ * @description 获得组织下的所有用户
+ * @param {string} roleId
+ */
+export function getUsersFromOrg () {
+  return request({
+    method: 'get',
+    url: `/users?orgId=111&all=true`
+  })
+}
+
 // /**
 //  * @description 获得角色指定一个或多个对象的权限。不传objectId表示全部
 //  * @param {string} roleId
@@ -231,3 +254,88 @@ export function getRoleRecordTypeAuths (roleId:any) {
 //     url: `/roles/${roleId}/biz-object-operate-auths?objectId= `
 //   })
 // }
+
+/**
+ * 修改角色对应的权限
+ * @param objectId
+ */
+export function updateRoleObejctAuth (data:any, roleId:any) {
+  return request({
+    method: 'put',
+    url: `/roles/${roleId}/biz-object-operate-auths`,
+    data
+  })
+}
+
+/**
+ * 修改角色对应的app权限
+ * @param objectId
+ */
+export function updateRoleAppAuth (data:any, roleId:any) {
+  return request({
+    method: 'put',
+    url: `/roles/${roleId}/biz-object-operate-auths`,
+    data
+  })
+}
+
+/**
+ * 获取角色对应的app权限
+ * @param objectId
+ */
+export function getRoleAppAuth (roleId:any) {
+  return request({
+    method: 'get',
+    url: `/roles/${roleId}/biz-object-operate-auths`
+  })
+}
+
+/**
+ * 获取角色对应的菜单权限
+ * @param objectId
+ */
+export function getRoleModuleAuth (roleId:any) {
+  return request({
+    method: 'get',
+    url: `/roles/${roleId}/menu-visibility-conf`
+  })
+}
+/**
+ * 获取角色对应的权限
+ * @param objectId
+ */
+export function getRoleObejctAuth (roleId:any, objectIds?:any) {
+  let str:any
+  if (objectIds) {
+    str = `/roles/${roleId}/biz-object-operate-auths?objectId=${objectIds}`
+  } else {
+    str = `/roles/${roleId}/biz-object-operate-auths`
+  }
+  return request({
+    method: 'get',
+    url: str
+  })
+}
+
+/**
+ * 修改角色对应的权限的记录类型
+ * @param objectId
+ */
+export function updateRoleObejctRecordTypesAuth (data:any, roleId:any) {
+  return request({
+    method: 'put',
+    url: `/roles/${roleId}/record-type-auths?objectId=${roleId}`,
+    data
+  })
+}
+
+/**
+ * 获得角色拥有的对象数据范围权限（数据权限）
+ * @param objectId
+ */
+export function getObjDataScopAuths (roleId:any) {
+  return request({
+    method: 'get',
+    url: `/roles/${roleId}/obj-data-scop-auths`
+  })
+}

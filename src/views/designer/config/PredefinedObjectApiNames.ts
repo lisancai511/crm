@@ -4,6 +4,8 @@
 enum PredefinedObjectApiNames {
   // 跟进记录
   followUp = 'follow_up',
+  // 用户
+  user = 'user'
 }
 
 export default PredefinedObjectApiNames

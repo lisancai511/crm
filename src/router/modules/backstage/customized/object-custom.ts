@@ -6,8 +6,8 @@ const objectCustom = lodash.cloneDeep(objectStandard.children)
 
 function changePath (ary: any) {
   ary.forEach((item: any) => {
-    if (item.meta.subTitle) {
-      item.meta.title = item.meta.subTitle
+    if (item.meta.customTitle) {
+      item.meta.title = item.meta.customTitle
     }
     if (item.path) {
       item.path = item.path.replace('object-standard', 'object-custom')
@@ -24,17 +24,28 @@ function changePath (ary: any) {
 changePath(objectCustom)
 
 const objectCustomRouter: RouteConfig = {
-  name: 'CustomObjectChildren',
+  name: 'CustomObjectLayout',
   path: '/backstage/customized/object-custom',
   component: () => import(/* webpackChunkName: "dashboard" */ '@/layout/empty-router-view.vue'),
   meta: {
     title: '组织自定义对象'
   },
-  children: objectCustom
+  children: [
+    {
+      name: 'CustomObjectLayoutAdd',
+      path: '/backstage/customized/object-custom/add',
+      component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/details.vue'),
+      props: true,
+      meta: {
+        title: '新建对象'
+      }
+    },
+    ...(objectCustom as RouteConfig[])
+  ]
 }
 export default objectCustomRouter
 
-export const objectCustomNavRouter:RouteConfig = {
+export const objectCustomNavRouter: RouteConfig = {
   name: 'CustomObject',
   path: '/backstage/customized/object-custom',
   component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/index.vue'),

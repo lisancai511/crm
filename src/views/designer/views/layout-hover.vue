@@ -82,7 +82,7 @@ import designerStore from '@/store/modules/designer'
 import { arrToMap } from '@/utils'
 import _ from 'lodash'
 import api from '@/api'
-import { base64DecompressToString, serverFieldToLocalField } from '@/views/designer/utils'
+import { decompressBase64ToString, serverFieldToLocalField } from '@/views/designer/utils'
 import LayoutTypes from '@/views/designer/config/LayoutTypes'
 import { ILookup, IHoverLookup } from '@/views/designer/types'
 import TheItemLabel from '@/views/designer/components/Transfer/TheItemLabel.vue'
@@ -160,7 +160,7 @@ export default class FormDesignHover extends mixins(initLayout) {
           designerStore.object.id,
           designerStore.layoutId
         )
-        data.define = JSON.parse(base64DecompressToString(data.define))
+        data.define = JSON.parse(decompressBase64ToString(data.define))
         data.define.usedFields = data.define.usedFields.map((id: any) => this.fieldById[id])
         data.define.lookups = data.define.lookups.map((item: any) => {
           return {

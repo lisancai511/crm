@@ -5,6 +5,7 @@ import _ from 'lodash'
 import nanoid from 'nanoid'
 import { IField } from '@/views/designer/config/components'
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
+import { arrToMap } from '@/utils'
 
 /**
  * @description 服务端字段转本地字段
@@ -15,7 +16,7 @@ export default function serverFieldToLocalField (field: any, uiId?: string): IFi
     type: field.dataType,
     key: field.dataType + '_' + nanoid(),
     apiName: field.apiName,
-    modal: field.defaultValue,
+    model: field.defaultValue,
     name: field.name,
     // TODO 接口未定义
     helpText: field.tooltip,
@@ -27,10 +28,14 @@ export default function serverFieldToLocalField (field: any, uiId?: string): IFi
     required: false
   }
   // console.log(field.layoutUiConfigById)
-  if (uiId && field.layoutUiConfig && field.layoutUiConfigById[uiId]) {
-    const curLayoutUiConfig = field.layoutUiConfigById[uiId]
-    baseAttrs.disabled = curLayoutUiConfig.readOnly
-    baseAttrs.required = curLayoutUiConfig.required
+  if (uiId && field.layoutUiConfig) {
+    // TODO 优化
+    const layoutUiConfigById = arrToMap(field.layoutUiConfig || [], 'layoutUiId')
+    const curLayoutUiConfig = layoutUiConfigById[uiId]
+    if (curLayoutUiConfig) {
+      baseAttrs.disabled = curLayoutUiConfig.readOnly
+      baseAttrs.required = curLayoutUiConfig.required
+    }
   }
   switch (field.dataType) {
     case ComponentTypes.TextField:
@@ -56,7 +61,7 @@ export default function serverFieldToLocalField (field: any, uiId?: string): IFi
     case ComponentTypes.CheckBoxField: {
       return {
         ..._.cloneDeep(baseField),
-        modal: +baseField.modal,
+        model: +baseField.model,
         // TODO 接口未定义
         attrs: {
           ..._.cloneDeep(baseAttrs)
@@ -87,6 +92,7 @@ export default function serverFieldToLocalField (field: any, uiId?: string): IFi
         attrs: {
           ..._.cloneDeep(baseAttrs),
           valueCandidateConfig: field.valueCandidateConfig,
+          sValueCandidates: field.valueCandidates,
           valueCandidates: field.valueCandidates
             .map((item: any) => item.v)
             .join('\n')

@@ -32,7 +32,7 @@ import designerStore from '@/store/modules/designer'
 import LayoutTypes from '@/views/designer/config/LayoutTypes'
 import api from '@/api'
 import _ from 'lodash'
-import { base64DecompressToString } from '@/views/designer/utils'
+import { decompressBase64ToString } from '@/views/designer/utils'
 import { mixins } from 'vue-class-component'
 import initLayout from '@/views/designer/mixins/initLayout'
 
@@ -72,7 +72,7 @@ export default class FormDesignLiner extends mixins(initLayout) {
         designerStore.object.id,
         designerStore.layoutId
       )
-      data.define = JSON.parse(base64DecompressToString(data.define))
+      data.define = JSON.parse(decompressBase64ToString(data.define))
       // console.log(data.define)
       this.layout = data.define.map((item: [string, boolean]) => {
         return {

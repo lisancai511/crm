@@ -2,10 +2,11 @@ import { RouteConfig } from 'vue-router'
 import customizedRouter from '@/router/modules/backstage/customized'
 import userSecuritySettingRouter from '@/router/modules/backstage/user-security-setting'
 import dataManagementRouter from '@/router/modules/backstage/data-management'
+import officeSettingRouter from '@/router/modules/backstage/office-setting'
 import Layout from '@/layout/backstage/index.vue'
 
 const router: RouteConfig = {
-  path: '/',
+  path: '/backstage',
   component: Layout,
   children: [
     {
@@ -51,14 +52,7 @@ const router: RouteConfig = {
         icon: 'Bankcard'
       }
     },
-    {
-      name: 'Office',
-      path: '/backstage/office-setting',
-      meta: {
-        title: '办公参数设置',
-        icon: 'Folder'
-      }
-    },
+    officeSettingRouter,
     dataManagementRouter,
     {
       name: 'Platform',

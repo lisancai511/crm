@@ -100,7 +100,7 @@ export default class Standard extends Vue {
     }
   }
   async getData () {
-    const { data: { data } } = await Api.mainData.getOrganizations()
+    const { data: { data } } = await Api.mainData.getOrganizations(true)
     this.data.push(data)
   }
 

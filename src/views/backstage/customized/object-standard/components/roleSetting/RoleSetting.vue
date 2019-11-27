@@ -1,24 +1,41 @@
 <template>
   <div>
       <el-tabs v-model="activeName" class="tabs" tab-position="left">
-        <el-tab-pane label="单行文本"></el-tab-pane>
-        <el-tab-pane label="长文本"></el-tab-pane>
-        <el-tab-pane label="长文本"></el-tab-pane>
+        <el-tab-pane class="disableTab" label="角色列表" disabled></el-tab-pane>
+        <el-tab-pane :lazy="true" v-for="(item) in tableData" :key="item.id" :label="item.name" :name="item.id"><Details v-if="item.id === activeName" :roleId="item.id"></Details></el-tab-pane>
       </el-tabs>
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import Api from '@/api'
+import Details from './Details.vue'
 @Component({
-  name: 'NewField'
+  name: 'NewField',
+  components: {
+    Details
+  }
 })
 
 export default class NewField extends Vue {
-  private activeName:any = ''
+  private activeName:any = 'first'
   private saveData:any = ''
+  tableData:any = []
+  created () {
+    this.getData()
+  }
   changeTabs (item:any) {
     this.saveData = item
     this.activeName = 'ten'
+  }
+  async getData () {
+    try {
+      const { data } = await Api.mainData.getRoles()
+      this.tableData = data.data
+      this.activeName = this.tableData[0].id
+    } catch (err) {
+      throw err
+    }
   }
 }
 </script>
@@ -51,5 +68,10 @@ export default class NewField extends Vue {
 /deep/.el-tabs__nav-wrap::after {
   height: 0px;
   background-color: transparent !important;
+}
+/deep/.is-disabled {
+  color: black !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
 }
 </style>

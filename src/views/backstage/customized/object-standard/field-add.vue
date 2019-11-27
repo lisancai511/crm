@@ -1,10 +1,11 @@
 <template>
   <div class="field-add">
     <el-card :body-style="{padding:0,position:'relative'}">
-      <div @click="$router.go(-1)" class="close m-r-20">
+      <div @click="$router.go(-1)"
+           class="close m-r-20">
         <dd-icon name="close"/>
       </div>
-      <h3 style="margin:30px 0 30px 20px">{{title}}</h3>
+      <h3 style="margin:20px 0 20px 20px">{{title}}</h3>
       <div class="tabs__wrap">
         <el-tabs v-model="activeName"
                  class="tabs"
@@ -14,7 +15,8 @@
                  }"
                  @tab-click="handleClick"
                  tab-position="left">
-          <el-tab-pane :lazy="true" v-for="field in basicFields"
+          <el-tab-pane :lazy="true"
+                       v-for="field in basicFields"
                        :key="field.type"
                        :name="field.type"
                        :label="field.name">
@@ -22,13 +24,12 @@
               <div class="title">{{field.name}}</div>
               <div class="title_second">{{field.description}}</div>
               <!--            -->
-              <component
-                :is="field.type"
-                :ref="field.type"
-                class="title_public"
-                @changeShowNext="changeShowNext"
-                position='right'
-                :data="dataObj"/>
+              <component :is="field.type"
+                         :ref="field.type"
+                         class="title_public"
+                         @changeShowNext="changeShowNext"
+                         position='right'
+                         :data="dataObj"/>
             </div>
             <el-button type="primary"
                        v-if="showFieldForm"
@@ -39,12 +40,12 @@
         </el-tabs>
         <keep-alive>
           <template v-if="showFieldForm"></template>
-          <div v-else class="layout__wrap">
-            <FieldDistributeLayout
-              :data='dataObj'
-              :field-id="fieldId"
-              :object-id="objectId"
-              @changeShowNext='changeShowNext'/>
+          <div v-else
+               class="layout__wrap">
+            <FieldDistributeLayout :data='dataObj'
+                                   :field-id="fieldId"
+                                   :object-id="objectId"
+                                   @changeShowNext='changeShowNext'/>
           </div>
         </keep-alive>
       </div>
@@ -71,8 +72,25 @@ import FieldDistributeLayout from './components/FeildList/FieldDistributeLayout.
 
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
 import Api from '@/api'
-import { serverFieldToLocalField, localFieldToServerField } from '@/views/designer/utils'
+import {
+  serverFieldToLocalField,
+  localFieldToServerField
+} from '@/views/designer/utils'
 import lodash from 'lodash'
+
+console.log(fieldComponents.reduce((pre: any, cur: any) => {
+  const attrs = {
+    ...pre.attrs,
+    ...(cur.attrs || {})
+  }
+
+  pre = {
+    ...pre,
+    ...cur,
+    attrs
+  }
+  return pre
+}))
 
 @Component({
   name: 'FieldAdd',
@@ -93,12 +111,25 @@ import lodash from 'lodash'
     FieldDistributeLayout
   }
 })
-
 export default class FieldAdd extends Vue {
   private activeName: any = 'TextField'
   private basicFields: any = ''
   private showFieldForm: any = true
-  private dataObj: any = {}
+  private dataObj: any = fieldComponents.reduce((pre: any, cur: any) => {
+    const attrs = {
+      ...pre.attrs,
+      ...(cur.attrs || {})
+    }
+
+    pre = {
+      ...pre,
+      ...cur,
+      attrs
+    }
+    return pre
+  }, {
+    attrs: {}
+  })
   private title: any = '新建字段'
 
   get objectId () {
@@ -113,7 +144,9 @@ export default class FieldAdd extends Vue {
     if (this.fieldId) {
       this.getData()
     } else {
-      this.dataObj = lodash.cloneDeep(Object.assign(this.dataObj, lodash.cloneDeep(fieldComponents[0])))
+      this.dataObj = lodash.cloneDeep(
+        Object.assign(this.dataObj, lodash.cloneDeep(fieldComponents[0]))
+      )
       this.basicFields = fieldComponents
     }
   }
@@ -137,7 +170,11 @@ export default class FieldAdd extends Vue {
     const targetField = this.$refs[this.activeName] as any
     targetField[0].validateForm().then(async () => {
       if (this.$route.params.fieldId) {
-        await Api.bizObjects.updateFields(this.objectId, this.fieldId, localFieldToServerField(this.dataObj))
+        await Api.bizObjects.updateFields(
+          this.objectId,
+          this.fieldId,
+          localFieldToServerField(this.dataObj)
+        )
         this.$router.go(-1)
         this.$message.success('修改成功')
       } else {
@@ -146,12 +183,22 @@ export default class FieldAdd extends Vue {
     })
   }
 
-  changeShowNext () {
+  changeShowNext (val: any) {
+    console.log(val)
+    if (val === 'saveAndAdd') {
+      this.dataObj = lodash.cloneDeep(
+        Object.assign(this.dataObj, lodash.cloneDeep(fieldComponents[0]))
+      )
+      this.basicFields = fieldComponents
+      this.activeName = 'TextField'
+    }
     this.showFieldForm = true
   }
 
   async getData () {
-    const { data: { data } } = await Api.bizObjects.getFieldDetails(this.objectId, this.fieldId)
+    const {
+      data: { data }
+    } = await Api.bizObjects.getFieldDetails(this.objectId, this.fieldId)
     this.dataObj = serverFieldToLocalField(data)
     this.title = '修改字段'
     this.basicFields = fieldComponents.filter((item: any) => {
@@ -163,8 +210,7 @@ export default class FieldAdd extends Vue {
 </script>
 <style lang="scss" scoped>
 .tabs {
-  margin-top: 20px;
-  border-top: 1px solid #F1F2F6;
+  border-top: 1px solid #f1f2f6;
 }
 
 .title {
@@ -198,8 +244,12 @@ export default class FieldAdd extends Vue {
     width: 4px;
   }
 
+  /deep/.el-tabs__nav {
+    margin: 15px 0 0 0;
+  }
+
   /deep/ .el-tabs__item.is-active {
-    background: #E8F1FF;
+    background: #e8f1ff;
   }
 
   /deep/ .el-tabs--left .el-tabs__item.is-left {
@@ -211,9 +261,9 @@ export default class FieldAdd extends Vue {
   }
 
   /deep/ .el-tabs__content {
-    border-left: 1px solid #F1F2F6;
-    background: #F8FAFC;
-    min-height: calc(100vh - 220px);
+    border-left: 1px solid #f1f2f6;
+    background: #f8fafc;
+    min-height: calc(100vh - 160px);
   }
 
   /deep/ .el-tabs--left .el-tabs__header.is-left {
@@ -226,7 +276,7 @@ export default class FieldAdd extends Vue {
   }
 
   .show-content {
-    flex: 1
+    flex: 1;
   }
 
   .hide-content {
@@ -237,9 +287,9 @@ export default class FieldAdd extends Vue {
 
   .layout__wrap {
     flex: 1;
-    background-color: #F8FAFC;
-    border-left: 1px solid #F1F2F6;
-    border-top: 1px solid #F1F2F6;
+    background-color: #f8fafc;
+    border-left: 1px solid #f1f2f6;
+    border-top: 1px solid #f1f2f6;
     margin-top: 20px;
   }
 

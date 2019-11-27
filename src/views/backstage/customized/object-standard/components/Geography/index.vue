@@ -44,8 +44,8 @@
       :visible.sync="dialogVisible"
       width="30%">
       <div class="details_delete">
-        <div class="details_title">删除自定义字段将会</div>
-        <el-checkbox v-model="checked">是，我要删除此自定义字段。</el-checkbox>
+        <div class="details_title">删除布局？</div>
+        <el-checkbox v-model="checked">是，我要删除布局。</el-checkbox>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="shoreDelete">确 定</el-button>

@@ -2,10 +2,10 @@
 <template>
   <div
     v-if="layout.children && layout.children.length > 0"
-    :class="{'designer--mobile':designer.isMobile}"
+    :class="{'designer--mobile':designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.MOBILE}"
     class="com-tab">
     <el-tabs v-model="tabValue"
-             :class="{'is-select':layout.isSelect && this.designer.isBackstage}">
+             :class="{'is-select':layout.isSelect && this.designer.setting}">
       <el-tab-pane v-for="(tab) in layout.children.filter(tab => tab.show)"
                    lazy
                    :key="tab.key"
@@ -52,6 +52,7 @@ import FdComponentsTabFollowUp from '@/views/designer/components/Tab/FollowUp.vu
 
 import { mixins } from 'vue-class-component'
 import updateCurrentField from '@/views/designer/mixins/updateCurrentField'
+import { DESIGNER_PLATFORMS } from '@/views/designer/config/Designer'
 
 @Component({
   name: 'FdComponentsTab',
@@ -68,6 +69,10 @@ export default class FdComponentsTab extends mixins(updateCurrentField) {
 
   get ComponentTypes () {
     return ComponentTypes
+  }
+
+  get DESIGNER_PLATFORMS () {
+    return DESIGNER_PLATFORMS
   }
 
   created () {
@@ -107,11 +112,11 @@ export default class FdComponentsTab extends mixins(updateCurrentField) {
       }
 
       &__nav-scroll {
-        padding: 10px 25px 10px 25px;
+        padding: 10px 20px 10px 20px;
       }
 
       &__content {
-        padding: 0 25px 25px 25px;
+        padding: 0 20px 20px;
         flex: 1
       }
     }

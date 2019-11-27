@@ -1,19 +1,22 @@
 <!--Created by LiuLei on 2019/9/12-->
 <template>
-  <div class="form-title p-25"
-       :class="{'designer--mobile':designer.isMobile}">
+  <div class="form-title p-20"
+       :class="{'designer--mobile':designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.MOBILE}">
     <div
+      v-if="designer.setting"
       :class="{'dd-fence':layout.isSelect}"
       class="dd-fence-mask">
     </div>
-    <template v-if="!designer.isMobile">
+    <template v-if="designer.running || (designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.PC)">
       <div class="form-title-top">
         <div class="form-title__name__wrap">
           <div class="form-title__name fs-18">
-            <strong>{{designer.object.name}}</strong>
+            <strong v-if="designer.setting">{{designer.object.name}}</strong>
+            <strong v-else>{{moduleById[moduleId].name}}</strong>
           </div>
           <div class="form-title__name--sub">
-            {{designer.object.description}}
+            <span v-if="designer.setting">xxxxxx</span>
+            <span v-else>{{record[PredefinedFieldApiNames.name]}}</span>
           </div>
         </div>
         <the-buttons
@@ -32,13 +35,14 @@
               {{usedField.name}}
             </div>
             <div class="form-title-info-item__value">
-              <strong>xxxx</strong>
+              <strong v-if="designer.setting">xxxx</strong>
+              <strong v-else>{{record[usedField.apiName]}}</strong>
             </div>
           </div>
         </transition-group>
       </div>
     </template>
-    <template v-if="designer.isMobile">
+    <template v-if="designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.MOBILE">
       <transition-group
         class="form-title-info-item__title"
         name="list-complete"
@@ -60,6 +64,9 @@
 import { Component, Prop, Vue, Inject } from 'vue-property-decorator'
 import TheButtons from '@/views/designer/components/FormTitle/TheButtons.vue'
 import { IField } from '@/views/designer/config/components'
+import { DESIGNER_PLATFORMS } from '@/views/designer/config/Designer'
+import PredefinedFieldApiNames from '@/views/designer/config/PredefinedFieldApiNames'
+import { arrToMap } from '@/utils'
 
 @Component({
   name: 'FdComponentsFormHeader',
@@ -71,6 +78,36 @@ export default class FdComponentsFormHeader extends Vue {
   @Prop({ type: Array, default: () => [] }) readonly usedFields!: []
 
   @Inject('designer') readonly designer!: any
+
+  get PredefinedFieldApiNames () {
+    return PredefinedFieldApiNames
+  }
+
+  get DESIGNER_PLATFORMS () {
+    return DESIGNER_PLATFORMS
+  }
+
+  get record () {
+    return (this.$store.state.app || {}).record.form || {}
+  }
+
+  get modules () {
+    if (this.designer.setting) {
+      return []
+    }
+    return this.$store.state.app.modules
+  }
+
+  get moduleById () {
+    return arrToMap(this.modules, 'id')
+  }
+
+  get moduleId () {
+    if (this.designer.setting) {
+      return ''
+    }
+    return this.$route.params.moduleId_objectId.split('_')[0]
+  }
 }
 </script>
 
@@ -84,10 +121,13 @@ export default class FdComponentsFormHeader extends Vue {
   &-top {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
   }
 
   &__name {
     &__wrap {
+      max-width: 50%;
+      overflow: hidden;
     }
 
     &--sub {
@@ -100,6 +140,8 @@ export default class FdComponentsFormHeader extends Vue {
   }
 
   &-info {
+    display: flex;
+
     &-item {
       margin-left: 56px;
       display: inline-block;
@@ -110,13 +152,13 @@ export default class FdComponentsFormHeader extends Vue {
       }
 
       &__title {
+        font-size: 12px;
         color: #8A96A0;
         margin-bottom: 10px;
-        text-align: center;
       }
 
       &__value {
-        text-align: center;
+
       }
     }
   }

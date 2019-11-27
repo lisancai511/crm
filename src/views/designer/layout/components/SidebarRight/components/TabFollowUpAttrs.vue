@@ -40,7 +40,7 @@
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import { IField } from '@/views/designer/config/components'
 import designerStore from '@/store/modules/designer'
-import PredefinedButtonApiNames from '@/views/designer/config/PredefinedButtonApiNames'
+import { PredefinedButtonApiNames } from '@/sdk/button-sdk/PredefinedButton'
 
 @Component({
   name: 'TabFollowUpAttrs.vue'

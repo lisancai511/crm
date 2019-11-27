@@ -20,14 +20,16 @@ import EssentialInformationEdit from './Edit.vue'
 import EssentialInformationDetails from './Details.vue'
 
 @Component({
-  name: 'index.vue',
+  name: 'EssentialInformation',
   components: {
     EssentialInformationEdit,
     EssentialInformationDetails
   }
 })
 export default class EssentialInformation extends mixins(injectObjectId) {
-  sizeForm: any = {}
+  sizeForm: any = {
+    iconUrl: ''
+  }
   private showEdit: Boolean = false
 
   edit (showEdit: boolean) {
@@ -40,7 +42,7 @@ export default class EssentialInformation extends mixins(injectObjectId) {
   }
 
   async getData (objectId: string) {
-    if (objectId !== 'add') {
+    if (objectId) {
       const { data: { data } } = await Api.bizObjects.getObjectById(objectId)
       this.sizeForm = data
     } else {
@@ -59,7 +61,7 @@ export default class EssentialInformation extends mixins(injectObjectId) {
   margin-top: 10px;
   padding-top: 15px;
   border-top: 1px solid rgba(241, 242, 246, 1);
-  min-height: calc(100vh - 220px);
+  min-height: calc(100vh - 160px);
 }
 
 .addIcon {

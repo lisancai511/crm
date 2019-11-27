@@ -2,7 +2,7 @@ import axios from '@/plugins/axios'
 import { requestFail, requestSuccess, responseFail, responseSuccess } from '@/plugins/axios/interceptors'
 
 const request = axios.create({
-  baseURL: window.GLOBAL_REGION_ADDRESS + '/api/v1/paas-portal'
+  baseURL: window.GLOBAL_REGION_ADDRESS + '/paas-portal/api/v1'
 })
 
 request.interceptors.request.use(requestSuccess, requestFail)

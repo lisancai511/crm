@@ -6,17 +6,19 @@ import PredefinedFieldApiNames from '@/views/designer/config/PredefinedFieldApiN
 import serverFieldToLocalField from './serverFieldToLocalField'
 import containerComponentByType from './containerComponentByType'
 import { FIELD } from '@/views/designer/config/components'
+import { arrToMap } from '@/utils'
 
 /**
  * Created by LiuLei on 2019/10/30
  */
 interface IServerLayoutToLocalPayload {
   serverLayout: any,
-  needAddFields: any[],
-  fieldByApiName: any,
-  fieldById: any,
-  lookupById: any,
-  uiId: string
+  needAddFields?: any[],
+  uiId: string,
+  fields: any[],
+  lookups?: any[],
+  exceptApiNames?: string[]
+  exceptFieldTypes?: string[]
 }
 
 /**
@@ -25,15 +27,19 @@ interface IServerLayoutToLocalPayload {
 export default function serverLayoutToLocal (payload: IServerLayoutToLocalPayload) {
   const {
     serverLayout,
-    needAddFields,
-    fieldByApiName,
-    fieldById,
-    lookupById,
+    needAddFields = [],
+    lookups = [],
+    fields = [],
+    exceptApiNames = [],
+    exceptFieldTypes = [],
     uiId
   } = payload
 
-  const cloneServerLayout = _.cloneDeep(serverLayout)
+  const fieldById = arrToMap(fields.filter(field => !!field.id), 'id')
+  const fieldByApiName = arrToMap(fields.filter(field => !!field.id), 'apiName')
+  const lookupById = arrToMap(lookups as any[], 'id')
 
+  const cloneServerLayout = _.cloneDeep(serverLayout)
   const defaultFieldContainer: any[] = []
 
   function inner (layout: any) {
@@ -140,8 +146,11 @@ export default function serverLayoutToLocal (payload: IServerLayoutToLocalPayloa
 
     if (Array.isArray(layout.children)) {
       layout.children = layout.children.filter((item: any) => {
-        // 如果是字段 且已经被删除
-        return !(item.type === FIELD && !fieldByApiName[item.apiName])
+        // 如果是字段 且已经被删除或者被排除掉
+        return item.type !== FIELD ||
+          (fieldByApiName[item.apiName] &&
+            !exceptApiNames.includes(item.apiName) &&
+            !exceptFieldTypes.includes(fieldByApiName[item.apiName].dataType))
       })
       layout.children.forEach((item: any) => {
         inner(item)
@@ -161,7 +170,10 @@ export default function serverLayoutToLocal (payload: IServerLayoutToLocalPayloa
     // console.log(item)
     // console.log(serverFieldToLocalField(item, uiId))
     // TODO 以后换成apiName
-    curLayout.children.push(serverFieldToLocalField(fieldById[item.id], uiId))
+    const localField = fieldById[item.id]
+    if (!exceptApiNames.includes(localField.apiName) && !exceptFieldTypes.includes(localField.dataType)) {
+      curLayout.children.push(serverFieldToLocalField(localField, uiId))
+    }
   })
   // console.log(cloneServerLayout)
   return cloneServerLayout

@@ -1,7 +1,7 @@
 <!--Created by LiuLei on 2019/9/12-->
 <template>
   <div
-    class="form-title__button__wrap p-15">
+    class="form-title__button__wrap">
     <div class="form-title__button__inner">
       <transition-group name="list-complete" tag="span">
         <el-button
@@ -10,12 +10,15 @@
           size="small"
           type="primary"
           plain
+          @click="handleClickButton(button)"
           class="form-title__button">
-          {{(buttonByApiName[button.apiName] || {}).name}}
+          {{button.name || (buttonByApiName[button.apiName] || {}).name}}
         </el-button>
       </transition-group>
-      <el-dropdown v-if="hiddenButtons.length > 0"
-                   class="m-l-10">
+      <el-dropdown
+        v-if="hiddenButtons.length > 0"
+        @command="handleCommand"
+        class="m-l-10">
         <el-button
           type="primary"
           plain
@@ -26,8 +29,9 @@
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item
             v-for="button in hiddenButtons"
-            :key="button.key"
-          >{{(buttonByApiName[button.apiName] || {}).name}}
+            :key="button.apiName"
+            :command="button"
+          >{{button.name || (buttonByApiName[button.apiName] || {}).name}}
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -36,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { Component, Vue, Prop, Inject } from 'vue-property-decorator'
 import designerStore from '@/store/modules/designer'
 
 @Component({
@@ -44,11 +48,15 @@ import designerStore from '@/store/modules/designer'
 })
 export default class TheButtons extends Vue {
   @Prop({ type: Array, required: true }) readonly usedButtons!: []
-
+  @Inject('designer') readonly designer!: any
   defaultShowLength: number = 3
 
   get buttonByApiName (): any {
-    return designerStore.buttonByApiName
+    if (this.designer.setting) {
+      return designerStore.buttonByApiName
+    } else {
+      return (this.$store.state.app || {}).record.buttonByApiName || {}
+    }
   }
 
   get displayedButtons () {
@@ -63,6 +71,16 @@ export default class TheButtons extends Vue {
       return []
     }
     return this.usedButtons.filter((item, i) => i >= 3)
+  }
+
+  handleClickButton (button: any) {
+    if (this.designer.running) {
+      this.$bus.$emit('app/record/details/click', this.buttonByApiName[button.apiName])
+    }
+  }
+
+  handleCommand (command: any) {
+    this.handleClickButton(command)
   }
 }
 </script>

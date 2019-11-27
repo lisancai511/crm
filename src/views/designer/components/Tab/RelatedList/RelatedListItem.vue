@@ -58,7 +58,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <div v-if="designer.isBackstage"
+    <div v-if="designer.setting"
          :class="{'dd-fence':layout.isSelect}"
          class="dd-fence-mask">
     </div>
@@ -71,7 +71,7 @@ import { Component, Prop, Vue, Inject } from 'vue-property-decorator'
 // import updateCurrentField from '@/views/designer/mixins/updateCurrentField'
 import { IField } from '@/views/designer/config/components'
 import { arrToMap } from '@/utils'
-import PredefinedButtonApiNames from '@/views/designer/config/PredefinedButtonApiNames'
+import { PredefinedButtonApiNames } from '@/sdk/button-sdk/PredefinedButton'
 import designerStore from '@/store/modules/designer'
 
 @Component({
@@ -89,7 +89,7 @@ export default class RelatedListItem extends Vue {
     return this.fieldByApiNameByObjectId[this.layout.attrs.objectId as string] || {}
   }
 
-  get PredefinedButtonApiNames () {
+  get PredefinedButton () {
     return PredefinedButtonApiNames
   }
 

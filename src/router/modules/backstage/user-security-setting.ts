@@ -27,7 +27,7 @@ const userSecuritySetting: RouteConfig = {
       },
       children: [
         {
-          name: 'userEditer',
+          name: 'editUser',
           path: '/backstage/user-setting/user/:id?/edit',
           component: () => import(/* webpackChunkName: 'dashboard' */ '@/views/backstage/user-safe-setting/user/userEdit.vue'),
           meta: {
@@ -35,7 +35,7 @@ const userSecuritySetting: RouteConfig = {
           }
         },
         {
-          name: 'userEditer',
+          name: 'newUser',
           path: '/backstage/user-setting/user/add',
           component: () => import(/* webpackChunkName: 'dashboard' */ '@/views/backstage/user-safe-setting/user/userEdit.vue'),
           meta: {
@@ -54,7 +54,7 @@ const userSecuritySetting: RouteConfig = {
       }
     },
     {
-      name: 'RoleChildren',
+      name: 'RoleLayout',
       path: '/backstage/user-setting/role',
       component: () => import(/* webpackChunkName: 'dashboard' */ '@/layout/empty-router-view.vue'),
       meta: {
@@ -62,7 +62,7 @@ const userSecuritySetting: RouteConfig = {
       },
       children: [
         {
-          name: 'RoleDetails',
+          name: 'editRole',
           path: '/backstage/user-setting/role/:id?/edit',
           component: () => import(/* webpackChunkName: 'dashboard' */ '@/views/backstage/user-safe-setting/role/roleEdit.vue'),
           meta: {
@@ -70,7 +70,7 @@ const userSecuritySetting: RouteConfig = {
           }
         },
         {
-          name: 'RoleDetails',
+          name: 'newRole',
           path: '/backstage/user-setting/role/add',
           component: () => import(/* webpackChunkName: 'dashboard' */ '@/views/backstage/user-safe-setting/role/roleEdit.vue'),
           meta: {
@@ -97,7 +97,7 @@ const userSecuritySetting: RouteConfig = {
       }
     },
     {
-      name: 'organizationsChildren',
+      name: 'organizationsLayout',
       path: '/backstage/user-setting/organizations',
       component: () => import(/* webpackChunkName: "dashboard" */ '@/layout/empty-router-view.vue'),
       meta: {

@@ -27,7 +27,7 @@ export function requestFail (error: any) {
 export function responseSuccess (response: any) {
 // Do something with response data
   const { data } = response
-  if (!data.success && response.status !== 204) {
+  if (data.message && !data.success && response.status !== 204) {
     Message({
       message: data.message,
       duration: 1000,
@@ -40,13 +40,21 @@ export function responseSuccess (response: any) {
 export function responseFail (error: any) {
 // Do something with response error
   try {
-    Message({
-      message: error.response.data.message,
-      duration: 1000,
-      type: 'error'
-    })
+    // eslint-disable-next-line no-proto
+    if (!(error as any).__proto__.__CANCEL__) {
+      let message = ''
+      if (typeof error.response.data.message === 'string') {
+        message = error.response.data.message
+      }
+      if (message.length > 0) {
+        Message({
+          message: message,
+          duration: 1000,
+          type: 'error'
+        })
+      }
+    }
   } catch (e) {
-    console.error(e)
     Message({
       message: '未知错误',
       duration: 1000,

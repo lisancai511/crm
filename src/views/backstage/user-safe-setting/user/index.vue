@@ -57,6 +57,10 @@ export default class Standard extends Vue {
     {
       label: '未激活',
       isActive: false
+    },
+    {
+      label: '全部',
+      isActive: null
     }
   ]
   private value:any = ''

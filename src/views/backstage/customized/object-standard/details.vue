@@ -8,24 +8,26 @@
         <el-tab-pane :lazy="true" label="基本信息" name="first">
           <EssentialInformation/>
         </el-tab-pane>
-        <el-tab-pane :lazy="true" v-if="objectId !== 'add'" label="记录类型" name="second">
-          <TypeRecord/>
-        </el-tab-pane>
-        <el-tab-pane :lazy="true" v-if="objectId !== 'add'" label="字段列表" name="third">
-          <FieldList/>
-        </el-tab-pane>
-        <el-tab-pane :lazy="true" v-if="objectId !== 'add'" label="字段依赖设置" name="fourth">
-          <FieldDependence/>
-        </el-tab-pane>
-        <!-- <el-tab-pane label="角色权限设置" name="fifth">
-          <RoleSetting></RoleSetting>
-        </el-tab-pane> -->
-        <el-tab-pane :lazy="true" v-if="objectId !== 'add'" label="布局" name="sixth">
-          <Geography/>
-        </el-tab-pane>
-        <el-tab-pane :lazy="true" label="布局分配" v-if="objectId !== 'add'" name="seventh">
-          <LayDistribution/>
-        </el-tab-pane>
+        <template v-if="objectId">
+          <el-tab-pane :lazy="true" label="记录类型" name="second">
+            <TypeRecord/>
+          </el-tab-pane>
+          <el-tab-pane :lazy="true" label="字段列表" name="third">
+            <FieldList/>
+          </el-tab-pane>
+          <el-tab-pane :lazy="true" label="字段依赖设置" name="fourth">
+            <FieldDependence/>
+          </el-tab-pane>
+          <el-tab-pane :lazy="true" label="角色权限设置" name="fifth">
+            <RoleSetting></RoleSetting>
+          </el-tab-pane>
+          <el-tab-pane :lazy="true" label="布局" name="sixth">
+            <Geography/>
+          </el-tab-pane>
+          <el-tab-pane :lazy="true" label="布局分配" name="seventh">
+            <LayDistribution/>
+          </el-tab-pane>
+        </template>
       </el-tabs>
     </el-card>
   </div>

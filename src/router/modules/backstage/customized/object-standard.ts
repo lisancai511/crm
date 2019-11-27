@@ -1,7 +1,17 @@
 import { RouteConfig } from 'vue-router'
 
+export const objectStandardNavRouter: RouteConfig = {
+  name: 'Object',
+  path: '/backstage/customized/object-standard',
+  component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/index.vue'),
+  meta: {
+    title: '平台标准对象',
+    inNav: true
+  }
+}
+
 const objectStandardRouter: RouteConfig = {
-  name: 'StandardObjectChildren',
+  name: 'StandardObjectLayout',
   path: '/backstage/customized/object-standard',
   component: () => import(/* webpackChunkName: "dashboard" */ '@/layout/empty-router-view.vue'),
   meta: {
@@ -15,17 +25,17 @@ const objectStandardRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/details.vue'),
       meta: {
         title: '平台标准对象详情',
-        subTitle: '平台自定义对象详情'
+        customTitle: '平台自定义对象详情'
       }
     },
     {
-      name: 'ObjectDetailsChildren',
+      name: 'ObjectDetailsLayout',
       path: `/backstage/customized/object-standard/:objectId`,
       props: true,
       component: () => import(/* webpackChunkName: "dashboard" */ '@/layout/empty-router-view.vue'),
       meta: {
         title: '平台标准对象详情',
-        subTitle: '平台自定义对象详情'
+        customTitle: '平台自定义对象详情'
       },
       children: [
         {
@@ -114,13 +124,3 @@ const objectStandardRouter: RouteConfig = {
 }
 
 export default objectStandardRouter
-
-export const objectStandardNavRouter: RouteConfig = {
-  name: 'Object',
-  path: '/backstage/customized/object-standard',
-  component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/index.vue'),
-  meta: {
-    title: '平台标准对象',
-    inNav: true
-  }
-}

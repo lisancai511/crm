@@ -29,11 +29,25 @@
           <el-table-column prop="description"
                            label="备注">
           </el-table-column>
-          <el-table-column prop="creator"
+          <el-table-column prop="creatorName"
                            label="创建人">
           </el-table-column>
           <el-table-column prop="lastModifiedTime"
                            label="最后修改日期">
+          </el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <div>
+                <span class="dd-click m-r-10"
+                      @click="goToEdit(scope.row)">
+                  <dd-icon name="edit"></dd-icon> 编辑
+                </span>
+                <span v-if="!isStandard" class="dd-click m-r-10"
+                      @click="deleteObejct(scope.row)">
+                  <dd-icon name="delete"></dd-icon> 删除
+                </span>
+              </div>
+            </template>
           </el-table-column>
         </el-table>
       </div>
@@ -44,6 +58,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { createNamespacedHelpers } from 'vuex'
+import Api from '@/api'
 
 const { mapState } = createNamespacedHelpers('backstage/customized')
 
@@ -76,8 +91,29 @@ export default class StandardObject extends Vue {
     })
   }
 
+  deleteObejct (row:any) {
+    this.$confirm('此操作将永久删除该对象, 是否继续?', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(async () => {
+      const data = await Api.bizObjects.deleteObjects(row.id)
+      console.log(data)
+      this.getData()
+      this.$message({
+        type: 'success',
+        message: '删除成功!'
+      })
+    }).catch(() => {
+      this.$message({
+        type: 'info',
+        message: '已取消删除'
+      })
+    })
+  }
+
   created () {
-    this.getData()
+    // this.getData()
   }
 
   goToEdit (row: any) {

@@ -1,0 +1,33 @@
+.form__wrap {
+	height: 100%;
+	> .pc-layout {
+		/deep/ .el-main, .el-row, .el-col {
+			overflow: hidden;
+		}
+
+		/deep/ .el-row {
+			&::before {
+				display: none;
+			}
+
+			&::after {
+				display: none;
+			}
+
+			display: flex;
+			flex-basis: auto;
+		}
+
+		/deep/ .el-col {
+			flex-basis: auto;
+			float: none;
+			display: block;
+			/*width: 50%;*/
+			min-height: 200px;
+		}
+
+		/deep/ .el-main {
+			height: 100%;
+		}
+	}
+}

@@ -45,7 +45,7 @@
         <el-checkbox :disabled="data.attrs.required"
                      v-model="data.attrs.disabled">只读
         </el-checkbox>
-        <el-checkbox :disabled="data.attrs.disabled"
+        <el-checkbox :disabled="data.attrs.disabled || PredefinedFieldApiNames.name === data.apiName"
                      v-model="data.attrs.required">必填
         </el-checkbox>
       </div>
@@ -63,6 +63,7 @@ import LayoutTypes from '@/views/designer/config/LayoutTypes'
 import designerStore from '@/store/modules/designer'
 import { arrToMap } from '@/utils'
 import { getLocalLayoutFields } from '@/views/designer/utils'
+import PredefinedFieldApiNames from '@/views/designer/config/PredefinedFieldApiNames'
 
 @Component({
   name: 'FieldComponentAttrs.vue',
@@ -87,6 +88,10 @@ export default class TheFieldComponentAttrs extends Vue {
 
   get hackData () {
     return JSON.parse(JSON.stringify(this.data))
+  }
+
+  get PredefinedFieldApiNames () {
+    return PredefinedFieldApiNames
   }
 
   get ComponentTypes () {

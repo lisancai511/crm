@@ -21,7 +21,7 @@
     </div>
     <div class="main">
       <span class="main_left">图标</span>
-      <span class="main_right"><dd-icon name="Folder"></dd-icon></span>
+      <span class="main_right"><dd-icon :name="sizeForm.iconUrl?sizeForm.iconUrl:''"></dd-icon></span>
     </div>
     <div class="main">
       <span class="main_left">最后修改人</span>

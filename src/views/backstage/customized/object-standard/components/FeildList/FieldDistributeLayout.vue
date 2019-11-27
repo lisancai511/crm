@@ -16,28 +16,30 @@
         label="是否显示"
         width="160">
         <template slot-scope="scope">
-          <el-checkbox @change="changeCheckbox(scope.row)" v-model="scope.row.show"></el-checkbox>
+          <el-checkbox
+            @change="changeCheckbox(scope.row)"
+            v-model="scope.row.show"></el-checkbox>
         </template>
       </el-table-column>
       <el-table-column
         label="必填"
         width="80">
         <template slot-scope="scope">
-          <el-checkbox :disabled="!scope.row.show" v-model="scope.row.required"></el-checkbox>
+          <el-checkbox :disabled="!scope.row.show || scope.row.readOnly" v-model="scope.row.required"></el-checkbox>
         </template>
       </el-table-column>
       <el-table-column
         label="只读"
         width="80">
         <template slot-scope="scope">
-          <el-checkbox :disabled="!scope.row.show" v-model="scope.row.readOnly"></el-checkbox>
+          <el-checkbox :disabled="!scope.row.show|| scope.row.required" v-model="scope.row.readOnly"></el-checkbox>
         </template>
       </el-table-column>
     </el-table>
     <div class="m-t-30 m-l-30 m-b-20">
       <el-button type="primary" @click="saveData">保存</el-button>
       <el-button type="primary" @click="goBack">返回</el-button>
-      <el-button>保存并继续添加</el-button>
+      <el-button @click="saveDataAndGoBack">保存并继续添加</el-button>
     </div>
   </div>
 </template>
@@ -90,6 +92,27 @@ export default class FieldDistributeLayout extends Vue {
     }
   }
 
+  async saveDataAndGoBack () {
+    const { fieldId, objectId } = this
+    try {
+      if (fieldId) {
+        await Api.bizObjects.updateFields(objectId, fieldId, localFieldToServerField(this.data))
+        this.$message.success('修改成功')
+      } else {
+        this.data.addToLayouts = this.addToLayouts.filter((item: any) => {
+          if (item.show) {
+            return item
+          }
+        })
+        await Api.bizObjects.addFields(localFieldToServerField(this.data), objectId)
+        this.$message.success('添加成功')
+      }
+      this.$emit('changeShowNext', 'saveAndAdd')
+    } catch (err) {
+      throw err
+    }
+  }
+
   async getData () {
     let { data: { data } } = await Api.bizObjects.getLayouts(this.objectId)
     this.layouts = data
@@ -99,7 +122,7 @@ export default class FieldDistributeLayout extends Vue {
   initAddToLayouts () {
     this.addToLayouts = this.layouts.map((item: any) => {
       let obj = {
-        show: false,
+        show: true,
         readOnly: false,
         required: false,
         layoutId: null,

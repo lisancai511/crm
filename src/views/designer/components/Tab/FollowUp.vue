@@ -73,7 +73,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import designerStore from '@/store/modules/designer'
-import PredefinedButtonApiNames from '@/views/designer/config/PredefinedButtonApiNames'
+import { PredefinedButtonApiNames } from '@/sdk/button-sdk/PredefinedButton'
 
 @Component({
   name: 'FdComponentsTabFollowUp'
@@ -96,7 +96,7 @@ export default class FdComponentsTabFollowUp extends Vue {
     return designerStore.followUpTypeById
   }
 
-  get PredefinedButtonApiNames () {
+  get PredefinedButton () {
     return PredefinedButtonApiNames
   }
 

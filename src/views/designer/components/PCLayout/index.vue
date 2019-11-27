@@ -119,9 +119,15 @@ import updateCurrentField from '@/views/designer/mixins/updateCurrentField'
 import DraggableGroupTypes from '@/views/designer/config/DraggableGroupTypes'
 import DraggableClassNames from '@/views/designer/config/DraggableClassNames'
 import { arrToMap } from '@/utils'
+import { DESIGNER_PLATFORMS, DESIGNER_TYPES } from '@/views/designer/config/Designer'
 
-Vue.component('FdComponentsGroup', FdComponentsGroup)
-Vue.component('FdComponentsTransition', FdComponentsTransition)
+const COMPONENT_NAMES = {
+  FdComponentsGroup: 'FdComponentsGroup',
+  FdComponentsTransition: 'FdComponentsTransition'
+}
+
+Vue.component(COMPONENT_NAMES.FdComponentsGroup, FdComponentsGroup)
+Vue.component(COMPONENT_NAMES.FdComponentsTransition, FdComponentsTransition)
 
 @Component({
   name: 'PCLayout',
@@ -158,6 +164,10 @@ export default class PCLayout extends mixins(updateCurrentField) {
 
   @Inject('designer') readonly designer!: any
 
+  get DESIGNER_PLATFORMS () {
+    return DESIGNER_PLATFORMS
+  }
+
   get ComponentTypes () {
     return ComponentTypes
   }
@@ -170,9 +180,9 @@ export default class PCLayout extends mixins(updateCurrentField) {
     } else if (this.main) {
       return Main.name
     } else if (this.group) {
-      return FdComponentsGroup.name
+      return COMPONENT_NAMES.FdComponentsGroup
     } else if (this.transition) {
-      return FdComponentsTransition.name
+      return COMPONENT_NAMES.FdComponentsTransition
     } else if (this.aside) {
       return Aside.name
     } else if (this.footer) {
@@ -210,7 +220,7 @@ export default class PCLayout extends mixins(updateCurrentField) {
   }
 
   get draggableOptions () {
-    if (!this.layout.draggable) {
+    if (!this.designer.setting || !this.layout.draggable) {
       return {
         disabled: true
       }
@@ -244,7 +254,7 @@ export default class PCLayout extends mixins(updateCurrentField) {
   }
 
   handleDraggableAdd (evt: any) {
-    if (!this.designer.isBackstage) {
+    if (!this.designer.setting) {
       return
     }
     const newIndex = evt.newIndex
@@ -254,7 +264,8 @@ export default class PCLayout extends mixins(updateCurrentField) {
     let tempLayout = {}
     // 如果是分组容器 添加默认子元素
     if (curLayout[newIndex].type === ComponentTypes.Group) {
-      if (this.designer.isMobile) {
+      // 如果是手机端
+      if (this.designer.setting.platform === DESIGNER_PLATFORMS.MOBILE) {
         tempLayout = {
           name: `分组_${nanoid(13)}`,
           children: [
@@ -329,18 +340,18 @@ export default class PCLayout extends mixins(updateCurrentField) {
     }
     // TODO 提取公共函数
     if (!newLayout.id) {
-      newLayout.apiName = ''
+      newLayout.apiName = this.designer.type === DESIGNER_TYPES.FORM
+        ? `api_${nanoid(8)}` : ''
       // if (_.isObject(newLayout.attrs) && newLayout.attrs.hasOwnProperty('maxlength')) {
       //   newLayout.attrs.maxlength = this.fieldComponentByType[newLayout.type].attrs.maxlength
       // }
     }
     this.$set(curLayout, newIndex, newLayout)
-
     this.$bus.$emit('designer/updateSelectLayout', curLayout[newIndex])
   }
 
   handleDraggableUpdate (evt: any) {
-    if (!this.designer.isBackstage) {
+    if (!this.designer.setting) {
       return
     }
     const newIndex = evt.newIndex
@@ -352,5 +363,10 @@ export default class PCLayout extends mixins(updateCurrentField) {
 
 <style lang="scss" scoped>
 .pc-layout {
+  overflow-x: hidden;
+
+  &.el-row {
+    width: 100%;
+  }
 }
 </style>

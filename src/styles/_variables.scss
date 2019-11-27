@@ -39,7 +39,7 @@ $dimensions: ("p":"padding", "m":"margin");
 @each $dim in $dimensions {
 	//循环四个方向
 	@each $dir in $directions {
-		@for $i from 1 through 6 {
+		@for $i from 0 through 6 {
 			$size: $i*5;
 			@if (nth($dir,2) != '') {
 				.#{nth($dim,1)}-#{nth($dir,1)}-#{$size} {

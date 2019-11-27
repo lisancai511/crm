@@ -88,13 +88,16 @@ export default function localLayoutToServer (localLayout: any) {
     if (_.isObject(tempLayout.attrs)) {
       layout.attrs = tempLayout.attrs
       if (Array.isArray(layout.attrs.usedFields)) {
-        layout.attrs.usedFields = layout.attrs.usedFields.map((item: any) => ({ apiName: item.apiName }))
+        layout.attrs.usedFields =
+          layout.attrs.usedFields.map((item: any) => ({ apiName: item.apiName }))
       }
       if (Array.isArray(layout.attrs.usedButtons)) {
-        layout.attrs.usedButtons = layout.attrs.usedButtons.map((item: any) => ({ apiName: item.apiName }))
+        layout.attrs.usedButtons =
+          layout.attrs.usedButtons.map((item: any) => ({ apiName: item.apiName }))
       }
       if (Array.isArray(layout.attrs.usedOptions)) {
-        layout.attrs.usedOptions = layout.attrs.usedOptions.map((item: any) => ({ id: item.id }))
+        layout.attrs.usedOptions =
+          layout.attrs.usedOptions.map((item: any) => ({ id: item.id }))
       }
       // 如果是表单详情页面的相关列表
       if (tempLayout.type === ComponentTypes.InfoTabRelatedListItem) {
