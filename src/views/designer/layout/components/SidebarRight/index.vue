@@ -30,6 +30,10 @@
           :data="curLayout"
           v-else-if="curLayout.type === ComponentTypes.InfoTabFollowUp"
         />
+        <!--如果是明细组件-->
+        <detailed-attrs
+          :data="curLayout"
+          v-else-if="curLayout.type === ComponentTypes.Detailed"/>
       </template>
     </div>
   </el-aside>
@@ -47,10 +51,12 @@ import TabRelatedListAttrs from '@/views/designer/layout/components/SidebarRight
 import TabRelatedListItemAttrs
   from '@/views/designer/layout/components/SidebarRight/components/TabRelatedListItemAttrs.vue'
 import TabFollowUpAttrs from '@/views/designer/layout/components/SidebarRight/components/TabFollowUpAttrs.vue'
+import DetailedAttrs from '@/views/designer/layout/components/SidebarRight/components/DetailedAttrs.vue'
 
 @Component({
   name: 'FormDesignSidebarRight',
   components: {
+    DetailedAttrs,
     TabFollowUpAttrs,
     TabRelatedListItemAttrs,
     FormHeaderAttrs,

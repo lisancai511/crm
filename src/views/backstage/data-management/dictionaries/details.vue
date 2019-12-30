@@ -143,10 +143,10 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
 import api from '@/api'
-import DictionaryEdit from '@/views/backstage/data-management/dictionaries/component/DictionaryEdit.vue'
+import DictionaryEdit from '@/views/backstage/data-management/dictionaries/components/DictionaryEdit.vue'
 import { mixins } from 'vue-class-component'
 import utils from '@/views/backstage/data-management/dictionaries/mixins/utils'
-import DictionaryItems from '@/views/backstage/data-management/dictionaries/component/DictionaryItems.vue'
+import DictionaryItems from '@/views/backstage/data-management/dictionaries/components/DictionaryItems.vue'
 
 interface IDictionaryItem {
   id: string,
@@ -168,12 +168,14 @@ export default class DictionaryDetails extends mixins(utils) {
     name: '',
     description: ''
   }
+
   dictionaryItems: IDictionaryItem[] = []
   visibleNewDictionaryItemsDialog: boolean = false
   visibleReplaceDictionaryItemsDialog: boolean = false
   dictionaryItemsNew: { value: string } = {
     value: ''
   }
+
   dictionaryItemsReplace: {
     replaceFromItemId: string,
     replaceToItemId: string,
@@ -199,6 +201,7 @@ export default class DictionaryDetails extends mixins(utils) {
       ]
     }
   }
+
   get dictionaryItemsReplaceRules () {
     return {
       replaceFromItemId: [

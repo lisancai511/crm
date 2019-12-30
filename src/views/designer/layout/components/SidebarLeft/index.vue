@@ -2,21 +2,28 @@
 <template>
   <el-aside
     width="200px"
+    :class="{'form-design-sidebar--left--form':isForm}"
     class="form-design-sidebar--left">
     <el-container direction="vertical">
-      <el-main class="section__wrap section__wrap section__components">
+      <el-main
+        v-if="!isForm"
+        class="section__wrap section__wrap section__components">
         <h6 class="section__title">组件</h6>
         <div class="section__body">
-          <field-button v-for="field in basicComponents"
-                 class="form-designer__field"
-                 :icon="field.icon"
-                 :title="field.name"
-                 :key="field.key"/>
+          <field-button
+            v-for="field in basicComponents"
+            class="form-designer__field"
+            :icon="field.icon"
+            :title="field.name"
+            :key="field.key"/>
         </div>
       </el-main>
       <el-main class="section__wrap section__fields">
         <h6 class="section__title">字段</h6>
-        <el-radio-group size="medium" v-model="curFieldTab">
+        <el-radio-group
+          v-if="!isForm"
+          size="medium"
+          v-model="curFieldTab">
           <el-radio-button
             v-for="type in fieldTabs"
             :key="type.key"
@@ -32,24 +39,42 @@
             v-bind="fieldDraggableProps"
             :list="fieldComponents"
             class="section__body">
-            <field-button v-for="field in fieldComponents"
-                   class="form-designer__field"
-                   :class="[field.type]"
-                   :icon="field.icon"
-                   :title="field.name"
-                   :key="field.key"/>
+            <field-button
+              v-for="field in fieldComponents"
+              class="form-designer__field"
+              :class="[field.type]"
+              :icon="field.icon"
+              :title="field.name"
+              :key="field.key"/>
           </draggable>
           <draggable
+            v-if="!isForm"
             tag="div"
             v-bind="fictitiousDraggableProps"
             :list="fictitiousComponents"
             class="section__body">
-            <field-button v-for="field in fictitiousComponents"
-                   class="form-designer__field"
-                   :class="[field.type]"
-                   :icon="field.icon"
-                   :title="field.name"
-                   :key="field.key"/>
+            <field-button
+              v-for="field in fictitiousComponents"
+              class="form-designer__field"
+              :class="[field.type]"
+              :icon="field.icon"
+              :title="field.name"
+              :key="field.key"/>
+          </draggable>
+          <draggable
+            v-if="isForm"
+            tag="div"
+            :move="moveDetailedComponents"
+            v-bind="fieldDraggableProps"
+            :list="detailedComponents"
+            class="section__body">
+            <field-button
+              v-for="field in detailedComponents"
+              class="form-designer__field"
+              :class="[field.type]"
+              :icon="field.icon"
+              :title="field.name"
+              :key="field.key"/>
           </draggable>
         </div>
         <draggable
@@ -59,11 +84,11 @@
           :list="unusedFields"
           class="section__body">
           <field-button v-for="field in unusedFields"
-                 class="form-designer__field"
-                 :class="[field.type]"
-                 :icon="field.icon"
-                 :title="field.name"
-                 :key="field.key"/>
+                        class="form-designer__field"
+                        :class="[field.type]"
+                        :icon="field.icon"
+                        :title="field.name"
+                        :key="field.key"/>
         </draggable>
       </el-main>
     </el-container>
@@ -71,26 +96,35 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Inject } from 'vue-property-decorator'
 import FieldButton from './FieldButton.vue'
 import {
   basicComponents,
   fieldComponents,
   fictitiousComponents,
+  detailedComponents,
   IField, ILayoutComponent
 } from '@/views/designer/config/components'
 import DraggableClassNames from '@/views/designer/config/DraggableClassNames'
 import DraggableGroupTypes from '@/views/designer/config/DraggableGroupTypes'
 import designerStore from '@/store/modules/designer'
+import { DESIGNER_USED_TYPES } from '@/views/designer/config/Designer'
+import ComponentTypes from '@/views/designer/config/ComponentTypes'
+
+const FORM_EXCLUDE_TYPES: string[] = [
+  ComponentTypes.TagField
+]
+const OBJECT_EXCLUDE_TYPES: string[] = []
 
 @Component({
   name: 'FormDesignSidebarLeft',
   components: { FieldButton }
 })
 export default class SidebarLeft extends Vue {
+  @Inject('designer') readonly designer!: any
   basicComponents: ILayoutComponent[] = basicComponents
-  fieldComponents: IField[] = fieldComponents
   fictitiousComponents: ILayoutComponent[] = fictitiousComponents
+  detailedComponents: ILayoutComponent[] = detailedComponents
   fieldTabs = [
     {
       key: 'base',
@@ -101,7 +135,21 @@ export default class SidebarLeft extends Vue {
       name: '未使用字段'
     }
   ]
+
   curFieldTab = this.fieldTabs[0].key
+
+  get fieldComponents (): IField[] {
+    return fieldComponents.filter((field) => {
+      if (this.isForm) {
+        return !FORM_EXCLUDE_TYPES.includes(field.type)
+      }
+      return !OBJECT_EXCLUDE_TYPES.includes(field.type)
+    })
+  }
+
+  get isForm () {
+    return this.designer?.setting?.usedType === DESIGNER_USED_TYPES.FORM
+  }
 
   get unusedFields (): any[] {
     return designerStore.unusedFields
@@ -130,6 +178,13 @@ export default class SidebarLeft extends Vue {
       sort: false
     }
   }
+
+  moveDetailedComponents (evt: any) {
+    // const componentType = evt.draggedContext.element.type
+    if (evt.to.className.includes(ComponentTypes.Detailed)) {
+      return false
+    }
+  }
 }
 </script>
 
@@ -139,6 +194,10 @@ export default class SidebarLeft extends Vue {
   box-shadow: 0 7px 26px 0 rgba(48, 48, 48, 0.13);
   height: 100%;
   overflow: auto;
+
+  /*&--form {*/
+  width: 330px !important;
+  /* }*/
 
   .section {
     &__title {
@@ -150,6 +209,16 @@ export default class SidebarLeft extends Vue {
       .form-designer__field {
         margin-top: 10px;
       }
+
+      /* &--form {*/
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+
+      .form-designer__field {
+      }
+
+      /*}*/
     }
 
     &__wrap {
@@ -167,13 +236,17 @@ export default class SidebarLeft extends Vue {
 
   .el-radio-group {
     margin-top: 5px;
+    width: 100%;
   }
 
   .el-radio-button {
+    width: 50%;
+
     /deep/ .el-radio-button__inner {
-      width: 78px;
-      padding-left: 0;
-      padding-right: 0;
+      width: 100%;
+      /*width: 78px;*/
+      /*padding-left: 0;*/
+      /*padding-right: 0;*/
       font-size: 12px;
     }
   }

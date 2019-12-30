@@ -38,6 +38,7 @@ export default class FieldDependenceEdit extends Vue {
     dependencyFields: [],
     dependencyItems: []
   }
+
   private dependencyItems: any = []
   private checked: any = []
   private leftData: any = []
@@ -67,19 +68,19 @@ export default class FieldDependenceEdit extends Vue {
       if (!index) {
         this.activeId = item.id
       }
-      let id = item.id
+      const id = item.id
       this.newData.dependencyItems.push({ [id]: [] })
     })
     this.newData.dependencyItems.forEach((item: any, index: any) => {
-      let arr = Object.keys(item)
+      const arr = Object.keys(item)
       this.dependencyItems.forEach((item0: any) => {
-        let newArr = Object.keys(item0)
+        const newArr = Object.keys(item0)
         if (arr[0] === newArr[0]) {
           this.newData.dependencyItems[index] = item0
         }
       })
     })
-    let ary = Object.keys(this.newData.dependencyItems[0])
+    const ary = Object.keys(this.newData.dependencyItems[0])
     this.changeActive(ary[0], 0)
     this.leftData = data
   }
@@ -90,7 +91,7 @@ export default class FieldDependenceEdit extends Vue {
   }
 
   async getDepend () {
-    let data = await Api.bizObjects.getFieldDependence(this.objectId, this.fieldDependenceId)
+    const data = await Api.bizObjects.getFieldDependence(this.objectId, this.fieldDependenceId)
     this.newData.dependencyFields[0] = this.controlId
     this.newData.dependencyFields[1] = this.dependenceId
     this.getLeftData()

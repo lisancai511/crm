@@ -57,6 +57,16 @@ const router: RouteConfig = {
       }
     },
     {
+      name: 'AppJiLi',
+      path: '/app/jili/:id',
+      components: {
+        default: () => import(/* webpackChunkName: "dashboard" */ '@/views/app/jili.vue')
+      },
+      meta: {
+        title: '激励'
+      }
+    },
+    {
       name: 'AppListEmptyView',
       path: '/app/:appId/:moduleId_objectId',
       component: () => import(/* webpackChunkName: "dashboard" */ '@/layout/empty-router-view.vue'),
@@ -74,6 +84,17 @@ const router: RouteConfig = {
           props: true,
           meta: {
             title: '新建'
+          }
+        },
+        {
+          name: 'BatchNewAppRecord',
+          path: '/app/:appId/:moduleId_objectId/records/batch-new',
+          components: {
+            default: () => import(/* webpackChunkName: "dashboard" */ '@/views/app/batchNew.vue')
+          },
+          props: true,
+          meta: {
+            title: '批量新增'
           }
         },
         {

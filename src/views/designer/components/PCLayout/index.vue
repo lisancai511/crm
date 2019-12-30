@@ -2,17 +2,24 @@
 <template>
   <draggable
     class="pc-layout"
-    v-if="layout.children"
+    v-if="draggableModel"
     :tag="curContainerName"
-    :component-data="{props:curContainerProps}"
+    :component-data="{
+      props:curContainerProps,
+      on:{
+        delete(val){
+          $emit('delete',val)
+        }
+      }
+    }"
     @add="handleDraggableAdd"
     @update="handleDraggableUpdate"
-    v-model="layout.children"
+    v-model="draggableModel"
     v-bind="draggableOptions">
     <template v-for="(component,index) in layout.children">
       <!--如果是Container-->
       <PCLayout v-if="component.type === ComponentTypes.Container"
-                v-bind="component.attr"
+                v-bind="component.attrs"
                 container
                 :key="component.key"
                 :layout="component"/>
@@ -56,6 +63,7 @@
       <PCLayout v-else-if="component.type === ComponentTypes.Group"
                 v-bind="component.attrs"
                 group
+                @delete="deleteCurField(index)"
                 @click.native.stop="updateCurrentField(component)"
                 :key="component.key"
                 :layout="component"/>
@@ -73,11 +81,11 @@
                                  :key="component.key"
       />
       <!--如果是MobileAppBar-->
-      <!--<fd-mobile-components-app-bar v-else-if="component.type === ComponentTypes.MobileAppBar"
-                v-bind="component.attrs"
-                @click.native.stop="updateCurrentField(component)"
-                :key="component.key"
-                :layout="component"/>-->
+      <!--<fd-mobile-components-app-bar v-else-if="components.type === ComponentTypes.MobileAppBar"
+                v-bind="components.attrs"
+                @click.native.stop="updateCurrentField(components)"
+                :key="components.key"
+                :layout="components"/>-->
       <!--如果是Tabs-->
       <fd-components-tab v-else-if="component.type === ComponentTypes.InfoTab"
                          @click.native.stop="updateCurrentField(component)"
@@ -97,11 +105,9 @@
 import { Component, Vue, Prop, Inject } from 'vue-property-decorator'
 import { mixins } from 'vue-class-component'
 import _ from 'lodash'
-import FdComponentsFormHeader from '@/views/designer/components/FormTitle/index.vue'
-import FdComponentsTab from '@/views/designer/components/Tab/index.vue'
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
-import FdComponentsGroup from '@/views/designer/components/Group/index.vue'
-import FdComponentsTransition from '@/views/designer/components/Transition/index.vue'
+import FdComponentGroup from '@/views/designer/components/Group/index.vue'
+import FdComponentTransition from '@/views/designer/components/Transition/index.vue'
 
 import {
   Container,
@@ -112,29 +118,33 @@ import {
   Row,
   Col
 } from 'element-ui'
-import FdFormItem from '@/views/designer/components/PCLayout/FdFormItem.vue'
 import { IDraggableOptions, IField, fieldComponents } from '@/views/designer/config/components'
 import nanoid from 'nanoid'
 import updateCurrentField from '@/views/designer/mixins/updateCurrentField'
 import DraggableGroupTypes from '@/views/designer/config/DraggableGroupTypes'
 import DraggableClassNames from '@/views/designer/config/DraggableClassNames'
 import { arrToMap } from '@/utils'
-import { DESIGNER_PLATFORMS, DESIGNER_TYPES } from '@/views/designer/config/Designer'
+import {
+  DESIGNER_EXEC_TYPES,
+  DESIGNER_UI_TYPES,
+  DESIGNER_USED_TYPES
+} from '@/views/designer/config/Designer'
+import { IDesigner } from '@/views/designer/types'
 
 const COMPONENT_NAMES = {
-  FdComponentsGroup: 'FdComponentsGroup',
-  FdComponentsTransition: 'FdComponentsTransition'
+  FdComponentGroup: 'FdComponentGroup',
+  FdComponentTransition: 'FdComponentTransition'
 }
 
-Vue.component(COMPONENT_NAMES.FdComponentsGroup, FdComponentsGroup)
-Vue.component(COMPONENT_NAMES.FdComponentsTransition, FdComponentsTransition)
+Vue.component(COMPONENT_NAMES.FdComponentGroup, FdComponentGroup)
+Vue.component(COMPONENT_NAMES.FdComponentTransition, FdComponentTransition)
 
 @Component({
   name: 'PCLayout',
   components: {
-    FdFormItem,
-    FdComponentsTab,
-    FdComponentsFormHeader
+    FdFormItem: () => import('@/views/designer/components/PCLayout/FdFormItem.vue'),
+    FdComponentsTab: () => import('@/views/designer/components/Tab/index.vue'),
+    FdComponentsFormHeader: () => import('@/views/designer/components/FormTitle/index.vue')
   },
   props: {
     ...(Container as any).props,
@@ -153,6 +163,7 @@ export default class PCLayout extends mixins(updateCurrentField) {
   @Prop({ type: Boolean, default: false }) readonly row!: boolean
   @Prop({ type: Boolean, default: false }) readonly col!: boolean
   @Prop({ type: Boolean, default: false }) readonly group!: boolean
+  @Prop({ type: Boolean, default: false }) readonly detailed!: boolean
   @Prop({ type: Boolean, default: false }) readonly transition!: boolean
   @Prop({ type: Boolean, default: false }) readonly container!: boolean
   @Prop({ type: Boolean, default: false }) readonly main!: boolean
@@ -161,11 +172,16 @@ export default class PCLayout extends mixins(updateCurrentField) {
   @Prop({ type: Boolean, default: false }) readonly footer!: boolean
   @Prop({ type: Boolean, default: false }) readonly form!: boolean
   @Prop({ type: Boolean, default: false }) readonly draggable!: boolean
+  @Prop({ type: Boolean, default: false }) readonly autoApiName!: boolean
 
-  @Inject('designer') readonly designer!: any
+  @Inject('designer') readonly designer!: IDesigner
 
-  get DESIGNER_PLATFORMS () {
-    return DESIGNER_PLATFORMS
+  get draggableModel () {
+    return this.layout.children
+  }
+
+  set draggableModel (val: any) {
+    this.layout.children = val
   }
 
   get ComponentTypes () {
@@ -180,9 +196,9 @@ export default class PCLayout extends mixins(updateCurrentField) {
     } else if (this.main) {
       return Main.name
     } else if (this.group) {
-      return COMPONENT_NAMES.FdComponentsGroup
+      return COMPONENT_NAMES.FdComponentGroup
     } else if (this.transition) {
-      return COMPONENT_NAMES.FdComponentsTransition
+      return COMPONENT_NAMES.FdComponentTransition
     } else if (this.aside) {
       return Aside.name
     } else if (this.footer) {
@@ -220,7 +236,7 @@ export default class PCLayout extends mixins(updateCurrentField) {
   }
 
   get draggableOptions () {
-    if (!this.designer.setting || !this.layout.draggable) {
+    if (this.designer.setting.execType !== DESIGNER_EXEC_TYPES.DESIGNER || !this.layout.draggable) {
       return {
         disabled: true
       }
@@ -254,7 +270,7 @@ export default class PCLayout extends mixins(updateCurrentField) {
   }
 
   handleDraggableAdd (evt: any) {
-    if (!this.designer.setting) {
+    if (this.designer.setting.execType !== DESIGNER_EXEC_TYPES.DESIGNER) {
       return
     }
     const newIndex = evt.newIndex
@@ -265,7 +281,8 @@ export default class PCLayout extends mixins(updateCurrentField) {
     // 如果是分组容器 添加默认子元素
     if (curLayout[newIndex].type === ComponentTypes.Group) {
       // 如果是手机端
-      if (this.designer.setting.platform === DESIGNER_PLATFORMS.MOBILE) {
+      // if (this.designer.setting.platform === DESIGNER_PLATFORMS.MOBILE) {
+      if (this.designer.setting.uiType === DESIGNER_UI_TYPES.MOBILE) {
         tempLayout = {
           name: `分组_${nanoid(13)}`,
           children: [
@@ -340,7 +357,7 @@ export default class PCLayout extends mixins(updateCurrentField) {
     }
     // TODO 提取公共函数
     if (!newLayout.id) {
-      newLayout.apiName = this.designer.type === DESIGNER_TYPES.FORM
+      newLayout.apiName = this.designer.setting.usedType === DESIGNER_USED_TYPES.FORM
         ? `api_${nanoid(8)}` : ''
       // if (_.isObject(newLayout.attrs) && newLayout.attrs.hasOwnProperty('maxlength')) {
       //   newLayout.attrs.maxlength = this.fieldComponentByType[newLayout.type].attrs.maxlength
@@ -351,7 +368,7 @@ export default class PCLayout extends mixins(updateCurrentField) {
   }
 
   handleDraggableUpdate (evt: any) {
-    if (!this.designer.setting) {
+    if (this.designer.setting.execType !== DESIGNER_EXEC_TYPES.DESIGNER) {
       return
     }
     const newIndex = evt.newIndex
@@ -366,7 +383,11 @@ export default class PCLayout extends mixins(updateCurrentField) {
   overflow-x: hidden;
 
   &.el-row {
-    width: 100%;
+    /*width: 100%;*/
+    height: 100%;
+  }
+
+  &.el-col {
   }
 }
 </style>

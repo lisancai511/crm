@@ -1,4 +1,3 @@
-import LayoutTypes from '@/views/designer/config/LayoutTypes'
 <!--Created by LiuLei on 2019/9/5-->
 <template>
   <div class="designer--content">
@@ -33,7 +32,12 @@ import designerStore from '@/store/modules/designer'
 import LayoutTypes from '@/views/designer/config/LayoutTypes'
 import FdMobileComponentsAppBar from '@/views/designer/components/Mobile/AppBar/index.vue'
 import initLayout from '@/views/designer/mixins/initLayout'
-import { DESIGNER_PLATFORMS, DESIGNER_TYPES } from '@/views/designer/config/Designer'
+import {
+  DESIGNER_EXEC_TYPES,
+  DESIGNER_UI_TYPES,
+  DESIGNER_USED_TYPES
+} from '@/views/designer/config/Designer'
+import { IDesigner } from '@/views/designer/types'
 
 @Component({
   name: 'FormDesignMobile',
@@ -48,10 +52,13 @@ import { DESIGNER_PLATFORMS, DESIGNER_TYPES } from '@/views/designer/config/Desi
 })
 
 export default class FormDesignMobile extends mixins(initLayout) {
-  @Provide() designer = {
+  @Provide() designer: IDesigner = {
     setting: {
-      type: DESIGNER_TYPES.PASS,
-      platform: DESIGNER_PLATFORMS.MOBILE
+      // type: DESIGNER_TYPES.PASS,
+      // platform: DESIGNER_PLATFORMS.MOBILE
+      uiType: DESIGNER_UI_TYPES.MOBILE,
+      usedType: DESIGNER_USED_TYPES.PAAS,
+      execType: DESIGNER_EXEC_TYPES.DESIGNER
     },
     object: designerStore.object
   }

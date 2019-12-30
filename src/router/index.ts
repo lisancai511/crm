@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import globalRouter from '@/router/modules/global'
-import backstageRouter from '@/router/modules/backstage'
 import designerRouter from '@/router/modules/designer'
 import { newFormRouter, newIndexRouter } from '@/router/modules/backstage/office-setting'
 import appRouter from '@/router/modules/app'
@@ -18,7 +17,6 @@ const router = new Router({
       path: '/',
       redirect: '/app'
     },
-    backstageRouter,
     designerRouter,
     globalRouter,
     newFormRouter,
@@ -26,12 +24,12 @@ const router = new Router({
     newIndexRouter,
     { path: '*', component: Error404 },
     {
-      name: 'share',
-      path: '/share',
+      name: 'invitation',
+      path: '/invitation',
       meta: {
         title: '邀请成员'
       },
-      component: () => import(/* webpackChunkName: "dashboard" */ '@/views/share/index.vue')
+      component: () => import(/* webpackChunkName: "dashboard" */ '@/views/invitation/index.vue')
     }
   ]
 })

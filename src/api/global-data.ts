@@ -115,5 +115,5 @@ export function postDictionary (dictionary: {
   firstItemAsDefault: boolean,
   letterOrder: boolean
 }) {
-  return request.post(`global-data-dicts`, dictionary)
+  return request.post('global-data-dicts', dictionary)
 }

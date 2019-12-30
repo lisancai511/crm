@@ -67,9 +67,11 @@ export default class Login extends Vue {
       }
     }, 100)
   }
+
   private ruleForm: any = {
     type: 'Cellphone'
   }
+
   private rules: any = {
     account: [
       { required: true, message: '请输入手机号', validator: this.checkPhone, trigger: 'blur' }
@@ -84,6 +86,7 @@ export default class Login extends Vue {
       { required: true, message: '请确认密码' }
     ]
   }
+
   private password: any = ''
   showCode: boolean = true
   count: number = 60
@@ -97,7 +100,7 @@ export default class Login extends Vue {
       }
       await Api.user.getCode(data)
       this.showCode = false
-      let a = setInterval(() => {
+      const a = setInterval(() => {
         if (this.count === 1) {
           this.showCode = true
           this.count = 60
@@ -111,33 +114,15 @@ export default class Login extends Vue {
   }
 
   async saveData () {
-    const register = this.$refs['ruleForm'] as any
+    const register = this.$refs.ruleForm as any
     register.validate(async (valid: any) => {
       if (valid) {
         if (this.ruleForm.password === this.password) {
-          let data = await Api.user.register(this.ruleForm)
-          if (data.data.success) {
+          const data = await userModule.register(this.ruleForm)
+          console.log(data)
+          if (data.success) {
             this.$message.success('注册成功')
-            const login = {
-              username: this.ruleForm.account,
-              password: this.ruleForm.password,
-              device: {
-                type: 'PC',
-                osType: 'IOS',
-                osVersion: '10.001',
-                model: 'asd',
-                deviceId: 'asdf',
-                pushAllow: true,
-                locateAllow: true,
-                photoAllow: true,
-                storageAllow: true
-              }
-            }
-            let { data } = await Api.user.login(login)
-            if (data.success) {
-              userModule.setToken(data.data)
-              this.chooseCompany()
-            }
+            this.chooseCompany()
             this.$emit('changeShow')
           } else {
             this.$message.error(data.data.message)
@@ -154,12 +139,12 @@ export default class Login extends Vue {
   }
 
   async surePhoneNumber () {
-    let { data: { data } } = await Api.user.surePhoneNumber()
+    const { data: { data } } = await Api.user.surePhoneNumber()
     return data
   }
 
   async chooseCompany () {
-    let { data } = await Api.user.getCompany('All')
+    const { data } = await Api.user.getCompany('All')
     if (data.data.length > 1) {
       await this.$router.push('/company-choose')
     } else if (data.data.length === 1) {

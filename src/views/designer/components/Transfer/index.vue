@@ -8,9 +8,10 @@
           size="small"
           v-model="searchVal"
           :placeholder="filterPlaceholder">
-          <el-button slot="append"
-                     type="primary"
-                     icon="el-icon-search"></el-button>
+          <el-button
+            slot="append"
+            type="primary"
+            icon="el-icon-search"/>
         </el-input>
       </div>
       <div class="fd-transfer__header--center"></div>
@@ -54,7 +55,7 @@
       <div class="fd-transfer__body fd-transfer__body--right">
         <div class="fd-transfer__body__title">已选字段</div>
         <div class="fd-transfer__body__inner">
-          <slot name="right-header"></slot>
+          <slot name="right-header"/>
           <div class="fd-transfer__body__main">
             <el-checkbox-group v-model="checkedValueList">
               <draggable tag="div"
@@ -75,11 +76,11 @@
                       </slot>
                     </span>
                       <span>
-                      <i class="el-icon-sort-down"></i>
-                      <i class="el-icon-sort-up"></i>
+                      <i class="el-icon-sort-down"/>
+                      <i class="el-icon-sort-up"/>
                     </span>
                     </div>
-                    <slot name="itemRight" v-bind:itemRight="item"></slot>
+                    <slot name="itemRight" v-bind:itemRight="item"/>
                   </el-checkbox>
                 </transition-group>
               </draggable>

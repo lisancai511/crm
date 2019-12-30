@@ -48,6 +48,7 @@ export default class RecordTypeChange extends Vue {
   form: any = {
     model: ''
   }
+
   options: any = []
   allOptions: any = []
   loading: boolean = false
@@ -83,7 +84,7 @@ export default class RecordTypeChange extends Vue {
         if (valid) {
           this.loading = true
           try {
-            await api.passObjectOp.putAppRecordRecordType({
+            await api.paasObjectOp.putAppRecordRecordType({
               objectApiName: this.objectApiName,
               recordId: this.recordId.join(','),
               data: {

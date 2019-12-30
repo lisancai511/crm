@@ -3,7 +3,8 @@
     <el-card class="main">
       <div class="title m-t-30">
         开始时间
-        <el-date-picker v-model="data.timeFrom"
+        <el-date-picker @change="changeDatge"
+                        v-model="dataFourth.timeFrom"
                         class="m-t-10"
                         value-format="yyyy-MM-dd HH:mm:ss"
                         style="width:100%;"
@@ -13,7 +14,8 @@
       </div>
       <div class="title m-t-20">
         截止时间
-        <el-date-picker v-model="data.timeTo"
+        <el-date-picker @change="changeDatge"
+                        v-model="dataFourth.timeTo"
                         class="m-t-10"
                         value-format="yyyy-MM-dd HH:mm:ss"
                         style="width:100%;"
@@ -34,6 +36,19 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
 export default class TermOfValidity extends Vue {
   static title = '指标有效期'
   @Prop() private data: any
+  dataFourth: any = {
+    timeFrom: null,
+    timeTo: null
+  }
+
+  mounted () {
+    this.dataFourth.timeFrom = this.data.timeFrom
+    this.dataFourth.timeTo = this.data.timeTo
+  }
+
+  changeDatge () {
+    this.$emit('choose', this.dataFourth)
+  }
 }
 </script>
 

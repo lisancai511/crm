@@ -29,17 +29,19 @@ export default class EssentialInformation extends Vue {
   created () {
     this.data.assignTarget = 'Operator'
   }
+
   drawer: any = false
   options: any = [
     {
-      label: '每月一次',
+      label: '每月',
       value: 'ByMonth'
     },
     {
-      label: '每季度一次',
+      label: '每季度',
       value: 'ByQuarter'
     }
   ]
+
   @Prop() private data: any
 }
 </script>

@@ -14,11 +14,12 @@ import { arrToMap } from '@/utils'
 interface IServerLayoutToLocalPayload {
   serverLayout: any,
   needAddFields?: any[],
-  uiId: string,
+  uiId?: string | number,
   fields: any[],
   lookups?: any[],
   exceptApiNames?: string[]
-  exceptFieldTypes?: string[]
+  exceptFieldTypes?: string[],
+  auth?: boolean
 }
 
 /**
@@ -32,7 +33,8 @@ export default function serverLayoutToLocal (payload: IServerLayoutToLocalPayloa
     fields = [],
     exceptApiNames = [],
     exceptFieldTypes = [],
-    uiId
+    uiId,
+    auth = false
   } = payload
 
   const fieldById = arrToMap(fields.filter(field => !!field.id), 'id')
@@ -41,12 +43,14 @@ export default function serverLayoutToLocal (payload: IServerLayoutToLocalPayloa
 
   const cloneServerLayout = _.cloneDeep(serverLayout)
   const defaultFieldContainer: any[] = []
+  const layoutUsedFieldApiNames: string[] = []
 
   function inner (layout: any) {
     // 如果是字段组件
     if (layout.type === FIELD) {
+      layoutUsedFieldApiNames.push(layout.apiName)
       Object.entries(
-        serverFieldToLocalField(fieldByApiName[layout.apiName], uiId))
+        serverFieldToLocalField(fieldByApiName[layout.apiName], uiId, auth))
         .forEach(([key, value]) => {
           layout[key] = value
         })
@@ -71,7 +75,7 @@ export default function serverLayoutToLocal (payload: IServerLayoutToLocalPayloa
               if (!fieldByApiName[usedField.apiName]) {
                 return false
               }
-              return serverFieldToLocalField(fieldByApiName[usedField.apiName], uiId)
+              return serverFieldToLocalField(fieldByApiName[usedField.apiName], uiId, auth)
             }).filter((usedField: any) => !!usedField)
           } else {
             layout.attrs.usedFields = []
@@ -90,7 +94,7 @@ export default function serverLayoutToLocal (payload: IServerLayoutToLocalPayloa
             layout.children = []
           }
           break
-        case ComponentTypes.InfoTabRelatedListItem:
+        case ComponentTypes.InfoTabRelatedListItem: {
           if (!_.isPlainObject(layout.attrs)) {
             layout.attrs = {}
           }
@@ -108,6 +112,7 @@ export default function serverLayoutToLocal (payload: IServerLayoutToLocalPayloa
           layout.attrs.sortDirection = layout.attrs.sortDirection || 'ASC'
           // TODO 确认 name字段的apiName
           layout.attrs.sortOrderBy = layout.attrs.sortOrderBy || PredefinedFieldApiNames.name
+        }
           break
         case ComponentTypes.InfoTabFollowUp:
           if (!_.isPlainObject(layout.attrs)) {
@@ -146,11 +151,21 @@ export default function serverLayoutToLocal (payload: IServerLayoutToLocalPayloa
 
     if (Array.isArray(layout.children)) {
       layout.children = layout.children.filter((item: any) => {
-        // 如果是字段 且已经被删除或者被排除掉
-        return item.type !== FIELD ||
-          (fieldByApiName[item.apiName] &&
-            !exceptApiNames.includes(item.apiName) &&
-            !exceptFieldTypes.includes(fieldByApiName[item.apiName].dataType))
+        if (item.type !== FIELD) {
+          return true
+        }
+        const curSField = fieldByApiName[item.apiName]
+        if (!curSField) {
+          return false
+        }
+        const localField = serverFieldToLocalField(curSField, uiId, auth)
+        if (exceptApiNames.includes(localField.apiName)) {
+          return false
+        }
+        if (exceptFieldTypes.includes(localField.type)) {
+          return false
+        }
+        return localField.attrs.show
       })
       layout.children.forEach((item: any) => {
         inner(item)
@@ -170,9 +185,13 @@ export default function serverLayoutToLocal (payload: IServerLayoutToLocalPayloa
     // console.log(item)
     // console.log(serverFieldToLocalField(item, uiId))
     // TODO 以后换成apiName
-    const localField = fieldById[item.id]
-    if (!exceptApiNames.includes(localField.apiName) && !exceptFieldTypes.includes(localField.dataType)) {
-      curLayout.children.push(serverFieldToLocalField(localField, uiId))
+    const localField = serverFieldToLocalField(fieldById[item.id], uiId, auth)
+    if (
+      !exceptApiNames.includes(localField.apiName) &&
+      !exceptFieldTypes.includes(localField.type) &&
+      !layoutUsedFieldApiNames.includes(localField.apiName)
+    ) {
+      curLayout.children.push(localField)
     }
   })
   // console.log(cloneServerLayout)

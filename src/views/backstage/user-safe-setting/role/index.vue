@@ -15,7 +15,7 @@
           <el-table-column
             label="对象名称">
             <template slot-scope="scope">
-              <span class="link" @click="goToEdit(scope.row)">{{scope.row.name}}</span>
+              <span class="link" @click="goToEditAuths(scope.row)">{{scope.row.name}}</span>
             </template>
           </el-table-column>
           <el-table-column
@@ -23,8 +23,10 @@
             label="描述">
           </el-table-column>
           <el-table-column
-            prop="stardard"
             label="自定义">
+            <template slot-scope="scope">
+              <span>{{scope.row.stardard?'否':'是'}}</span>
+            </template>
           </el-table-column>
           <el-table-column
             prop="creatorName"
@@ -37,7 +39,7 @@
           <el-table-column
             label="操作">
             <template slot-scope="scope">
-              <div>
+              <div v-if="scope.row.id !== -1">
                 <span class="dd-click m-r-10" @click="goToEdit(scope.row)">
                   <dd-icon name="edit"></dd-icon> 编辑 </span>
                 <span class="dd-click m-r-10" @click="deleteObject(scope.row)">
@@ -71,12 +73,18 @@ export default class Standard extends Vue {
     })
   }
 
+  goToEditAuths (row: any) {
+    this.$router.push({
+      path: this.$route.path + `/${row.id}/editAuths`
+    })
+  }
+
   async getData () {
     try {
       const { data } = await Api.mainData.getRoles()
       this.tableData = data.data
     } catch (err) {
-      throw err
+      console.log(err)
     }
   }
 
@@ -88,13 +96,13 @@ export default class Standard extends Vue {
         this.getData()
       }
     } catch (err) {
-      throw err
+      console.error(err)
     }
   }
 
   createRole () {
     this.$router.push({
-      path: this.$route.path + `/add`
+      path: this.$route.path + '/add'
     })
   }
 }

@@ -7,9 +7,9 @@
     <template slot="right">
       <el-button @click="saveData"
                  type="primary">保存</el-button>
-      <el-button>取消</el-button>
+      <el-button @click="()=>{$router.go(-1)}">取消</el-button>
     </template>
-    <component :is="activeTabName"
+    <component v-if="Id?data.name:true" @choose="choose" :is="activeTabName"
                :data="data"></component>
   </header-tab-steps>
 </template>
@@ -22,6 +22,7 @@ import EssentialInformation from '@/views/backstage/office-setting/integral-mana
 import IntegralRule from '@/views/backstage/office-setting/integral-management/new/components/IntegralRule.vue'
 import ScopeOfApplication from '@/views/backstage/office-setting/integral-management/new/components/ScopeOfApplication.vue'
 import TermOfValidity from '@/views/backstage/office-setting/integral-management/new/components/TermOfValidity.vue'
+import lodash from 'lodash'
 
 @Component({
   name: 'IntegralManagementNew',
@@ -36,7 +37,6 @@ import TermOfValidity from '@/views/backstage/office-setting/integral-management
 export default class IntegralManagementNew extends Vue {
   activeTabName = ''
   data: any = {
-    typeId: 2,
     measure: true,
     applyScoreMeasureConfig: {
       define: {
@@ -51,42 +51,120 @@ export default class IntegralManagementNew extends Vue {
     formScoreMeasureConfig: {},
     attendanceScoreMeasureConfig: {
       define: {
-        computeRules: [
-        ]
+        computeRules: []
       }
     },
     reportScoreMeasureConfig: {
       define: {
-        computeRules: [
-        ]
+        computeRules: []
       }
     },
     fixedScoreMeasureConfig: {},
-    applyTargets: [{ targetType: 'User', targetIds: [] }]
+    applyTargets: {
+      peopleIdList: [],
+      orgIdList: [],
+      roleIdList: []
+    }
   }
-  activeIndex: any = ''
-  created () {
-    this.activeIndex = this.$route.query.activeIndex
+
+  async created () {
+    await this.getData()
+    this.$forceUpdate()
+  }
+
+  choose (val:any) {
+    Object.assign(this.data, val)
   }
 
   async saveData () {
-    // const type = this.$route.query.activeIndex
     let res: any
-    this.data.superiorLevelId = this.data.superiorLevelId[this.data.superiorLevelId.length - 1]
+    const orgType = this.data.orgType
+    if (Array.isArray(this.data.superiorLevelId)) {
+      this.data.superiorLevelId = this.data.superiorLevelId[
+        this.data.superiorLevelId.length - 1
+      ]
+    }
     this.switchType()
-    const type = this.data.type
-    delete this.data.type
-    res = await Api.jiliScore.addDataScore(
-      this.data,
-      type === 'BusinessForm' ? 'Form' : type
-    )
-    console.log(res)
+    if (this.Id) {
+      this.data.measure = true
+      res = await Api.jiliScore.updateScoreMeasure(
+        this.Id,
+        orgType === 'BusinessForm' ? 'Form' : orgType,
+        this.data
+      )
+    } else {
+      res = await Api.jiliScore.addDataScore(
+        this.data,
+        orgType === 'BusinessForm' ? 'Form' : orgType
+      )
+    }
+    if (res.data.success) {
+      this.$router.go(-1)
+      this.Id
+        ? this.$message.success('修改成功')
+        : this.$message.success('保存成功')
+    }
+  }
+
+  get Id () {
+    return this.$route.query.id
+  }
+
+  async getData () {
+    if (this.Id) {
+      const data = await Api.jiliScore.getScoreMeasure(this.Id)
+      this.data = lodash.cloneDeep(data.data.data)
+      if (!this.data.applyTargets) {
+        this.data.applyTargets = [{ targetType: 'User', targetIds: [] }]
+      }
+      this.filterData(this.data)
+      const arr = lodash.cloneDeep(this.data.applyTargets)
+      this.data.applyTargets = {}
+      if (arr) {
+        arr.forEach((item: any) => {
+          if (item.targetType === 'User' && item.targetIds.length > 0) {
+            this.data.applyTargets.peopleIdList = item.targetIds
+          }
+          if (item.targetType === 'Org' && item.targetIds.length > 0) {
+            this.data.applyTargets.orgIdList = item.targetIds
+          }
+        })
+      }
+      this.$forceUpdate()
+    }
+  }
+
+  filterData (data: any) {
+    if (data.formScoreMeasureConfig) {
+      data.orgType = 'BusinessForm'
+      data.formScoreMeasureConfig.define = JSON.parse(
+        data.formScoreMeasureConfig.define
+      )
+    } else if (data.inputScoreMeasureConfig) {
+      data.orgType = 'Input'
+    } else if (data.attendanceScoreMeasureConfig) {
+      data.orgType = 'Attendance'
+      data.attendanceScoreMeasureConfig.define = JSON.parse(
+        data.attendanceScoreMeasureConfig.define
+      )
+    } else if (data.reportScoreMeasureConfig) {
+      data.orgType = 'Report'
+      data.reportScoreMeasureConfig.define = JSON.parse(
+        data.reportScoreMeasureConfig.define
+      )
+    } else if (data.fixedScoreMeasureConfig) {
+      data.orgType = 'FixedScore'
+    } else if (data.applyScoreMeasureConfig) {
+      data.orgType = 'Apply'
+    }
   }
 
   switchType () {
-    switch (this.data.type) {
+    switch (this.data.orgType) {
       case 'BusinessForm':
-        this.data.BusinessForm.define = JSON.stringify(this.data.BusinessForm.define)
+        this.data.BusinessForm.define = JSON.stringify(
+          this.data.BusinessForm.define
+        )
         delete this.data.inputScoreMeasureConfig
         delete this.data.attendanceScoreMeasureConfig
         delete this.data.reportScoreMeasureConfig
@@ -94,7 +172,9 @@ export default class IntegralManagementNew extends Vue {
         delete this.data.applyScoreMeasureConfig
         break
       case 'Apply':
-        this.data.applyScoreMeasureConfig.define = JSON.stringify(this.data.applyScoreMeasureConfig.define)
+        this.data.applyScoreMeasureConfig.define = JSON.stringify(
+          this.data.applyScoreMeasureConfig.define
+        )
         delete this.data.inputScoreMeasureConfig
         delete this.data.attendanceScoreMeasureConfig
         delete this.data.reportScoreMeasureConfig
@@ -102,7 +182,9 @@ export default class IntegralManagementNew extends Vue {
         delete this.data.formScoreMeasureConfig
         break
       case 'Attendance':
-        this.data.attendanceScoreMeasureConfig.define = JSON.stringify(this.data.attendanceScoreMeasureConfig.define)
+        this.data.attendanceScoreMeasureConfig.define = JSON.stringify(
+          this.data.attendanceScoreMeasureConfig.define
+        )
         delete this.data.inputScoreMeasureConfig
         delete this.data.formScoreMeasureConfig
         delete this.data.reportScoreMeasureConfig
@@ -110,7 +192,9 @@ export default class IntegralManagementNew extends Vue {
         delete this.data.applyScoreMeasureConfig
         break
       case 'Report':
-        this.data.reportScoreMeasureConfig.define = JSON.stringify(this.data.reportScoreMeasureConfig.define)
+        this.data.reportScoreMeasureConfig.define = JSON.stringify(
+          this.data.reportScoreMeasureConfig.define
+        )
         delete this.data.inputScoreMeasureConfig
         delete this.data.attendanceScoreMeasureConfig
         delete this.data.formScoreMeasureConfig
@@ -118,7 +202,9 @@ export default class IntegralManagementNew extends Vue {
         delete this.data.applyScoreMeasureConfig
         break
       case 'FixedScore':
-        this.data.fixedScoreMeasureConfig.define = JSON.stringify(this.data.fixedScoreMeasureConfig.define)
+        this.data.fixedScoreMeasureConfig.define = JSON.stringify(
+          this.data.fixedScoreMeasureConfig.define
+        )
         delete this.data.inputScoreMeasureConfig
         delete this.data.attendanceScoreMeasureConfig
         delete this.data.reportScoreMeasureConfig
@@ -126,7 +212,9 @@ export default class IntegralManagementNew extends Vue {
         delete this.data.applyScoreMeasureConfig
         break
       case 'Input':
-        this.data.inputScoreMeasureConfig.define = JSON.stringify(this.data.inputScoreMeasureConfig.define)
+        this.data.inputScoreMeasureConfig.define = JSON.stringify(
+          this.data.inputScoreMeasureConfig.define
+        )
         delete this.data.formScoreMeasureConfig
         delete this.data.attendanceScoreMeasureConfig
         delete this.data.reportScoreMeasureConfig
@@ -136,37 +224,49 @@ export default class IntegralManagementNew extends Vue {
         delete this.data.typeInSource
         break
     }
+    const obj = lodash.cloneDeep(this.data.applyTargets)
+    this.data.applyTargets = []
+    if (obj.peopleIdList && obj.peopleIdList.length > 0) {
+      const userObj = {
+        targetType: 'User',
+        targetIds: []
+      }
+      userObj.targetIds = obj.peopleIdList
+      this.data.applyTargets.push(userObj)
+    }
+    if (obj.orgIdList && obj.orgIdList.length > 0) {
+      const orgObj = {
+        targetType: 'Org',
+        targetIds: []
+      }
+      orgObj.targetIds = obj.orgIdList
+      this.data.applyTargets.push(orgObj)
+    }
   }
 
   get tabs () {
     return [
       {
         label: (EssentialInformation as any).title,
-        name: EssentialInformation.name
+        name: EssentialInformation.name,
+        id: this.$route.query.id
       },
       {
         label: (IntegralRule as any).title,
-        name: IntegralRule.name
+        name: IntegralRule.name,
+        id: this.$route.query.id
       },
       {
         label: (ScopeOfApplication as any).title,
-        name: ScopeOfApplication.name
+        name: ScopeOfApplication.name,
+        id: this.$route.query.id
       },
       {
         label: (TermOfValidity as any).title,
-        name: TermOfValidity.name
+        name: TermOfValidity.name,
+        id: this.$route.query.id
       }
     ]
-  }
-  filterConfig (data:any) {
-    data.define.computeRules[1].ruleItems.forEach((item:any) => {
-      if (item.seq !== '介于') {
-        item.seq = 2
-        item.condition.splice(0, 1)
-      } else {
-        item.seq = 1
-      }
-    })
   }
 }
 </script>

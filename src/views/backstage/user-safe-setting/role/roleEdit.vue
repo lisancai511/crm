@@ -11,10 +11,8 @@
           <el-row v-if="!roleId">
             <el-col class="m-t-10"
                     :span="6">
-              <el-checkbox class="m-b-10"
-                           v-model="checkbox">复制</el-checkbox>
-              <el-select :disabled="!checkbox"
-                         style="width: 100%"
+              <div class="m-b-10" style="color:#606266">将从以下角色复制权限</div>
+              <el-select style="width: 100%"
                          v-model="saveData.copyFromRoleId"
                          placeholder="请选择">
                 <el-option v-for="item in roleList"
@@ -51,7 +49,8 @@
         </el-form>
         <el-button @click="nextStep"
                    type="primary"
-                   class="m-t-30">下一步</el-button>
+                   class="m-t-30">下一步
+        </el-button>
       </div>
     </el-card>
   </div>
@@ -64,7 +63,10 @@ import Api from '@/api'
   name: 'Standard'
 })
 export default class Standard extends Vue {
-  saveData: any = {}
+  saveData: any = {
+    copyFromRoleId: -1
+  }
+
   roleList: any = []
   checkbox: boolean = false
 
@@ -86,7 +88,7 @@ export default class Standard extends Vue {
       } = await Api.mainData.getRoles()
       this.roleList = data
     } catch (err) {
-      throw err
+      console.error(err)
     }
   }
 
@@ -97,7 +99,7 @@ export default class Standard extends Vue {
       } = await Api.mainData.getRole(this.roleId)
       this.saveData = data
     } catch (err) {
-      throw err
+      console.error(err)
     }
   }
 
@@ -107,21 +109,22 @@ export default class Standard extends Vue {
         const {
           data: { data }
         } = await Api.mainData.addRole(this.saveData)
-        this.$router.push({
+        await this.$router.push({
           path: `/backstage/user-setting/role/${data.id}/editAuths`
         })
       } catch (err) {
-        throw err
+        console.error(err)
       }
     } else {
       try {
         const { data } = await Api.mainData.updateRole(this.saveData)
-        console.log(data)
-        this.$router.push({
-          path: `/backstage/user-setting/role/${this.roleId}/editAuths`
-        })
+        if (data.success) {
+          await this.$router.push({
+            path: `/backstage/user-setting/role/${this.roleId}/editAuths`
+          })
+        }
       } catch (err) {
-        throw err
+        console.error(err)
       }
     }
   }
@@ -131,6 +134,7 @@ export default class Standard extends Vue {
 .card {
   min-height: calc(100vh - 150px);
 }
+
 /deep/ .el-form-item__label {
   line-height: 24px;
   padding-bottom: 5px;

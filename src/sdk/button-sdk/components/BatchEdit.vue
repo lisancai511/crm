@@ -48,7 +48,13 @@ import PredefinedFieldApiNames from '@/views/designer/config/PredefinedFieldApiN
 import { arrToMap } from '@/utils'
 import FdFormItem from '@/views/designer/components/PCLayout/FdFormItem.vue'
 import { serverFieldToLocalField } from '@/views/designer/utils'
-import { DESIGNER_RUNNING_TYPES } from '@/views/designer/config/Designer'
+import {
+  DESIGNER_EXEC_TYPES,
+  DESIGNER_UI_TYPES,
+  DESIGNER_USED_TYPES
+} from '@/views/designer/config/Designer'
+import { IDesigner } from '@/views/designer/types'
+import { toNormalApiName } from '@/views/app/utils'
 
 // 单行文本
 // 数字
@@ -93,11 +99,15 @@ export default class BatchEdit extends Vue {
   @Prop({ required: true, type: String }) readonly objectId!: string
   @Prop({ required: true, type: String }) readonly objectApiName!: string
   @Prop({ required: true, type: Array }) readonly recordId!: string[]
-  @Provide() designer = {
-    running: {
-      type: DESIGNER_RUNNING_TYPES.FORM
+  @Provide() designer: IDesigner = {
+    object: {},
+    setting: {
+      execType: DESIGNER_EXEC_TYPES.FORM,
+      uiType: DESIGNER_UI_TYPES.PC,
+      usedType: DESIGNER_USED_TYPES.PAAS
     }
   }
+
   fields: any[] = []
   allFields: any[] = []
   loading: boolean = false
@@ -133,6 +143,7 @@ export default class BatchEdit extends Vue {
   //
   // }
 
+  // TODO 批量编辑注册模块有问题   重复打开的时候
   async created () {
     try {
       const [
@@ -142,7 +153,7 @@ export default class BatchEdit extends Vue {
           }
         }
       ] = await Promise.all([
-        api.bizObjects.getFields(this.objectId)
+        api.bizObjects.getFields({ objectId: this.objectId })
       ])
       this.fields = this.allFields = allFields.filter((field: any) => {
         return INCLUDE_FIELD_TYPES.includes(field.dataType) &&
@@ -197,19 +208,16 @@ export default class BatchEdit extends Vue {
             const data: any = {}
             Object.entries(((this.$store.state.app || {}).record || {}).form || {})
               .forEach(([k, v]: [string, any]) => {
-                if (k.includes('__id')) {
-                  k = k.replace('__id', '')
-                }
+                k = toNormalApiName(k)
                 data[k] = v
               })
-            await api.passObjectOp.putAppRecordField({
+            await api.paasObjectOp.putAppRecordField({
               objectApiName: this.objectApiName,
               recordId: this.recordId.join(','),
               data: {
                 ...data
               }
             })
-            this.$store.unregisterModule(['app', 'record'])
             this.$emit('confirm', this.formModel)
           } catch (e) {
             console.error(e)
@@ -222,7 +230,6 @@ export default class BatchEdit extends Vue {
   }
 
   cancel () {
-    this.$store.unregisterModule(['app', 'record'])
     this.$emit('cancel')
   }
 }

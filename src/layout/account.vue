@@ -28,7 +28,7 @@ export default class SignIn extends Vue {
     min-width: 32.5%;
     height: 100%;
     float: left;
-    background: url("https://qzonestyle.gtimg.cn/qzone/qzactStatics/imgs/20171123181522_c48800.jpg") no-repeat 100%;
+    background: url("https://qzonestyle.gtimg.cn/qzone/qzactStatics/imgs/20171122191532_f2975b.jpg") no-repeat 100%;
     background-size: cover;
   }
 

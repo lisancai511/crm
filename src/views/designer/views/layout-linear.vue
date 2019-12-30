@@ -76,7 +76,7 @@ export default class FormDesignLiner extends mixins(initLayout) {
       // console.log(data.define)
       this.layout = data.define.map((item: [string, boolean]) => {
         return {
-          ..._.cloneDeep(designerStore.fieldById[item[0]]),
+          ..._.cloneDeep(designerStore.fieldByApiName[item[0]]),
           required: item[1]
         }
       })
@@ -97,14 +97,18 @@ export default class FormDesignLiner extends mixins(initLayout) {
 .FormDesignLiner {
   height: 100%;
   position: relative;
+  display: flex;
+  flex-direction: column;
 
   .form-design-liner {
     &__wrap {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      bottom: 20px;
-      left: 20px;
+      flex: 1;
+      padding: 20px;
+      /*position: absolute;*/
+      /*top: 20px;*/
+      /*right: 20px;*/
+      /*bottom: 20px;*/
+      /*left: 20px;*/
     }
 
     &__inner {

@@ -36,13 +36,13 @@ function doBuildApp (){
   echo "========================================"
   echo "yarn install"
   echo "========================================"
-  CYPRESS_INSTALL_BINARY=https://npm.taobao.org/mirrors/cypress yarn
+  CYPRESS_INSTALL_BINARY=0 yarn
 
   # build
   echo "========================================"
   echo "build from source"
   echo "========================================"
-  yarn run build
+  yarn build
 }
 
 #########################################

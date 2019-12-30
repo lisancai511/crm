@@ -42,5 +42,5 @@ module.exports = {
     pre[cur.name] = cur.externalName
     return pre
   }, {}) : {},
-  externalsScript: hasExternals ? externals.map(external => `<script src="${external.url}"></script>`).join('') : ``
+  externalsScript: hasExternals ? externals.map(external => `<script src="${external.url}"></script>`).join('') : ''
 }

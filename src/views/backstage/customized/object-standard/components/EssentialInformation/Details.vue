@@ -17,8 +17,22 @@
     </div>
     <div class="main">
       <span class="main_left">Name字段类型</span>
-      <span class="main_right">{{sizeForm.nameFieldType}}</span>
+      <span class="main_right">{{sizeForm.nameFieldType | filterNameType }}</span>
     </div>
+
+    <div v-if="sizeForm.nameFieldType === 'AutoNumberField'" class="main">
+      <span class="main_left">格式</span>
+      <span class="main_right">{{sizeForm.autoNumberFormat}}</span>
+    </div>
+    <div v-if="sizeForm.nameFieldType === 'AutoNumberField'" class="main">
+      <span class="main_left">起始编号</span>
+      <span class="main_right">{{sizeForm.beginNumber}}</span>
+    </div>
+    <div v-if="sizeForm.nameFieldType === 'AutoNumberField'" class="main">
+      <span class="main_left">编号长度</span>
+      <span class="main_right">{{sizeForm.autoNumberLength}}</span>
+    </div>
+
     <div class="main">
       <span class="main_left">图标</span>
       <span class="main_right"><dd-icon :name="sizeForm.iconUrl?sizeForm.iconUrl:''"></dd-icon></span>
@@ -46,10 +60,28 @@
 import { Component, Vue, Prop } from 'vue-property-decorator'
 
 @Component({
-  name: 'EssentialInformationDetails'
+  name: 'EssentialInformationDetails',
+  filters: {
+    filterNameType (val:any) {
+      if (val === 'TextField') {
+        return '文本'
+      }
+      if (val === 'AutoNumberField') {
+        return '编号文本'
+      }
+    }
+  }
 })
 export default class EssentialInformationDetails extends Vue {
   @Prop({ required: true, type: Object }) readonly sizeForm !: any
+
+  NameType: any = [{
+    label: '文本',
+    value: 'TextField'
+  }, {
+    label: '编号文本',
+    value: 'AutoNumberField'
+  }]
 
   edit () {
     this.$emit('edit', true)

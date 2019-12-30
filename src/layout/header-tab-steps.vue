@@ -74,6 +74,7 @@ export default class HeaderTabSteps extends Vue {
     this.$router.replace({
       path: this.$route.path,
       query: {
+        ...this.$route.query,
         tab: tabName
       }
     })
@@ -87,12 +88,14 @@ export default class HeaderTabSteps extends Vue {
 
 <style lang="scss" scoped>
 $headerHeight: 60px;
-.header-tab-steps{
+.header-tab-steps {
   height: 100%;
 }
-.el-main{
+
+.el-main {
   padding: 0;
 }
+
 .fm-header {
   display: flex;
   justify-content: center;

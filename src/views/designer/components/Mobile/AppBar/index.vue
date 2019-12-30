@@ -3,18 +3,19 @@
   <div class="FdMobileComponentsAppBar">
     <dd-icon name="back"/>
     <span>{{designer.object.name}}</span>
-    <dd-icon name="more"></dd-icon>
+    <dd-icon name="more"/>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Inject } from 'vue-property-decorator'
+import { IDesigner } from '@/views/designer/types'
 
 @Component({
   name: 'FdMobileComponentsAppBar'
 })
 export default class FdMobileComponentsAppBar extends Vue {
-  @Inject('designer') readonly designer!: any
+  @Inject('designer') readonly designer!: IDesigner
 }
 </script>
 

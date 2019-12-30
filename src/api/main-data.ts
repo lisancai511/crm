@@ -2,7 +2,7 @@ import axios from '@/plugins/axios'
 import { requestFail, requestSuccess, responseFail, responseSuccess } from '@/plugins/axios/interceptors'
 
 const request = axios.create({
-  baseURL: window.TENANT_REGION_ADDRESS + '/paas-maindata/api/v1/'
+  baseURL: window.TENANT_REGION_ADDRESS + '/paas-maindata/api/v1'
 })
 
 request.interceptors.request.use(requestSuccess, requestFail)
@@ -25,7 +25,7 @@ export function getRoles () {
 export function updateRole (data: any) {
   return request({
     method: 'put',
-    url: `/roles`,
+    url: '/roles',
     data
   })
 }
@@ -56,7 +56,7 @@ export function getRole (roleId: string | number) {
  * @description 创建角色
  * @param {object} data
  */
-export function addRole (data:any) {
+export function addRole (data: any) {
   return request({
     method: 'post',
     url: '/roles',
@@ -70,8 +70,8 @@ export function addRole (data:any) {
  * @param {string | number} objectId
  */
 export function getObjectOperateAuthsByRole (
-  roleId:string | number,
-  objectId:string | number
+  roleId: string | number,
+  objectId: string | number
 ) {
   return request({
     method: 'get',
@@ -84,7 +84,7 @@ export function getObjectOperateAuthsByRole (
  * @param {string | number} roleId
  * @param {object} data
  */
-export function updateRoleObejctField (roleId: string | number, data:any) {
+export function updateRoleObjectField (roleId: string | number, data: any) {
   return request({
     method: 'put',
     url: `/roles/${roleId}/field-auths`,
@@ -97,7 +97,7 @@ export function updateRoleObejctField (roleId: string | number, data:any) {
  * @param {string | number} roleId
  * @param {string | number} objectId
  */
-export function getRoleObejctField (roleId: string | number, objectId:any) {
+export function getRoleObjectField (roleId: string | number, objectId: any) {
   return request({
     method: 'get',
     url: `/roles/${roleId}/field-auths?objectId=${objectId}`
@@ -111,18 +111,40 @@ export function getRoleObejctField (roleId: string | number, objectId:any) {
 export function addOrganization (data: any) {
   return request({
     method: 'post',
-    url: `/organizations`,
+    url: '/organizations',
     data
+  })
+}
+
+/**
+ * @description 删除组织
+ * @param {object} data
+ */
+export function deleteOrganization (orgId: any) {
+  return request({
+    method: 'delete',
+    url: `/organizations/${orgId}`
   })
 }
 
 /**
  * @description 获取组织
  */
-export function getOrganizations (type:boolean) {
+export function getOrganizations (type: boolean) {
   return request({
     method: 'get',
     url: `/organizations?all=${type}`
+  })
+}
+
+/**
+ * @description 修改组织名称
+ */
+export function updateOrganizations (data: any, id:any) {
+  return request({
+    method: 'put',
+    url: `/organizations/${id}`,
+    data
   })
 }
 
@@ -132,7 +154,7 @@ export function getOrganizations (type:boolean) {
 export function getOrganizationsList () {
   return request({
     method: 'get',
-    url: `/organizations/list`
+    url: '/organizations/list'
   })
 }
 
@@ -153,16 +175,7 @@ export function sortOrganizations (firstOrgId: string, secondOrgId: boolean) {
  * @param {boolean} isActive
  */
 export function getUsersList (isActive?: boolean) {
-  let newUrl
-  if (typeof isActive === 'boolean') {
-    newUrl = `/users/activity?activity=${isActive}`
-  } else {
-    newUrl = `/users/activity?activity=`
-  }
-  return request({
-    method: 'get',
-    url: newUrl
-  })
+  return request.get('/users/activity', { params: { isActive } })
 }
 
 /**
@@ -202,7 +215,7 @@ export function getUser (userId: string | number) {
  * @description 创建用户
  * @param {object} data
  */
-export function addUser (data:any) {
+export function addUser (data: any) {
   return request({
     method: 'post',
     url: '/users/createUser',
@@ -226,10 +239,16 @@ export function updateUser (data: any) {
  * @description 获得角色对应的记录类型权限
  * @param {string} roleId
  */
-export function getRoleRecordTypeAuths (roleId:any) {
+export function getRoleRecordTypeAuths (roleId: any, objectId?: any) {
+  let str
+  if (objectId) {
+    str = `/roles/${roleId}/record-type-auths?objectId=${objectId}`
+  } else {
+    str = `/roles/${roleId}/record-type-auths`
+  }
   return request({
     method: 'get',
-    url: `/roles/${roleId}/record-type-auths`
+    url: str
   })
 }
 
@@ -237,10 +256,11 @@ export function getRoleRecordTypeAuths (roleId:any) {
  * @description 获得组织下的所有用户
  * @param {string} roleId
  */
-export function getUsersFromOrg () {
+export function getUsersFromOrg (params: any) {
   return request({
     method: 'get',
-    url: `/users?orgId=111&all=true`
+    url: '/users',
+    params
   })
 }
 
@@ -259,7 +279,7 @@ export function getUsersFromOrg () {
  * 修改角色对应的权限
  * @param objectId
  */
-export function updateRoleObejctAuth (data:any, roleId:any) {
+export function updateRoleObjectAuth (data: any, roleId: any) {
   return request({
     method: 'put',
     url: `/roles/${roleId}/biz-object-operate-auths`,
@@ -271,10 +291,10 @@ export function updateRoleObejctAuth (data:any, roleId:any) {
  * 修改角色对应的app权限
  * @param objectId
  */
-export function updateRoleAppAuth (data:any, roleId:any) {
+export function updateRoleAppAuth (data: any, roleId: any) {
   return request({
     method: 'put',
-    url: `/roles/${roleId}/biz-object-operate-auths`,
+    url: `/roles/${roleId}/app-auths`,
     data
   })
 }
@@ -283,10 +303,10 @@ export function updateRoleAppAuth (data:any, roleId:any) {
  * 获取角色对应的app权限
  * @param objectId
  */
-export function getRoleAppAuth (roleId:any) {
+export function getRoleAppAuth (roleId: any) {
   return request({
     method: 'get',
-    url: `/roles/${roleId}/biz-object-operate-auths`
+    url: `/roles/${roleId}/app-auths`
   })
 }
 
@@ -294,18 +314,31 @@ export function getRoleAppAuth (roleId:any) {
  * 获取角色对应的菜单权限
  * @param objectId
  */
-export function getRoleModuleAuth (roleId:any) {
+export function getRoleModuleAuth (roleId: any) {
   return request({
     method: 'get',
     url: `/roles/${roleId}/menu-visibility-conf`
   })
 }
+
+/**
+ * 修改角色对应的菜单权限
+ * @param objectId
+ */
+export function updateRoleModuleAuth (data: any, roleId: any) {
+  return request({
+    method: 'put',
+    url: `/roles/${roleId}/menu-visibility-conf`,
+    data
+  })
+}
+
 /**
  * 获取角色对应的权限
  * @param objectId
  */
-export function getRoleObejctAuth (roleId:any, objectIds?:any) {
-  let str:any
+export function getRoleObejctAuth (roleId: any, objectIds?: any) {
+  let str: any
   if (objectIds) {
     str = `/roles/${roleId}/biz-object-operate-auths?objectId=${objectIds}`
   } else {
@@ -321,7 +354,7 @@ export function getRoleObejctAuth (roleId:any, objectIds?:any) {
  * 修改角色对应的权限的记录类型
  * @param objectId
  */
-export function updateRoleObejctRecordTypesAuth (data:any, roleId:any) {
+export function updateRoleObejctRecordTypesAuth (data: any, roleId: any) {
   return request({
     method: 'put',
     url: `/roles/${roleId}/record-type-auths?objectId=${roleId}`,
@@ -333,9 +366,105 @@ export function updateRoleObejctRecordTypesAuth (data:any, roleId:any) {
  * 获得角色拥有的对象数据范围权限（数据权限）
  * @param objectId
  */
-export function getObjDataScopAuths (roleId:any) {
+export function getObjDataScopAuths (roleId: any) {
   return request({
     method: 'get',
     url: `/roles/${roleId}/obj-data-scop-auths`
+  })
+}
+
+/**
+ * 修改角色拥有的对象数据范围权限（数据权限）
+ * @param objectId
+ */
+export function updateObjDataScopAuths (roleId: any, data: any) {
+  return request({
+    method: 'put',
+    url: `/roles/${roleId}/obj-data-scop-auths`,
+    data
+  })
+}
+
+/**
+ * 获得当前用户
+ */
+export function getCurrentUser () {
+  return request.get('/current-user')
+  // return Promise.reject(new Error('121221'))
+}
+
+export function uploadUserAvatar (userId: string) {
+  return {
+    url: `${request.defaults.baseURL}/users/${userId}/head-img`
+  }
+}
+
+export function uploadCompanyLogo (tenantId: string) {
+  return {
+    url: `${request.defaults.baseURL}/tenant/${tenantId}/log-img`
+  }
+}
+
+/**
+ * 更新当前用户信息
+ * @param user
+ */
+export function putCurrentUser (user: { name: string, email: string }) {
+  return request.put('/current-user', user)
+}
+
+/**
+ * 获取当前租户
+ */
+export function getCurrentTenant () {
+  return request.get('/current-tenant')
+}
+
+/**
+ * 修改当前租户
+ * @param tenant
+ */
+export function putCurrentTenant (
+  tenant: {
+    name: string,
+    shortName: string,
+    contactUserId: string,
+    telephone: string
+  }
+) {
+  return request.put('current-tenant', tenant)
+}
+
+/**
+ * 获取角色的用户管理权限
+ * @param roleId
+ */
+export function getRoleManageAuth (roleId: any) {
+  return request({
+    method: 'get',
+    url: `/roles/${roleId}/manage-func-auths`
+  })
+}
+
+/**
+ * 修改角色的用户管理权限
+ * @param roleId
+ * @param data
+ */
+export function updateRoleManageAuth (roleId: any, data: any) {
+  return request({
+    method: 'put',
+    url: `/roles/${roleId}/manage-func-auths`,
+    data
+  })
+}
+
+/**
+ * 获取用户的路由权限
+ */
+export function getCurrentUserAuths () {
+  return request({
+    method: 'get',
+    url: '/current-user/manage-func-auths'
   })
 }

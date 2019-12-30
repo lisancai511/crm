@@ -19,7 +19,9 @@
            v-for="iconName in iconNames"
            :key="iconName"
            circle>
-           <dd-icon :full-name="iconName"/>
+           <dd-icon
+             :style="{fontSize:`${size}px`}"
+             :full-name="iconName"/>
          </el-button>
        </div>
     <div class="dd-text-center m-t-20">
@@ -45,6 +47,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
 export default class IconSelectDialog extends Vue {
   @Prop({ required: true, type: Array }) readonly iconNames!: string[]
   @Prop({ required: true, type: String }) readonly value!: string
+  @Prop({ default: 18, type: Number }) readonly size!: number
   dialogVisible: boolean = false
   selectedName: string = ''
 
@@ -60,7 +63,8 @@ export default class IconSelectDialog extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.IconSelectDialog {
+.icon-button__wrap {
+  margin-left: -5px;
   .icon-button {
     margin-left: 10px !important;
     margin-bottom: 10px;

@@ -33,7 +33,7 @@ export default class AppSideBar extends Vue {
           path: `/app/${this.appId}`,
           meta: {
             title: node.name,
-            icon: 'edit'
+            icon: node.iconUrl
           },
           children: node.children.map((menu: IDD.ISMenu) => {
             const name = (this.moduleById[menu.moduleId as string] || {}).name
@@ -43,7 +43,7 @@ export default class AppSideBar extends Vue {
               path: `/app/${this.appId}/${path}`,
               meta: {
                 title: name,
-                icon: 'edit',
+                icon: menu.module && menu.module.iconUrl,
                 inNav: true
               }
             }
@@ -57,7 +57,7 @@ export default class AppSideBar extends Vue {
         path: `/app/${this.appId}/${path}`,
         meta: {
           title: name,
-          icon: 'edit'
+          icon: node.module && node.module.iconUrl
         }
       }
     })
@@ -81,7 +81,8 @@ export default class AppSideBar extends Vue {
     this.plainMenus = []
     api.metaData.getApp(
       newAppId,
-      this.source.token
+      this.source.token,
+      { checkAuth: true }
     ).then((res: any) => {
       this.plainMenus = res.data.data.menus
     }).finally(() => {
@@ -91,7 +92,7 @@ export default class AppSideBar extends Vue {
 
   created () {
     if (this.$store.state.app.modules.length === 0) {
-      this.$store.dispatch('app/getModules')
+      this.$store.dispatch('app/getModules', { checkAuth: true })
     }
   }
 }

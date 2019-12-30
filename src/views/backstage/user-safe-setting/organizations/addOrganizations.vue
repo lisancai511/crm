@@ -44,6 +44,7 @@ export default class Standard extends Vue {
     parentId: null,
     name: null
   }
+
   roleList: any = []
 
   get parentId () {

@@ -1,6 +1,6 @@
 import { arrToMap } from '@/utils'
 import {
-  basicComponents,
+  basicComponents, detailedComponents,
   fictitiousComponents,
   layoutComponents,
   tabDetailsComponents,
@@ -15,7 +15,8 @@ const containerComponentByType = arrToMap([
   ...fictitiousComponents,
   ...basicComponents,
   ...tabDetailsComponents,
-  ...tabDetailsRelatedListComponents
+  ...tabDetailsRelatedListComponents,
+  ...detailedComponents
 ], 'type')
 
 export default containerComponentByType

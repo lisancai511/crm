@@ -54,13 +54,13 @@ export default class SideBar extends Vue {
     }
   }
 
-  // get moduleById (): IObjectById {
-  //   if (/^\/app\/:appId\/:moduleId_objectId/.test(this.$route.matched[this.$route.matched.length - 1].path)) {
-  //     return this.$store.getters['app/moduleById']
-  //   } else {
-  //     return {}
-  //   }
-  // }
+  get moduleById (): IObjectById {
+    if (/^\/app\/:appId\/:moduleId_objectId/.test(this.$route.matched[this.$route.matched.length - 1].path)) {
+      return this.$store.getters['app/moduleById']
+    } else {
+      return {}
+    }
+  }
 
   // @Watch('$route', { immediate: true, deep: true })
   // on$RouterChange () {
@@ -95,18 +95,29 @@ export default class SideBar extends Vue {
           }
         }
       }
+      // 如果是应用页面
       if (/^\/app\/:appId\/:moduleId_objectId$/.test(item.path)) {
+        // eslint-disable-next-line camelcase
+        const [moduleId] = (this.$route.params?.moduleId_objectId || '').split('_')
         return {
           ...item,
           meta: {
             ...item.meta,
-            title: (((this.$store.state.app || {}).record || {}).form || {}).name || item.meta.title
+            title: this.moduleById[moduleId]?.name
+            // title: this.$store.state.app?.record?.form?.name || item.meta.title
           }
         }
       }
       // 如果是记录详情页面
-      // if (/^\/app\/:appId\/:moduleId_objectId\/records\/:recordId/.test(item.path)) {
-      // }
+      if (/^\/app\/:appId\/:moduleId_objectId\/records\/:recordId/.test(item.path)) {
+        return {
+          ...item,
+          meta: {
+            ...item.meta,
+            title: item.name === 'EditAppRecord' ? '编辑' : this.$store.state.app?.record?.form?.name
+          }
+        }
+      }
       return item
     })
   }

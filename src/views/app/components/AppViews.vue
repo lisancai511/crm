@@ -49,21 +49,23 @@
                     :key="apiName"
                     :label="fieldByApiName[apiName].name"
                     :label-length="maxLabelLength"
-                    :type="fieldByApiName[apiName].dataType"/>
+                    :type="fieldByApiName[apiName].type"/>
                 </el-tab-pane>
               </el-tabs>
               <div class="terms-buttons">
                 <app-setting-fields-dialog
                   :checked-list="curCheckedFieldApiNames"
                   @update="updateFields"
-                  :fields="fields.filter(field => TermsFieldTypesList.includes(field.dataType))">
+                  :fields="fields.filter(field => TermsFieldTypesList.includes(field.type))">
                   <el-button
-                    class="terms-buttons-setting" type="text">
+                    class="terms-buttons-setting dd-button__text dd-button__text--info"
+                    type="text">
                     <dd-icon name="setting"/>
                     <span> 设置</span>
                   </el-button>
                 </app-setting-fields-dialog>
                 <el-button
+                  class="dd-button__text dd-button__text--info"
                   @click="saveOtherView"
                   type="text">保存当前搜索条件
                 </el-button>
@@ -89,6 +91,7 @@ import ComponentTypes from '@/views/designer/config/ComponentTypes'
 import api from '@/api'
 import { mixins } from 'vue-class-component'
 import routerParams from '@/views/app/mixins/router-params'
+import handleClickButton from '@/views/app/mixins/handle-click-button'
 import { arrToMap } from '@/utils'
 import AppSettingFieldsDialog from '@/views/app/components/AppSettingFieldsDialog.vue'
 import { ListViewOperators, TermsFieldTypesList } from '@/views/app/const'
@@ -100,7 +103,7 @@ import AppRecordRecordTypeDialog from '@/views/app/components/AppRecordRecordTyp
   name: 'AppViews',
   components: { AppRecordRecordTypeDialog, AppSettingFieldsDialog, AppViewsTerms }
 })
-export default class AppViews extends mixins(routerParams) {
+export default class AppViews extends mixins(routerParams, handleClickButton) {
   @Prop({ required: true, type: Array }) readonly fields !: any[]
   @Prop({ required: true, type: Array }) readonly buttons !: any[]
   @Prop({ required: true, type: Object }) readonly curListView !: any
@@ -148,8 +151,10 @@ export default class AppViews extends mixins(routerParams) {
       if (this.terms[apiName]) {
         terms[apiName] = this.terms[apiName]
       } else {
-        switch (this.fieldByApiName[apiName].dataType) {
+        switch (this.fieldByApiName[apiName].type) {
           case ComponentTypes.OptionListField:
+          case ComponentTypes.CheckBoxField:
+          case ComponentTypes.DateField:
             terms[apiName] = []
             break
           default:
@@ -164,7 +169,7 @@ export default class AppViews extends mixins(routerParams) {
     return Math.max(
       ...this.curCheckedFieldApiNames
         .map((apiName: string) => (this.fieldByApiName[apiName].name || '到达到达到达')
-        // eslint-disable-next-line no-control-regex
+          // eslint-disable-next-line no-control-regex
           .replace(/[^\x00-\xff]/g, '01').length / 2)
     )
   }
@@ -188,18 +193,19 @@ export default class AppViews extends mixins(routerParams) {
         }
         return false
       }).map(({ fieldApiName, values }) => {
-        switch (this.fieldByApiName[fieldApiName].dataType) {
+        switch (this.fieldByApiName[fieldApiName].type) {
+          // case ComponentTypes.DateField:
+          //   return typeof values === 'string'
+          //     ? {
+          //       fieldApiName,
+          //       operator: ListViewOperators.EQ,
+          //       values: [values]
+          //     } : {
+          //       fieldApiName,
+          //       operator: ListViewOperators.IN,
+          //       values
+          //     }
           case ComponentTypes.DateField:
-            return typeof values === 'string'
-              ? {
-                fieldApiName,
-                operator: ListViewOperators.EQ,
-                values: [values]
-              } : {
-                fieldApiName,
-                operator: ListViewOperators.IN,
-                values
-              }
           case ComponentTypes.DateTimeField:
             return {
               fieldApiName,
@@ -207,12 +213,12 @@ export default class AppViews extends mixins(routerParams) {
               values: values
             }
           case ComponentTypes.OptionListField:
+          case ComponentTypes.CheckBoxField:
             return {
               fieldApiName,
               operator: ListViewOperators.IN,
               values
             }
-          case ComponentTypes.CheckBoxField:
           case ComponentTypes.LookUpField:
             return {
               fieldApiName,
@@ -330,23 +336,13 @@ export default class AppViews extends mixins(routerParams) {
   handleClickButton (button: any) {
     switch (button.apiName) {
       case PredefinedButtonApiNames.new:
-        this.newRecord()
+        this.newRecord(`${this.$route.path}/records/new`)
+        break
+      case PredefinedButtonApiNames.batchNew:
+        this.batchNewRecord(`${this.$route.path}/records/batch-new`)
         break
       default:
     }
-  }
-
-  async newRecord () {
-    // await this.$router.push(`${this.$route.path}/records/new`)
-    const recordType = await (this.$refs as any).recordTypeDialog.selectRecordType()
-    const query: any = {}
-    if (recordType) {
-      query.recordTypeId = recordType.id
-    }
-    await this.$router.push({
-      path: `${this.$route.path}/records/new`,
-      query
-    })
   }
 
   //  按钮点击end
@@ -461,6 +457,9 @@ export default class AppViews extends mixins(routerParams) {
   }
 
   .body-tabs {
+    flex: 1;
+    overflow: hidden;
+
     /deep/ .el-tabs {
       &__header {
         display: none;
@@ -469,7 +468,7 @@ export default class AppViews extends mixins(routerParams) {
   }
 
   .terms-pane {
-    .AppViewsTerms {
+    .app-views-terms {
       margin-bottom: 10px;
 
       &:last-child {

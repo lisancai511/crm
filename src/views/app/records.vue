@@ -33,6 +33,7 @@ import { arrToMap } from '@/utils'
 import _ from 'lodash'
 import PredefinedFieldApiNames from '@/views/designer/config/PredefinedFieldApiNames'
 import { ButtonPositions } from '@/sdk/button-sdk/PredefinedButton'
+import { serverFieldToLocalField } from '@/views/designer/utils'
 
 const CancelToken = axios.CancelToken
 
@@ -118,12 +119,13 @@ export default class AppRecords extends mixins(routerParams) {
     this.source = CancelToken.source()
     this.fields = []
     api.bizObjects.getFields(
-      this.objectId,
-      null,
-      null,
-      this.source.token
+      {
+        objectId: this.objectId,
+        cancelToken: this.source.token
+      }
     ).then((res: any) => {
-      this.fields = res.data.data
+      // this.fields = res.data.data
+      this.fields = res.data.data.map(serverFieldToLocalField)
     }).finally(() => {
       this.loadingFields = false
     })
@@ -139,7 +141,10 @@ export default class AppRecords extends mixins(routerParams) {
     this.buttons = []
     api.bizObjects.getOperators(
       this.objectId,
-      'Button',
+      {
+        type: 'Button',
+        checkAuth: true
+      },
       this.sourceButton.token
     ).then((res: any) => {
       this.buttons = res.data.data
@@ -195,7 +200,11 @@ export default class AppRecords extends mixins(routerParams) {
   activatedAppList () {
     this.$nextTick(() => {
       if (
-        ['NewAppRecord', 'EditAppRecord'].includes((this._from || {}).name) ||
+        [
+          'BatchNewAppRecord',
+          'NewAppRecord',
+          'EditAppRecord'
+        ].includes((this._from || {}).name) ||
         this.$route.query.update
       ) {
         (this.$refs as any).appList.getRecords()

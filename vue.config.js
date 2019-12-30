@@ -1,7 +1,11 @@
 const externalsConfig = require('./externals.config')
 const staticEnvConfig = require('./static.env.config')
+const icons = require('./pre-build/icon/urls')
+const iconConfig = require('./pre-build/icon')
 process.env.VUE_APP_EXTERNALS_SCRIPT = externalsConfig.externalsScript
 process.env.VUE_APP_ENV_SCRIPT = staticEnvConfig.script
+process.env.VUE_APP_ICONS = JSON.stringify(icons)
+process.env.VUE_APP_ICON_SCRIPT = iconConfig.script
 const css = process.env.NODE_ENV === 'development'
   ? {} : { extract: { filename: 'css/dd.[hash:8].css' } }
 
@@ -12,8 +16,9 @@ module.exports = {
     loaderOptions: {
       sass: {
         sourceMap: process.env.NODE_ENV === 'development',
-        data: `
+        prependData: `
           @import "@/styles/_variables.scss";
+          @import "@/styles/_design.scss";
         `
       }
     },
@@ -64,10 +69,18 @@ module.exports = {
         pathRewrite: {
           '/jili-score': ''
         }
-      }
+      },
       // '/': {
       //   target: 'http://192.168.3.105:8100/api/v1'
       // }
+      '/api': {
+        target: 'http://192.168.3.151:8084',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '/paas-metadata/api/v1': '/api'
+        }
+      }
     }
   }
 }

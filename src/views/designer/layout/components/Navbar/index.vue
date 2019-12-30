@@ -1,6 +1,7 @@
 <!--Created by LiuLei on 2019/9/5-->
 <template>
-  <div class="form-design-navbar">
+  <div v-loading.fullscreen.lock="saving"
+       class="form-design-navbar">
     <div class="navbar__left">
       <el-menu
         mode="horizontal"
@@ -46,23 +47,23 @@ import LayoutTypes from '@/views/designer/config/LayoutTypes'
 import api from '@/api'
 import {
   compressStringToBase64,
-  getLocalLayoutFields,
+  // getLocalLayoutFields,
   getLocalLayoutNeedAddFields,
   getLocalLayoutNeedModifyFields,
   getLocalLayoutUsedFields,
   localFieldToServerField,
-  localLayoutToServer
+  localLayoutToServer, validLocalLayout
 } from '@/views/designer/utils'
 import { IField, fieldComponents } from '@/views/designer/config/components'
 import { IHoverLookup } from '@/views/designer/types'
 import initLayoutBaseData from '@/views/designer/mixins/initLayoutBaseData'
 import _ from 'lodash'
 import AsyncValidator from 'async-validator'
-import allSettled from 'promise.allsettled'
+// import allSettled from 'promise.allsettled'
 
 (AsyncValidator as any).warning = function () {
 }
-const fieldComponentByType: { [prop: string]: IField } = arrToMap(fieldComponents, 'type')
+// const fieldComponentByType: { [prop: string]: IField } = arrToMap(fieldComponents, 'type')
 
 @Component({
   name: 'FormDesignNavBar'
@@ -237,65 +238,19 @@ export default class FormDesignNavBar extends mixins(initLayoutBaseData) {
   async savePcOrMobile (type: LayoutTypes.PC | LayoutTypes.Mobile) {
     const ui = designerStore.layout[type]
 
-    const allUsedFields: IField[] = getLocalLayoutFields(ui.define)
+    // const allUsedFields: IField[] = getLocalLayoutFields(ui.define)
     const serverFields: IField[] = designerStore.fields
-    const allFields = [...new Set([...serverFields, ...allUsedFields])]
+    // const allFields = [...new Set([...serverFields, ...allUsedFields])]
     // 验证当前显示的表单
-    this.$bus.$emit('designer/layout/valid')
-    const validResult = await allSettled(allUsedFields.map((field: IField) => {
-      const configRules: any = fieldComponentByType[field.type].configRules
-      // TODO 递归格式化验证规则
-      const copyRules = _.cloneDeep(configRules)
-      this.flatRules(copyRules)
-      // console.log(copyRules)
-      // 验证name和apiName重复
-      // TODO 优化算法
-      const otherUsedFieldNames: string[] = []
-      const otherUsedFieldApiNames: string[] = []
-      allFields.forEach((_field: IField) => {
-        if (_field.id) {
-          if (_field.id === field.id) {
-            return
-          }
-        } else {
-          if (_field === field) {
-            return
-          }
-        }
-        otherUsedFieldNames.push(_field.name)
-        otherUsedFieldApiNames.push(_field.apiName)
-      })
-      const dynamicConfigRules: any = ((this.fieldComponentByType[field.type] || {}) as IField).dynamicConfigRules
-      const dynamicRules: any = dynamicConfigRules({
-        otherUsedFieldNames: otherUsedFieldNames,
-        otherUsedFieldApiNames: otherUsedFieldApiNames
-      })
-      // console.log(dynamicRules)
-      Object.entries(copyRules as any).forEach(([k, v]) => {
-        if (dynamicRules[k]) {
-          (v as any[]).push(dynamicRules[k])
-        }
-      })
-      // console.log(field)
-      const validator = new AsyncValidator(copyRules)
-      return new Promise((resolve, reject) => {
-        validator.validate(field, { firstFields: true })
-          .then((data) => {
-            this.$set(field, 'isError', false)
-            resolve(data)
-          })
-          .catch((err: any) => {
-            this.$set(field, 'isError', true)
-            reject(err)
-          })
-      })
-    }))
+    const validResult = await validLocalLayout({
+      vm: this,
+      serverFields,
+      uiDefine: ui.define
+    })
     // console.log(validResult)
     if (validResult.some(item => item.status === 'rejected')) {
       return
     }
-    // console.log(getLocalLayoutNeedAddFields(ui.define))
-    console.log(localLayoutToServer(ui.define))
     const layoutUI = {
       ...ui,
       usedFields: getLocalLayoutUsedFields(ui.define).map((field: IField) => {
@@ -313,7 +268,7 @@ export default class FormDesignNavBar extends mixins(initLayoutBaseData) {
     }
     // return
     await this.saveUI(layoutUI)
-    this.$bus.$emit(`designer/updateSelectLayout`, null)
+    this.$bus.$emit('designer/updateSelectLayout', null)
   }
 
   async saveLinear () {
@@ -322,7 +277,7 @@ export default class FormDesignNavBar extends mixins(initLayoutBaseData) {
       ...ui,
       define: compressStringToBase64(
         JSON.stringify((ui.define as any[]).map((item: any) => {
-          return [item.id, !!item.required]
+          return [item.apiName, !!item.required]
         }))
       )
     }
@@ -335,20 +290,21 @@ export default class FormDesignNavBar extends mixins(initLayoutBaseData) {
       ...ui,
       define: compressStringToBase64(
         JSON.stringify({
-          usedFields: ui.define.usedFields.map((item: IField) => item.id),
+          usedFields: ui.define.usedFields.map((item: IField) => item.apiName),
           lookups: ui.define.lookups.filter((item: IHoverLookup) => item.checked)
             .map((item: IHoverLookup) => {
               return {
                 id: item.id,
                 objectId: item.objectId,
                 relatedListTitle: item.relatedListTitle,
-                usedFields: item.usedFields.map((field: IField) => field.id)
+                usedFields: item.usedFields.map((field: IField) => field.apiName)
               }
             })
         })
       )
     }
     await this.saveUI(layoutUI)
+    this.$bus.$emit(`designer/saved/${LayoutTypes.Hover}`)
   }
 
   // 请求接口

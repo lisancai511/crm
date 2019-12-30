@@ -17,11 +17,13 @@
               :key="app.id"
               :index="`${app.id}`">{{app.name}}
             </el-menu-item>
+            <el-menu-item :key="123">激励
+            </el-menu-item>
           </el-submenu>
         </el-menu>
       </div>
     </nav-bar>
-    <router-view name="sideBar"></router-view>
+    <router-view name="sideBar"/>
     <side-bar/>
     <div class="dd-main__wrap">
       <div class="dd-main">
@@ -75,7 +77,7 @@ export default class ApplicationLayout extends Vue {
   }
 
   async initApp () {
-    await this.$store.dispatch('app/getApps')
+    await this.$store.dispatch('app/getApps', { checkAuth: true })
     if (!this.appId && this.apps.length > 0) {
       await this.$router.push(`${this.$route.path}/${(this.apps[0] || {}).id || ''}`)
     }
@@ -85,6 +87,7 @@ export default class ApplicationLayout extends Vue {
     if (appId === this.appId) {
       return
     }
+    debugger
     this.$router.push(pathToRegexp.compile(
       '/app/:appId/'
     )({ appId }))

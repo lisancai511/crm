@@ -20,7 +20,7 @@
             <span slot="title">
               <dd-icon
                 style="margin-left:-10px;margin-right:10px"
-                :name="item.meta.icon||'a'"></dd-icon>
+                :full-name="item.meta.icon||'a'"></dd-icon>
               {{ item.meta.title }}</span>
             </el-menu-item>
             <nest-menu

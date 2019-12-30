@@ -12,6 +12,7 @@
         <div class="timeline__wrap">
           <div class="timeline__button-new timeline__button-new__wrap">
             <el-button
+              class="dd-button__text dd-button__text--info"
               v-if="usedButtonApiNames.includes(PredefinedButtonApiNames.new)"
               type="text">
               写跟进
@@ -33,11 +34,13 @@
                  </span>
                     <div class="timeline__buttons">
                       <el-button
+                        class="dd-button__text dd-button__text--info"
                         v-if="usedButtonApiNames.includes(PredefinedButtonApiNames.edit)"
                         type="text">
                         编辑
                       </el-button>
                       <el-button
+                        class="dd-button__text dd-button__text--info"
                         v-if="usedButtonApiNames.includes(PredefinedButtonApiNames.delete)"
                         type="text">
                         删除

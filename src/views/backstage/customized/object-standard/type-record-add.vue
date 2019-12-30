@@ -15,7 +15,7 @@
           <el-form-item label="记录类型标签">
             <el-input style="width:500px"
                       v-model="formLabelAlign.name"
-                      placeholder="请输入内容"></el-input>
+                      placeholder="请输入内容"/>
           </el-form-item>
           <el-form-item>
             <el-checkbox v-model="formLabelAlign.enable">启用</el-checkbox>
@@ -86,6 +86,7 @@ export default class TypeRecordTypeAdd extends Vue {
   private formLabelAlign: any = {
     roleToRecordTypes: []
   }
+
   roleList: any = []
   layoutList: any = []
 
@@ -141,7 +142,7 @@ export default class TypeRecordTypeAdd extends Vue {
     ])
     if (!this.recordTypeId) {
       this.roleList.forEach((item: any) => {
-        let obj: any = {}
+        const obj: any = {}
         obj.roleId = item.id
         this.formLabelAlign.roleToRecordTypes.push(obj)
       })

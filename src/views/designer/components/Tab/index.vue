@@ -2,10 +2,10 @@
 <template>
   <div
     v-if="layout.children && layout.children.length > 0"
-    :class="{'designer--mobile':designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.MOBILE}"
+    :class="{'designer--mobile':DESIGNER_UI_TYPES.MOBILE === designer.setting.uiType}"
     class="com-tab">
     <el-tabs v-model="tabValue"
-             :class="{'is-select':layout.isSelect && this.designer.setting}">
+             :class="{'is-select':layout.isSelect && DESIGNER_EXEC_TYPES.DESIGNER === designer.setting.execType}">
       <el-tab-pane v-for="(tab) in layout.children.filter(tab => tab.show)"
                    lazy
                    :key="tab.key"
@@ -52,7 +52,7 @@ import FdComponentsTabFollowUp from '@/views/designer/components/Tab/FollowUp.vu
 
 import { mixins } from 'vue-class-component'
 import updateCurrentField from '@/views/designer/mixins/updateCurrentField'
-import { DESIGNER_PLATFORMS } from '@/views/designer/config/Designer'
+import { DESIGNER_EXEC_TYPES, DESIGNER_UI_TYPES } from '@/views/designer/config/Designer'
 
 @Component({
   name: 'FdComponentsTab',
@@ -71,8 +71,12 @@ export default class FdComponentsTab extends mixins(updateCurrentField) {
     return ComponentTypes
   }
 
-  get DESIGNER_PLATFORMS () {
-    return DESIGNER_PLATFORMS
+  get DESIGNER_UI_TYPES () {
+    return DESIGNER_UI_TYPES
+  }
+
+  get DESIGNER_EXEC_TYPES () {
+    return DESIGNER_EXEC_TYPES
   }
 
   created () {
@@ -172,6 +176,10 @@ export default class FdComponentsTab extends mixins(updateCurrentField) {
 
         &__content {
           padding: 0;
+
+          /deep/ .pc-layout.el-col {
+            overflow-y: hidden;
+          }
         }
       }
 

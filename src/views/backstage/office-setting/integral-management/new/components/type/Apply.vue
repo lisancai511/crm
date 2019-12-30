@@ -73,19 +73,6 @@
                    v-model="data.applyScoreMeasureConfig.needPhoto">申请时需上传照片</el-checkbox>
     </div>
     <div class="title">
-      每月最晚申请时间
-      <el-select class="m-t-10"
-                 v-model="data.applyScoreMeasureConfig.latestApplyTimeValue"
-                 style="width:100%;"
-                 placeholder="请选择">
-        <el-option v-for="item in 28"
-                   :key="item.value"
-                   :label="item+'号'"
-                   :value="item">
-        </el-option>
-      </el-select>
-    </div>
-    <div class="title">
       配置审批流
      <!-- TODO 选择一个审批流 -->
     </div>
@@ -105,6 +92,7 @@ export default class EssentialInformation extends Vue {
   latestApplyTimeValue:any = ''
   created () {
   }
+
   changeRadio (val:any) {
     this.data.applyScoreMeasureConfig.scoreType = val
   }

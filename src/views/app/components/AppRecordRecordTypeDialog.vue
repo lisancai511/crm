@@ -60,7 +60,7 @@ export default class AppRecordRecordTypeDialog extends mixins(routerParams) {
       this.reject = reject
       if (this.recordTypes.length === 0) {
         try {
-          await api.bizObjects.getAllRecordTypes(this.objectId).then((res: any) => {
+          await api.bizObjects.getAllRecordTypes(this.objectId, { checkAuth: true }).then((res: any) => {
             this.recordTypes = res.data.data
           })
         } catch (e) {

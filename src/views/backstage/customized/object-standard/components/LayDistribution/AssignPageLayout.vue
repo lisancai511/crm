@@ -14,12 +14,12 @@
                        min-width='200'
                        :label="item.name">
         <template slot-scope="scope">
-          <el-input v-model="input"
+          <el-input v-model="selectMaps[item.id + '_' + scope.row.id]"
                     placeholder="请选择"
                     class="dd-click"
                     suffix-icon="el-icon-arrow-down"
-                    v-if="!selectMaps[item.id + '_' + scope.row.id]"
-                    @focus="showSelect(item.id + '_' + scope.row.id)"> placeholder="请输入内容"></el-input>
+                    v-if="currentKey!==item.id + '_' + scope.row.id"
+                    @focus="showSelect(item.id + '_' + scope.row.id)"></el-input>
           <el-select v-else
                      :ref="item.id + '_' + scope.row.id"
                      clearable
@@ -42,6 +42,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import Api from '@/api'
+import { arrToMap } from '@/utils'
 
 @Component({
   name: 'LayDistribution'
@@ -51,8 +52,8 @@ export default class LayDistribution extends Vue {
   roleList: any = []
   layoutList: any = []
   recordTypesList: any = []
-  data: any = []
-  selectMaps: any = {}
+  Authdata: any = []
+  currentKey:string = ''
   input: any = ''
 
   created () {
@@ -63,8 +64,35 @@ export default class LayDistribution extends Vue {
     return this.$route.params.objectId
   }
 
+  get layoutMaps () {
+    const tempMaps:any = {}
+    this.saveArr.forEach((outArr:any) => {
+      outArr.forEach((innerArr:any) => {
+        tempMaps[`${innerArr.recordTypeId}_${innerArr.roleId}`] = innerArr.layoutId
+      })
+    })
+    return tempMaps
+  }
+
+  get layoutById () {
+    return arrToMap(this.layoutList, 'id')
+  }
+
+  get selectMaps () {
+    const tempMaps:any = {}
+    this.recordTypesList.forEach((type:any) => {
+      this.roleList.forEach((role:any) => {
+        const key = type.id + '_' + role.id
+        tempMaps[key] = (this.layoutById[this.layoutMaps[key]] || {}).name
+      })
+    })
+    return tempMaps
+  }
+
+  set selectMaps (val:any) {}
+
   async getData () {
-    ;[
+    [
       {
         data: { data: this.roleList }
       },
@@ -75,7 +103,7 @@ export default class LayDistribution extends Vue {
         data: { data: this.recordTypesList }
       },
       {
-        data: { data: this.data }
+        data: { data: this.Authdata }
       }
     ] = await Promise.all([
       Api.mainData.getRoles(),
@@ -87,20 +115,30 @@ export default class LayDistribution extends Vue {
       this.recordTypesList.push({ id: -1, name: '默认' })
     }
     this.roleList.forEach((item: any) => {
-      let arr: any = []
+      const arr: any = []
       this.recordTypesList.forEach((item0: any) => {
-        let obj: any = {}
+        const obj: any = {}
         obj.roleId = item.id
         obj.recordTypeId = item0.id
+        obj.layoutId = null
         arr.push(obj)
       })
       this.saveArr.push(arr)
     })
+    this.saveArr.forEach((item:any) => {
+      item.forEach((item0:any) => {
+        this.Authdata.forEach((item1:any) => {
+          if (item0.roleId === item1.roleId && item0.recordTypeId === item1.recordTypeId) {
+            item0.layoutId = item1.layoutId
+          }
+        })
+      })
+    })
   }
 
   async saveData () {
-    let newAry: any = []
-    let ary = this.saveArr.flat()
+    const newAry: any = []
+    const ary = this.saveArr.flat()
     ary.map((item: any) => {
       if (item.layoutId) {
         newAry.push(item)
@@ -118,7 +156,7 @@ export default class LayDistribution extends Vue {
   }
 
   showSelect (key: string) {
-    this.$set(this.selectMaps, key, true)
+    this.currentKey = key
     this.$nextTick(() => {
       ;(this.$refs as any)[key][0].focus()
       ;(this.$refs as any)[key][0].$el.click()

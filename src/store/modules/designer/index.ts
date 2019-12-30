@@ -52,11 +52,13 @@ export interface ILayoutItem {
   isInit: boolean
 }
 
+export interface IHoverLayoutItemDefine {
+  usedFields: any[]
+  lookups: any[]
+}
+
 export interface IHoverLayoutItem extends ILayoutItem {
-  define: {
-    usedFields: any[]
-    lookups: any[]
-  }
+  define: IHoverLayoutItemDefine
 }
 
 export interface ILayout {
@@ -181,6 +183,7 @@ class Designer extends VuexModule implements IDesignerState {
       type: 'PC'
     }
   }
+
   public fieldsByObjectId: { [propName: string]: any[] } = {}
   public followUpTypes: any[] = []
 
@@ -218,6 +221,7 @@ class Designer extends VuexModule implements IDesignerState {
   get buttonById (): any {
     return arrToMap(this.buttons.filter(button => !!button.id), 'id')
   }
+
   get buttonByApiName (): any {
     return arrToMap(this.buttons.filter(button => !!button.id), 'apiName')
   }
@@ -335,7 +339,10 @@ class Designer extends VuexModule implements IDesignerState {
   @Action
   async getAllFields () {
     try {
-      const { data: { data } } = await api.bizObjects.getFields(this.object.id, null, this.layoutId)
+      const { data: { data } } = await api.bizObjects.getFields({
+        objectId: this.object.id,
+        layoutId: this.layoutId
+      })
       this.UPDATE_FIELDS(
         data.map((item: any) => ({
           key: '' + item.id,
@@ -352,7 +359,7 @@ class Designer extends VuexModule implements IDesignerState {
   async getAllButtons () {
     try {
       // @ts-ignore
-      const { data: { data } } = await api.bizObjects.getOperators(this.object.id, 'Button')
+      const { data: { data } } = await api.bizObjects.getOperators(this.object.id, { type: 'Button' })
       this.UPDATE_BUTTONS((data).map((item: any) => ({ key: '' + item.id, ...item })))
     } catch (e) {
       console.error(e)
@@ -436,7 +443,7 @@ class Designer extends VuexModule implements IDesignerState {
     //   objectId
     // })
     try {
-      const { data: { data } } = await api.bizObjects.getFields(objectId)
+      const { data: { data } } = await api.bizObjects.getFields({ objectId })
       this.UPDATE_FIELDS_BY_OBJECT_ID({
         fields: data,
         objectId

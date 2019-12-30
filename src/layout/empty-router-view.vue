@@ -1,8 +1,8 @@
 <!--Created by LiuLei on 2019/10/31-->
 <template>
-  <!--  <component :is="$route.meta.keepAlive ? 'keep-alive' : 'router-view'">     &lt;!&ndash;使用keep-alive会将页面缓存&ndash;&gt;-->
+  <!--  <components :is="$route.meta.keepAlive ? 'keep-alive' : 'router-view'">     &lt;!&ndash;使用keep-alive会将页面缓存&ndash;&gt;-->
   <!--    <router-view v-if="$route.meta.keepAlive"></router-view>-->
-  <!--  </component>-->
+  <!--  </components>-->
   <!--  <router-view v-if="!$route.meta.keepAlive"></router-view>-->
   <div style="height: 100%">
     <keep-alive>

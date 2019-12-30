@@ -8,7 +8,7 @@
           {{layout.attrs.relatedListTitle}}
         </strong>
       </div>
-<!--      {{usedButtons.map(item => item.apiName)}}-->
+      <!--      {{usedButtons.map(item => item.apiName)}}-->
       <el-button
         v-show="usedButtonByApiName[PredefinedButtonApiNames.new]"
         plain
@@ -58,7 +58,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <div v-if="designer.setting"
+    <div v-if="designer.setting.execType === DESIGNER_EXEC_TYPES.DESIGNER"
          :class="{'dd-fence':layout.isSelect}"
          class="dd-fence-mask">
     </div>
@@ -67,12 +67,13 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Inject } from 'vue-property-decorator'
-// import { mixins } from 'vue-class-component'
+// import { mixins } from 'vue-class-components'
 // import updateCurrentField from '@/views/designer/mixins/updateCurrentField'
 import { IField } from '@/views/designer/config/components'
 import { arrToMap } from '@/utils'
 import { PredefinedButtonApiNames } from '@/sdk/button-sdk/PredefinedButton'
 import designerStore from '@/store/modules/designer'
+import { DESIGNER_EXEC_TYPES } from '@/views/designer/config/Designer'
 
 @Component({
   name: 'RelatedListItem'
@@ -80,6 +81,10 @@ import designerStore from '@/store/modules/designer'
 export default class RelatedListItem extends Vue {
   @Prop({ required: true, type: Object }) readonly layout!: IField
   @Inject('designer') readonly designer!: any
+
+  get DESIGNER_EXEC_TYPES () {
+    return DESIGNER_EXEC_TYPES
+  }
 
   get fieldByApiNameByObjectId () {
     return designerStore.fieldByApiNameByObjectId

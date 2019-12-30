@@ -16,36 +16,9 @@ const tabDetailsComponentByType = arrToMap(
  * @description 本地布局转服务端布局
  */
 export default function localLayoutToServer (localLayout: any) {
-//  usedButtons
-//  usedFields
   const cloneLocalLayout = _.cloneDeep(localLayout)
 
   function inner (layout: any) {
-    // delete layout.key
-    // // TODO 判断是数组在执行
-    // if (layout.attrs && layout.attrs.usedFields) {
-    //   layout.attrs.usedFields = layout.attrs.usedFields.map((item: any) => item.id)
-    // }
-    // if (layout.attrs && layout.attrs.usedButtons) {
-    //   layout.attrs.usedButtons = layout.attrs.usedButtons.map((item: any) => item.id)
-    // }
-    // if (Array.isArray(layout.children)) {
-    //   layout.children.forEach((item: any) => {
-    //     inner(item)
-    //   })
-    // }
-
-    // if (fieldComponentByType[layout.type]) {
-    // } else {
-    // const _layout: any = {
-    //   type: layout.type,
-    //   children: layout.children,
-    //   draggable: layout.draggable.name
-    // }
-    // if (!(Object.keys(layout.attrs).length === 0)) {
-    //   _layout.attrs = layout.attrs
-    // }
-    //  清空Layout
     const tempLayout: any = {}
     Object.keys(layout).forEach((key: any) => {
       tempLayout[key] = layout[key]
@@ -85,7 +58,7 @@ export default function localLayoutToServer (localLayout: any) {
         layout.isDefaultFieldContainer = tempLayout.isDefaultFieldContainer
       }
     }
-    if (_.isObject(tempLayout.attrs)) {
+    if (_.isObject(tempLayout.attrs) && !fieldComponentByType[tempLayout.type]) {
       layout.attrs = tempLayout.attrs
       if (Array.isArray(layout.attrs.usedFields)) {
         layout.attrs.usedFields =

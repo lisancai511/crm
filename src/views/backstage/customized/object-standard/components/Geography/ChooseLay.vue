@@ -36,6 +36,7 @@ export default class NewLay extends Vue {
    created () {
      console.log(this.data)
    }
+
    chooseLay (num:any) {
      if (num === 1) {
        this.lay1 = 0
@@ -48,6 +49,7 @@ export default class NewLay extends Vue {
        this.lay3 = 0
      }
    }
+
    nextStep () {
      console.log(this.data)
    }

@@ -6,7 +6,7 @@ const userSecuritySetting: RouteConfig = {
   component: () => import(/* webpackChunkName: "dashboard" */ '@/layout/empty-router-view.vue'),
   meta: {
     title: '用户及安全设置',
-    icon: 'security'
+    icon: 'dd-icon-security'
   },
   children: [
     {

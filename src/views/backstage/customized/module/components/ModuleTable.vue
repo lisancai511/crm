@@ -5,10 +5,10 @@
     class="dd-table--card" :data="data">
     <el-table-column
       prop="name"
-      label="模块名称"></el-table-column>
+      label="模块名称"/>
     <el-table-column
       prop="objectName"
-      label="对象"></el-table-column>
+      label="对象"/>
     <el-table-column
       prop="iconUrl"
       label="图标">
@@ -18,7 +18,7 @@
     </el-table-column>
     <el-table-column
       prop="description"
-      label="备注"></el-table-column>
+      label="备注"/>
     <el-table-column
       prop="operation"
       width="120px"
@@ -26,12 +26,12 @@
       label="操作">
       <template slot-scope="scope">
         <el-button
-          class="p-v-0"
+          class="p-v-0 dd-button__text dd-button__text--info"
           @click="editMenu(scope.row)"
           type="text">编辑
         </el-button>
         <el-button
-          class="p-v-0"
+          class="p-v-0 dd-button__text dd-button__text--info"
           @click="deleteMenu(scope.row)"
           v-if="!standard"
           type="text">删除

@@ -2,7 +2,8 @@
   <div class="details">
     <div class="m-l-20">
       <el-button @click="addField"
-                 type="primary">新建字段</el-button>
+                 type="primary">新建字段
+      </el-button>
     </div>
     <div class="m-t-15">
       <el-table :header-cell-style="{background:'#F8FAFC',borderTop:'1px solid #EBEEF5'}"
@@ -27,11 +28,11 @@
             <div>
               <span class="dd-click m-r-10"
                     @click="editField(scope.row)">
-                <dd-icon name="edit"></dd-icon> 编辑
+                <dd-icon name="edit"/> 编辑
               </span>
               <span v-if="!scope.row.internal" class="dd-click m-r-10"
                     @click="deleteField(scope.row)">
-                <dd-icon name="delete"></dd-icon> 删除
+                <dd-icon name="delete"/> 删除
               </span>
             </div>
           </template>
@@ -125,7 +126,7 @@ export default class FiledList extends mixins(injectObjectId) {
   async getData (objectId: string) {
     const {
       data: { data }
-    } = await Api.bizObjects.getFields(objectId)
+    } = await Api.bizObjects.getFields({ objectId })
     this.tableData = data
   }
 }

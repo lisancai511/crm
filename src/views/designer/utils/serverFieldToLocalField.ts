@@ -10,7 +10,10 @@ import { arrToMap } from '@/utils'
 /**
  * @description 服务端字段转本地字段
  */
-export default function serverFieldToLocalField (field: any, uiId?: string): IField {
+export default function serverFieldToLocalField (
+  field: any,
+  uiId?: string | number,
+  auth?: boolean): IField {
   const baseField = {
     id: field.id,
     type: field.dataType,
@@ -25,16 +28,30 @@ export default function serverFieldToLocalField (field: any, uiId?: string): IFi
   }
   const baseAttrs = {
     disabled: false,
-    required: false
+    required: false,
+    show: true
   }
   // console.log(field.layoutUiConfigById)
   if (uiId && field.layoutUiConfig) {
     // TODO 优化
     const layoutUiConfigById = arrToMap(field.layoutUiConfig || [], 'layoutUiId')
-    const curLayoutUiConfig = layoutUiConfigById[uiId]
+    const curLayoutUiConfig = layoutUiConfigById[uiId] || { ...baseAttrs }
+    const roleToFieldConfig: {
+      invisible: boolean
+      readOnly: boolean
+      readWrite: boolean
+    } = field.roleToFieldConfig || {
+      invisible: false,
+      readOnly: false,
+      readWrite: false
+    }
     if (curLayoutUiConfig) {
       baseAttrs.disabled = curLayoutUiConfig.readOnly
+      if (auth) {
+        baseAttrs.disabled = baseAttrs.disabled || roleToFieldConfig.readOnly
+      }
       baseAttrs.required = curLayoutUiConfig.required
+      baseAttrs.show = !auth || (curLayoutUiConfig.show && !roleToFieldConfig.invisible)
     }
   }
   switch (field.dataType) {
@@ -74,7 +91,18 @@ export default function serverFieldToLocalField (field: any, uiId?: string): IFi
         attrs: {
           ..._.cloneDeep(baseAttrs),
           decimalDigit: field.decimalDigit,
-          integerDigit: field.integerDigit
+          integerDigit: field.integerDigit,
+          unit: field.unit
+        }
+      }
+    case ComponentTypes.MoneyField:
+      return {
+        ..._.cloneDeep(baseField),
+        attrs: {
+          ..._.cloneDeep(baseAttrs),
+          decimalDigit: field.decimalDigit,
+          capital: field.capital,
+          unit: field.unit
         }
       }
     case ComponentTypes.WebsiteField:
@@ -105,7 +133,7 @@ export default function serverFieldToLocalField (field: any, uiId?: string): IFi
         autoNumberConfig: field.autoNumberConfig,
         attrs: {
           ..._.cloneDeep(baseAttrs),
-          maxlength: field.maxLength - field.autoNumberConfig.prefix.length
+          maxlength: field.maxLength
         }
       }
     case ComponentTypes.LookUpField:
@@ -114,6 +142,16 @@ export default function serverFieldToLocalField (field: any, uiId?: string): IFi
         attrs: {
           ..._.cloneDeep(baseAttrs),
           lookupConfig: field.lookupConfig
+        }
+      }
+    case ComponentTypes.ImageField:
+      return {
+        ..._.cloneDeep(baseField),
+        attrs: {
+          ..._.cloneDeep(baseAttrs),
+          limitNumber: field.limitNumber,
+          watermarks: field.watermarks,
+          onlyUsedCellPhoneCamera: field.onlyUsedCellPhoneCamera
         }
       }
     default:

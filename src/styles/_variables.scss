@@ -15,7 +15,7 @@ $dd--color-text-secondary: #666 !default;
 /// color|1|Font Color|2
 $dd--color-text-placeholder: #999 !default;
 /// color|1|Border Color|3
-$dd--border-color-base: #F2F3F6 !default;
+$dd--border-color-base: #D5D8DE !default;
 /// color|1|Border Color|3
 $dd--border-color-light: #E4E7ED !default;
 /// color|1|Border Color|3
@@ -39,7 +39,7 @@ $dimensions: ("p":"padding", "m":"margin");
 @each $dim in $dimensions {
 	//循环四个方向
 	@each $dir in $directions {
-		@for $i from 0 through 6 {
+		@for $i from 0 through 10 {
 			$size: $i*5;
 			@if (nth($dir,2) != '') {
 				.#{nth($dim,1)}-#{nth($dir,1)}-#{$size} {
@@ -76,3 +76,7 @@ $fontsize: ('fs':'font-size');
 	background-color: transparent;
 	border: 1px dashed $dd--primary-color;
 }
+
+
+// 表单流程Color
+$dd-workflow-arrow: #CACACA;

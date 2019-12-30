@@ -2,20 +2,30 @@
 <template>
   <el-main :class="{
   isSelect:layout.isSelect,
-  'designer--mobile':designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.MOBILE
+  'designer--mobile':designer.setting.execType === DESIGNER_EXEC_TYPES.DESIGNER && designer.setting.uiType === DESIGNER_UI_TYPES.MOBILE
   }"
            class="FdComponentsGroup">
     <div class="group__title">
-      <span v-show="!editing">{{layout.name}}</span>
-      <el-input
-        v-if="designer.setting"
-        v-show="editing"
-        @blur="blur"
-        size="mini" class="group__title__input"
-        v-model="layout.name"/>
+      <div>
+        <span v-show="!editing">{{layout.name}}</span>
+        <el-input
+          v-if="designer.setting.execType === DESIGNER_EXEC_TYPES.DESIGNER"
+          v-show="editing"
+          @blur="blur"
+          size="mini"
+          class="group__title__input"
+          v-model="layout.name"/>
+        <dd-icon
+          v-if="designer.setting.execType === DESIGNER_EXEC_TYPES.DESIGNER"
+          name="edit"
+          class="group__title__button"
+          @click.native.stop="edit"/>
+      </div>
       <dd-icon
-        v-if="designer.setting"
-        name="edit" class="group__title__button" @click.native.stop="edit"></dd-icon>
+        v-if="layout.isSelect"
+        class="group__title__button"
+        slot="delete"
+        name="delete" @click.native.stop="deleteGroup"/>
     </div>
     <slot/>
   </el-main>
@@ -25,7 +35,8 @@
 import { Component, Vue, Prop, Inject } from 'vue-property-decorator'
 import { Main } from 'element-ui'
 import { IField } from '@/views/designer/config/components'
-import { DESIGNER_PLATFORMS } from '@/views/designer/config/Designer'
+import { DESIGNER_EXEC_TYPES, DESIGNER_UI_TYPES } from '@/views/designer/config/Designer'
+import { IDesigner } from '@/views/designer/types'
 
 @Component({
   name: 'FdComponentsGroup',
@@ -35,10 +46,14 @@ import { DESIGNER_PLATFORMS } from '@/views/designer/config/Designer'
 })
 export default class FdComponentsGroup extends Vue {
   @Prop({ required: true, type: Object }) readonly layout!: IField
-  @Inject('designer') readonly designer!: any
+  @Inject('designer') readonly designer!: IDesigner
 
-  get DESIGNER_PLATFORMS () {
-    return DESIGNER_PLATFORMS
+  get DESIGNER_EXEC_TYPES () {
+    return DESIGNER_EXEC_TYPES
+  }
+
+  get DESIGNER_UI_TYPES () {
+    return DESIGNER_UI_TYPES
   }
 
   editing: boolean = false
@@ -49,6 +64,10 @@ export default class FdComponentsGroup extends Vue {
 
   blur (): void {
     this.editing = !this.editing
+  }
+
+  deleteGroup () {
+    this.$emit('delete', this.layout)
   }
 }
 </script>
@@ -72,7 +91,10 @@ export default class FdComponentsGroup extends Vue {
     &__title {
       height: 40px;
       line-height: 40px;
-      padding-left: 10px;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
 
       &__input {
         width: auto;

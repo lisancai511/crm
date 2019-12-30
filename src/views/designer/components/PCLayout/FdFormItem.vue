@@ -1,21 +1,28 @@
 <!--Created by LiuLei on 2019/9/18-->
 <template>
+  <fd-component-detailed
+    :class="itemClassNames"
+    v-bind="$props"
+    v-if="layout.type === ComponentTypes.Detailed">
+    <PCLayout
+      detailed
+      :class="[ComponentTypes.Detailed]"
+      v-bind="$props"/>
+    <dd-icon
+      slot="delete"
+      name="delete" @click.native="deleteField(layout)"/>
+  </fd-component-detailed>
   <div
+    v-else
     class="fd-form-item"
-    :class="[
-    layout.type,
-    {
-    'designer--mobile':designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.MOBILE,
-    disabled:layout.attrs.disabled,
-    'is-error':layout.isError
-    }]">
+    :class="itemClassNames">
     <div
-      v-if="!layout.name"
-      style="height: 50px;"></div>
+      v-if="DESIGNER_UI_TYPES.PC === designer.setting.uiType && !layout.attrs.required && !layout.name"
+      style="height: 24px;"></div>
     <el-form-item
-      v-if="designer.setting || (designer.running && designer.running.type === DESIGNER_RUNNING_TYPES.FORM)"
+      v-if="[DESIGNER_EXEC_TYPES.DESIGNER,DESIGNER_EXEC_TYPES.FORM].includes(designer.setting.execType)"
       :rules="rules"
-      :prop="layout.apiName"
+      :prop="apiName"
       :label="layout.name">
       <span slot="label">
         {{layout.name}}
@@ -54,7 +61,7 @@
           :disabled="layout.attrs.disabled"
           type="date"
           placeholder="选择日期"
-          style="width: 100%;"></el-date-picker>
+          style="width: 100%;"/>
       </template>
       <!--日期时间-->
       <template v-if="layout.type === ComponentTypes.DateTimeField">
@@ -64,7 +71,7 @@
           :disabled="layout.attrs.disabled"
           type="datetime"
           placeholder="选择日期时间"
-          style="width: 100%;"></el-date-picker>
+          style="width: 100%;"/>
       </template>
       <!--电话-->
       <template v-if="layout.type === ComponentTypes.PhoneField">
@@ -74,6 +81,9 @@
       </template>
       <!--数字-->
       <template v-if="layout.type === ComponentTypes.NumberField">
+        <label
+          v-if="layout.attrs.unit"
+          slot="label">({{layout.attrs.unit}})</label>
         <el-input
           style="width: 100%"
           :precision="layout.attrs.decimalDigit || 2"
@@ -105,60 +115,64 @@
       </template>
       <!--查找-->
       <template v-if="layout.type === ComponentTypes.LookUpField">
-        <!--        TODO-->
-        <el-select
-          class="fd-form-item__lookup"
-          filterable
-          remote
-          clearable
-          reserve-keywor
-          :remote-method="remoteMethod"
-          placeholder=""
-          v-model="model"
-          :disabled="!lookupObjectApiName && layout.attrs.disabled">
-          <el-option
-            v-for="item in options"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id">
-          </el-option>
-        </el-select>
+        <!--TODO-->
+        <LookUpField
+          v-bind="$props"
+          v-model="model"/>
       </template>
       <!--选项列表-->
       <template v-if="layout.type === ComponentTypes.OptionListField">
-        <!--<el-select
-          class="fd-form-item__option-list"
-          placeholder=""
-          v-model="model"
-          :disabled="layout.attrs.disabled">
-          <el-option
-            :key="item.id"
-            :value="item.id"
-            :label="item.v"
-            v-for="item in valueCandidates">
-            {{item.v}}
-          </el-option>
-        </el-select>-->
-        <option-list-field
-          :record="($store.state.app.record || {}).form || {}"
-          :field-by-id="($store.state.app.record || {}).fieldById || {}"
-          :show-all="designer.setting || (designer.running && designer.running.type === DESIGNER_RUNNING_TYPES.DETAILS)"
-          :field-dependencies="fieldDependencies"
-          :layout="layout"
+        <OptionListField
+          v-bind="$props"
           v-model="model"/>
       </template>
       <!--自动编号-->
       <template v-if="layout.type === ComponentTypes.AutoNumberField">
-        <span v-show="layout.autoNumberConfig.prefix">{{$moment().format(prefixByValue[layout.autoNumberConfig.prefix].label)}}{{String(layout.autoNumberConfig.beginNumber).padStart(+layout.attrs.maxlength,'0')}}</span>
+        <span v-show="layout.autoNumberConfig.prefix">{{$moment().format((prefixByValue[layout.autoNumberConfig.prefix] || {}).label)}}{{String(layout.autoNumberConfig.beginNumber).padStart(+layout.attrs.maxlength,'0')}}</span>
         <span v-show="!layout.autoNumberConfig.prefix">
             <span style="visibility: hidden">[]</span>
           </span>
       </template>
+      <!--金额-->
+      <template v-if="layout.type === ComponentTypes.MoneyField">
+        <label
+          v-if="layout.attrs.unit"
+          slot="label">({{layout.attrs.unit}})</label>
+        <el-input
+          style="width: 100%"
+          :precision="layout.attrs.decimalDigit || 8"
+          :max="Math.pow(10,layout.attrs.integerDigit || 20)-(1/Math.pow(10,layout.attrs.decimalDigit || 2))"
+          :min="-Math.pow(10,layout.attrs.integerDigit || 20)+(1/Math.pow(10,layout.attrs.decimalDigit || 2))"
+          v-model="model"
+          :disabled="layout.attrs.disabled">
+          <template
+            v-if="layout.attrs.capital"
+            slot="append">{{nzhcn.toMoney(model).replace('人民币','')}}
+          </template>
+        </el-input>
+      </template>
+      <!--图片-->
+      <template v-if="layout.type === ComponentTypes.ImageField">
+        <image-field
+          v-model="model"
+          v-bind="$props"/>
+      </template>
+      <!--定位-->
+      <template v-if="layout.type === ComponentTypes.LocationField">
+        <el-button type="text">获取定位</el-button>
+      </template>
+      <!--标签-->
+      <template v-if="layout.type === ComponentTypes.TagField">
+        <el-button
+          class="button-new-tag">+ 新建标签
+        </el-button>
+      </template>
     </el-form-item>
     <div
-      v-if="designer.running && designer.running.type === DESIGNER_RUNNING_TYPES.DETAILS"
+      v-if="DESIGNER_EXEC_TYPES.DETAILS === designer.setting.execType"
       class="details-item">
       <div class="details-item__label">{{layout.name}}</div>
+      <!--网址-->
       <template v-if="layout.type===ComponentTypes.WebsiteField">
         <a
           :target="layout.attrs.urlModel"
@@ -166,63 +180,87 @@
           {{model}}
         </a>
       </template>
+      <!--复选框-->
       <template v-else-if="layout.type===ComponentTypes.CheckBoxField">
         <el-checkbox
           disabled
           :checked="model-1===0"/>
       </template>
+      <!--查找-->
       <template v-else-if="layout.type===ComponentTypes.LookUpField">
-        <router-link
-          v-if="lookUpFieldPath"
-          :to="lookUpFieldPath"
-        >{{model}}
-        </router-link>
+        <LookUpFieldDetails v-bind="$props"/>
       </template>
+      <!--图片-->
+      <template v-else-if="layout.type===ComponentTypes.ImageField">
+        <ImageFieldDetails v-bind="$props"/>
+      </template>
+      <!--默认-->
       <template v-else>
         <div class="details-item__value">{{model}}</div>
       </template>
     </div>
-    <div v-if="designer.setting"
+    <div v-if="DESIGNER_EXEC_TYPES.DESIGNER === designer.setting.execType"
          :class="{'dd-fence':layout.isSelect}"
          class="dd-fence-mask">
       <div v-show="layout.isSelect" class="operation-buttons">
-        <dd-icon name="delete" @click.native="deleteField(layout)"></dd-icon>
+        <dd-icon name="delete" @click.native="deleteField(layout)"/>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Inject, Emit } from 'vue-property-decorator'
+import { Component, Prop, Inject, Emit } from 'vue-property-decorator'
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
 import { IField } from '@/views/designer/config/components'
-import { DESIGNER_PLATFORMS, DESIGNER_RUNNING_TYPES } from '@/views/designer/config/Designer'
-import api from '@/api'
-import axios from 'axios'
-import PredefinedFieldApiNames from '@/views/designer/config/PredefinedFieldApiNames'
-import { ListViewOperators } from '@/views/app/const'
-import pathToRegexp from 'path-to-regexp'
+import {
+  DESIGNER_EXEC_TYPES,
+  DESIGNER_UI_TYPES
+} from '@/views/designer/config/Designer'
 import { AutoNumberPrefixesList } from '@/views/designer/config/AutoNumberPrefixes'
 import { arrToMap } from '@/utils'
-import OptionListField from '@/views/designer/components/PCLayout/field-components/OptionListField.vue'
-
-const CancelToken = axios.CancelToken
+import OptionListField
+  from '@/views/designer/components/PCLayout/field-components/OptionListField/OptionListField.vue'
+import Nzh from 'nzh'
+import FdComponentDetailed from '@/views/designer/components/Detailed/index.vue'
+import LookUpField
+  from '@/views/designer/components/PCLayout/field-components/LookUpField/LookUpField.vue'
+import ImageField
+  from '@/views/designer/components/PCLayout/field-components/ImageField/ImageField.vue'
+import { IDesigner } from '@/views/designer/types'
+import LookUpFieldDetails
+  from '@/views/designer/components/PCLayout/field-components/LookUpField/LookUpFieldDetails.vue'
+import { mixins } from 'vue-class-component'
+import operateModelMixins from '@/views/designer/components/PCLayout/mixins/modelMixins'
+import apiNameMixins from '@/views/designer/components/PCLayout/mixins/apiNameMixins'
+import ImageFieldDetails from '@/views/designer/components/PCLayout/field-components/ImageField/ImageFieldDetails.vue'
 
 @Component({
   name: 'FdFormItem',
-  components: { OptionListField }
+  components: {
+    ImageFieldDetails,
+    ImageField,
+    LookUpFieldDetails,
+    LookUpField,
+    PCLayout: () => import('@/views/designer/components/PCLayout/index.vue'),
+    OptionListField,
+    FdComponentDetailed
+  }
 })
-export default class FdFormItem extends Vue {
+export default class FdFormItem extends mixins(operateModelMixins, apiNameMixins) {
   @Prop({ type: Object, required: true }) readonly layout!: IField
-  @Inject('designer') readonly designer!: any
+  @Inject('designer') readonly designer!: IDesigner
+  @Prop({ type: Number }) readonly index!: number
 
-  loading: boolean = false
-  options: any[] = []
-  lookupObjectApiName: string = ''
-  source = CancelToken.source()
-  // 选项列表控制字段值
-  controlFieldValue: string = ''
-  valueCandidateIds: string[] = []
+  get itemClassNames () {
+    return [
+      this.layout.type,
+      {
+        'designer--mobile': this.designer.setting.uiType === DESIGNER_UI_TYPES.MOBILE,
+        disabled: this.layout.attrs.disabled,
+        'is-error': this.layout.isError
+      }]
+  }
 
   get rules () {
     const baseRules = [
@@ -257,85 +295,12 @@ export default class FdFormItem extends Vue {
     ]
   }
 
-  get DESIGNER_PLATFORMS () {
-    return DESIGNER_PLATFORMS
+  get DESIGNER_EXEC_TYPES () {
+    return DESIGNER_EXEC_TYPES
   }
 
-  get DESIGNER_RUNNING_TYPES () {
-    return DESIGNER_RUNNING_TYPES
-  }
-
-  get apiName () {
-    let apiName = this.layout.apiName
-    if (this.designer.running.type === DESIGNER_RUNNING_TYPES.FORM) {
-      switch (this.layout.type) {
-        case ComponentTypes.OptionListField:
-        case ComponentTypes.LookUpField:
-          apiName += '__id'
-          break
-        default:
-      }
-    }
-    return apiName
-  }
-
-  get model () {
-    if (this.designer.setting) {
-      return this.layout.model
-    }
-
-    return ((this.$store.state.app.record || {}).form || {})[this.apiName] || ''
-  }
-
-  set model (value: any) {
-    if (this.designer.setting) {
-      this.layout.model = value
-    } else {
-      try {
-        switch (this.layout.type) {
-          case ComponentTypes.NumberField:
-            const decimalDigit = this.layout.attrs.decimalDigit || 2
-            const integerDigit = this.layout.attrs.integerDigit || 8
-            value = (value.match(new RegExp(`^\\d*(\\.?\\d{0,${decimalDigit}})`, 'g'))[0]) || 0
-            if (typeof value === 'string') {
-              const integerDigitVal = value.split('.')[0]
-              if (integerDigitVal.length > integerDigit) {
-                value = value.substring(0, integerDigit)
-              }
-            }
-            break
-          default:
-        }
-        this.$store.dispatch('app/record/updateForm',
-          {
-            key: this.apiName,
-            value
-          })
-      } catch (e) {
-        console.error(e)
-      }
-    }
-  }
-
-  get modelId () {
-    if (this.designer.setting) {
-      return ''
-    }
-    return ((this.$store.state.app.record || {}).form || {})[this.apiName + '__id'] || ''
-  }
-
-  get lookUpFieldPath () {
-    if (!this.modelId) {
-      return
-    }
-    const toPath = pathToRegexp.compile(
-      this.$route.matched[this.$route.matched.length - 1].path
-    )
-    return toPath({
-      ...this.$route.params,
-      recordId: this.modelId,
-      moduleId_objectId: `${this.$route.params.moduleId_objectId.split('_')[0]}_${this.layout.attrs.lookupConfig && this.layout.attrs.lookupConfig.lookupObjectId}`
-    })
+  get DESIGNER_UI_TYPES () {
+    return DESIGNER_UI_TYPES
   }
 
   get ComponentTypes () {
@@ -350,73 +315,7 @@ export default class FdFormItem extends Vue {
     return arrToMap(this.prefixes, 'value')
   }
 
-  // 获取全部字段依赖
-  get fieldDependencies () {
-    if (this.designer.running && this.designer.running.type === DESIGNER_RUNNING_TYPES.FORM) {
-      return (this.$store.state.app.record || {}).fieldDependencies || []
-    }
-    return []
-  }
-
-  async created () {
-    this.initLookUpField()
-  }
-
-  async remoteMethod (query: string) {
-    try {
-      if (this.loading) {
-        this.source.cancel()
-      }
-      this.loading = true
-      this.source = CancelToken.source()
-      const {
-        data: {
-          data
-        }
-      } = await api.passObjectOp.getAppRecords(
-        this.lookupObjectApiName,
-        {
-          info: {
-            filters: [{
-              fieldApiName: PredefinedFieldApiNames.name,
-              values: [query],
-              operator: ListViewOperators.LIKE
-            }],
-            colApiName: [PredefinedFieldApiNames.name]
-          },
-          size: 10
-        },
-        this.source.token
-      )
-      this.options = data
-    } catch (e) {
-      console.error(e)
-    } finally {
-      this.loading = false
-    }
-  }
-
-  // 初始化查找
-  async initLookUpField () {
-    if (this.designer.running) {
-      switch (this.layout.type) {
-        case ComponentTypes.LookUpField:
-          if (!this.lookupObjectApiName) {
-            const {
-              data: {
-                data: {
-                  apiName
-                }
-              }
-            } = await api.bizObjects.getObjectById((this.layout.attrs.lookupConfig as any).lookupObjectId)
-            this.lookupObjectApiName = apiName
-            this.remoteMethod('')
-          }
-          break
-        default:
-      }
-    }
-  }
+  nzhcn = Nzh.cn
 
   @Emit('delete')
   deleteField (layout: IField) {
@@ -431,6 +330,12 @@ export default class FdFormItem extends Vue {
   position: relative;
   padding: 0 10px 0;
 
+  /deep/ .el-form-item {
+    &__label {
+      padding-bottom: 0;
+    }
+  }
+
   &.is-error {
     border: 1px solid #F56C6C;
   }
@@ -442,7 +347,7 @@ export default class FdFormItem extends Vue {
 
   &__textarea {
     /deep/ .el-textarea__inner {
-      height: 152px;
+      height: 142px;
     }
   }
 
@@ -477,8 +382,11 @@ export default class FdFormItem extends Vue {
     &.LookUpField,
     &.OptionListField,
     &.AutoNumberField,
-    &.PhoneField {
-      height: 46px;
+    &.PhoneField,
+    &.ImageField,
+    &.LocationField,
+    &.MoneyField {
+      height: $dd-design-mobile-item-height;
       /*background-color: #FE723F;*/
       &::after {
         position: absolute;
@@ -517,6 +425,13 @@ export default class FdFormItem extends Vue {
                 height: 40px;
               }
             }
+          }
+        }
+
+        /deep/ .el-input-group--append {
+          .el-input-group__append {
+            border: none !important;
+            background-color: transparent;
           }
         }
       }

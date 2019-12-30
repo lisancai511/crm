@@ -9,6 +9,7 @@ const request = axios.create({
   baseURL: window.TENANT_REGION_ADDRESS + '/paas-metadata/api/v1'
   // todo 换成真实地址
   // baseURL: 'http://47.94.245.113:7300/mock/5d760ceb7bd0602ac8480cc5/paas-metadata/api/v1'
+  // baseURL: '/paas-metadata/api/v1'
 })
 
 request.interceptors.request.use(requestSuccess, requestFail)
@@ -42,15 +43,15 @@ export function deleteModule (moduleId: string) {
 /**
  * 获取全部模块
  */
-export function getModules () {
-  return request.get('/modules')
+export function getModules (params: { checkAuth: boolean | string } = { checkAuth: false }) {
+  return request.get('/modules', { params })
 }
 
 /**
  * 获取全部apps
  */
-export function getApps () {
-  return request.get('/apps')
+export function getApps (params: { checkAuth: boolean | string } = { checkAuth: false }) {
+  return request.get('/apps', { params })
 }
 
 /**
@@ -81,22 +82,30 @@ export function deleteApp (id: string) {
  * 获取单个app详情
  * @param {string} appId
  * @param cancelToken
+ * @param params
  */
 export function getApp (
   appId: string,
-  cancelToken?: any
+  cancelToken?: any,
+  params: { checkAuth: boolean | string } = { checkAuth: false }
 ) {
-  const data: any = {}
+  const data: any = { params }
   if (cancelToken) {
     data.cancelToken = cancelToken
   }
   return request.get(`apps/${appId}`, data)
 }
 
+/**
+ * 获取布局UI
+ * @param objectId
+ * @param layoutType
+ * @param recordTypeId
+ */
 export function getLayoutUi (
   objectId: string,
   layoutType: string,
-  recordTypeId: number
+  recordTypeId: number|string
 ) {
   const params: any = {}
   if (recordTypeId) {

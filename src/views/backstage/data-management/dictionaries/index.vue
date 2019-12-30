@@ -3,7 +3,7 @@
   <div class="dictionaries">
     <el-card :body-style="{padding:0}">
       <div class="dictionaries__header" slot="header">
-        <strong class="fs-16">数据字段</strong>
+        <strong class="fs-16">数据字典</strong>
         <el-button
           @click="newDictionary"
           type="primary"
@@ -34,8 +34,14 @@
           align="center"
         >
           <template slot-scope="scope">
-            <el-button type="text" @click="editDictionary(scope.row)">编辑</el-button>
-            <el-button type="text" @click="deleteDictionary(scope.row.id)">删除</el-button>
+            <el-button
+              class="dd-button__text dd-button__text--info"
+              type="text" @click="editDictionary(scope.row)">编辑
+            </el-button>
+            <el-button
+              class="dd-button__text dd-button__text--info"
+              type="text" @click="deleteDictionary(scope.row.id)">删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -49,7 +55,7 @@
 <script lang="ts">
 import { Component } from 'vue-property-decorator'
 import api from '@/api'
-import DictionaryEdit from '@/views/backstage/data-management/dictionaries/component/DictionaryEdit.vue'
+import DictionaryEdit from '@/views/backstage/data-management/dictionaries/components/DictionaryEdit.vue'
 import { mixins } from 'vue-class-component'
 import utils from '@/views/backstage/data-management/dictionaries/mixins/utils'
 

@@ -8,8 +8,9 @@
         规则来源
       </div>
       <el-select style="width:100%"
+                 :disabled="Id"
                  @change="changeTypeInSource"
-                 v-model="data.type"
+                 v-model="data.orgType"
                  placeholder="请选择">
         <el-option v-for="item in options"
                    :key="item.value"
@@ -18,7 +19,7 @@
         </el-option>
       </el-select>
       <component :data="data"
-                 :is="data.type"></component>
+                 :is="data.orgType"></component>
     </el-card>
   </div>
 </template>
@@ -26,7 +27,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import BusinessForm from '@/views/backstage/office-setting/integral-management/new/components/type/BusinessForm.vue'
-import Reoprt from '@/views/backstage/office-setting/integral-management/new/components/type/Reoprt.vue'
+import Report from '@/views/backstage/office-setting/integral-management/new/components/type/Report.vue'
 import Apply from '@/views/backstage/office-setting/integral-management/new/components/type/Apply.vue'
 import FixedScore from '@/views/backstage/office-setting/integral-management/new/components/type/FixedScore.vue'
 import Attendance from '@/views/backstage/office-setting/integral-management/new/components/type/Attendance.vue'
@@ -36,7 +37,7 @@ import Input from '@/views/backstage/office-setting/integral-management/new/comp
   name: 'IntegralRule',
   components: {
     BusinessForm,
-    Reoprt,
+    Report,
     Apply,
     FixedScore,
     Attendance,
@@ -49,12 +50,17 @@ export default class IntegralRule extends Vue {
   activeIndex: any = ''
   options: any = [
     { label: '业务表单类', name: 'BusinessForm' },
-    { label: '工作报告类', name: 'Reoprt' },
+    { label: '工作报告类', name: 'Report' },
     { label: '申请类', name: 'Apply' },
     { label: '考勤类', name: 'Attendance' },
     { label: '固定积分类', name: 'FixedScore' },
     { label: '录入类', name: 'Input' }
   ]
+
+  get Id () {
+    return !!this.$route.query.id
+  }
+
   changeTypeInSource () {
     this.data.typeInSource = ''
     this.data.eventType = ''

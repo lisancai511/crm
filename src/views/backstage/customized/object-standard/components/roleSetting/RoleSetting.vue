@@ -24,17 +24,19 @@ export default class NewField extends Vue {
   created () {
     this.getData()
   }
+
   changeTabs (item:any) {
     this.saveData = item
     this.activeName = 'ten'
   }
+
   async getData () {
     try {
       const { data } = await Api.mainData.getRoles()
       this.tableData = data.data
       this.activeName = this.tableData[0].id
     } catch (err) {
-      throw err
+      console.error(err)
     }
   }
 }

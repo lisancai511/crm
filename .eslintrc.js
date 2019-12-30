@@ -9,13 +9,14 @@ module.exports = {
     '@vue/typescript'
   ],
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     '@typescript-eslint/no-unused-vars': ['error', {
       'vars': 'all',
       'args': 'after-used',
       'ignoreRestSiblings': true
-    }]
+    }],
+    'no-async-promise-executor': 'off'
   },
   parserOptions: {
     parser: '@typescript-eslint/parser'

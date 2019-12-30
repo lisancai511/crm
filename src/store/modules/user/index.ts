@@ -36,7 +36,15 @@ export default class User extends VuexModule implements IUserState {
   @Action
   public async login (userInfo: any) {
     const { data } = await api.user.login(userInfo)
-    this.setToken(data.data)
+    this.setToken(data.data.token)
+    return data
+  }
+
+  @Action
+  public async register (ruleForm: any) {
+    const { data } = await api.user.register(ruleForm)
+    this.setTenantId(data.data.tenantId)
+    this.setToken(data.data.token)
     return data
   }
 

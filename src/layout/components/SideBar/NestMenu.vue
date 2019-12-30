@@ -6,8 +6,9 @@
     :index="menu.name || menu.meta.name">
     <template slot="title">
       <span>
-        <dd-icon style="margin-left:-10px;margin-right:10px"
-                 :name="menu.meta.icon?menu.meta.icon:''"></dd-icon>
+        <dd-icon
+          style="margin-left:-10px;margin-right:10px"
+          :full-name="menu.meta.icon?menu.meta.icon:''"></dd-icon>
         {{ menu.meta.title }}
       </span>
     </template>
@@ -22,6 +23,10 @@
         class="dd-el-menu-item"
         :class="{'is-active':new RegExp(`^${item.path}`).test($route.path)}"
         :key="item.name || item.meta.name">
+        <dd-icon
+          v-if="item.meta && item.meta.icon"
+          style="margin-left:-10px;margin-right:10px"
+          :full-name="item.meta.icon"></dd-icon>
         {{ item.meta.title }}
       </el-menu-item>
     </template>

@@ -3,6 +3,7 @@
  */
 import { IField } from '@/views/designer/config/components'
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
+import { DESIGNER_EXEC_TYPES, DESIGNER_UI_TYPES, DESIGNER_USED_TYPES } from '@/views/designer/config/Designer'
 
 // import { IField } from '@/views/designer/const/components'
 
@@ -23,8 +24,9 @@ export interface IHoverLookup extends ILookup {
   fields: IField[]
   usedFields: any[]
   usedFieldIds?: string[]
+  usedFieldApiNames?: string[]
   loadedFields: boolean
-  loadingFields: boolean
+  loadingFields: boolean,
 }
 
 export interface IRelatedListLookup {
@@ -38,4 +40,14 @@ export interface IRelatedListLookup {
     sortDirection: 'ASC' | 'DESC',
     sortOrderBy: string
   }
+}
+
+export interface IDesigner {
+  setting: {
+    uiType: DESIGNER_UI_TYPES,
+    usedType: DESIGNER_USED_TYPES,
+    execType: DESIGNER_EXEC_TYPES
+  },
+  recordTypeId?: string
+  object: any
 }

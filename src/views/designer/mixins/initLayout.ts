@@ -11,7 +11,7 @@ import {
   localLayoutToServer,
   serverLayoutToLocal
 } from '@/views/designer/utils'
-import PredefinedLayouts from '@/views/designer/config/PredefinedLayouts'
+import layout1 from '@/views/designer/config/PredefinedLayouts/layout1'
 
 @Component({
   name: 'InitLayout'
@@ -61,7 +61,7 @@ export default class extends Vue {
         // })
         data.define = compressStringToBase64(
           JSON.stringify(localLayoutToServer(
-            PredefinedLayouts.layout1({
+            layout1({
               buttons: designerStore.buttons,
               fields: designerStore.fields
               // standObject: designerStore.object

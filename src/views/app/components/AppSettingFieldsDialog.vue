@@ -44,6 +44,7 @@ export default class AppSettingFieldsDialog extends Vue {
     },
     type: Array
   }) readonly disabledCheckedList !: string[]
+
   dialogVisible: boolean = false
   checkList: string[] = []
   editableFields: any[] = []

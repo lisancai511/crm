@@ -5,7 +5,7 @@
       <div slot="header">
         <div class="title">
           <span class="title_left">{{isStandard?'平台标准对象':'组织自定义对象'}}</span>
-          <span class="title_right">合计共有9个平台标准对象</span>
+          <span v-if="isStandard" class="title_right">合计共有{{objects.length}}个平台标准对象</span>
         </div>
         <div v-if="!isStandard"
              class="m-t-20">
@@ -43,7 +43,7 @@
                   <dd-icon name="edit"></dd-icon> 编辑
                 </span>
                 <span v-if="!isStandard" class="dd-click m-r-10"
-                      @click="deleteObejct(scope.row)">
+                      @click="deleteObject(scope.row)">
                   <dd-icon name="delete"></dd-icon> 删除
                 </span>
               </div>
@@ -87,11 +87,11 @@ export default class StandardObject extends Vue {
 
   creatObject () {
     this.$router.push({
-      path: this.$route.path + `/add`
+      path: this.$route.path + '/add'
     })
   }
 
-  deleteObejct (row:any) {
+  deleteObject (row:any) {
     this.$confirm('此操作将永久删除该对象, 是否继续?', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',

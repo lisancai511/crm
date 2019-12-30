@@ -9,7 +9,7 @@ const dataManagementRouter: RouteConfig = {
   component: () => import(/* webpackChunkName: "dashboard" */ '@/layout/empty-router-view.vue'),
   meta: {
     title: '数据管理',
-    icon: 'security'
+    icon: 'dd-icon-security'
   },
   children: [
     {

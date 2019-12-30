@@ -8,7 +8,8 @@
         <el-col :span="9">
           <span class="m-b-10"
                 style="display:block">{{item.name}}</span>
-          <el-select v-if="data[index]" v-model="data[index].visibility"
+          <el-select :disabled="roleId==='-1'" v-if="data[index]"
+                     v-model="data[index].visibility"
                      class="m-b-20"
                      style="width:60%"
                      placeholder="请选择">
@@ -21,7 +22,7 @@
         </el-col>
       </div>
     </el-row>
-    <div class="button">
+    <div v-if="roleId!=='-1'" class="button">
       <el-button @click="saveData"
                  type="primary">保存</el-button>
     </div>
@@ -52,10 +53,12 @@ export default class StandardDetails extends Vue {
   async created () {
     await this.getData()
   }
+
   mounted () {}
   handleClick (tab: any) {
     sessionStorage.setItem('activeName', tab.name)
   }
+
   get roleId () {
     return this.$route.params.id
   }
@@ -66,16 +69,29 @@ export default class StandardDetails extends Vue {
 
   async getData () {
     await this.$store.dispatch('backstage/customized/getModules')
-    const data = Api.mainData.getRoleModuleAuth(this.roleId)
-    console.log(data)
-    this.modules.forEach((item:any) => {
-      this.data.push({ menuId: item.id })
+    const res = await Api.mainData.getRoleModuleAuth(this.roleId)
+    this.data = []
+    this.modules.forEach((item: any) => {
+      this.data.push({ menuId: item.id, visibility: null })
+    })
+    this.data.forEach((item:any) => {
+      res.data.data.forEach((item0:any) => {
+        if (item0.menuId === item.menuId) {
+          item.visibility = item0.visibility
+        }
+      })
     })
   }
 
   async saveData () {
-    const data = await Api.mainData.updateRoleObejctAuth(this.data, this.roleId)
-    console.log(data)
+    const arr = this.data.filter((item:any) => {
+      return item.visibility
+    })
+    const data = await Api.mainData.updateRoleModuleAuth(arr, this.roleId)
+    if (data.data.success) {
+      this.$message.success('保存成功')
+      this.getData()
+    }
   }
 }
 </script>

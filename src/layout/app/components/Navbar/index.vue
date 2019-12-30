@@ -45,11 +45,11 @@ const userModule = getModule(UserModule, store)
 export default class SideBar extends Vue {
   logout () {
     userModule.logout()
-    this.$router.push('/login')
+    window.location.reload()
   }
 
   navBackstage () {
-    this.$router.push('/backstage/general-setting/personalSetting')
+    this.$router.push('/backstage/general-setting/personal')
   }
 
   handleUserCommand (command: string) {

@@ -42,12 +42,13 @@ import PredefinedObjectApiNames from '@/views/designer/config/PredefinedObjectAp
   name: 'OwnerChange'
 })
 export default class OwnerChange extends Vue {
-  @Prop({ required: true, type: String }) readonly ownerId!: string
+  @Prop({ required: true, type: Array }) readonly ownerId!: string[]
   @Prop({ required: true, type: String }) readonly objectApiName!: string
   @Prop({ required: true, type: Array }) readonly recordId!: string[]
   form: any = {
     model: ''
   }
+
   options: any = []
   allOptions: any = []
   loading: boolean = false
@@ -65,7 +66,7 @@ export default class OwnerChange extends Vue {
 
   created () {
     // TODO 确定切换账号数据会不会更新
-    api.passObjectOp.getAppRecords(PredefinedObjectApiNames.user).then((res: any) => {
+    api.paasObjectOp.getAppRecords(PredefinedObjectApiNames.user).then((res: any) => {
       this.allOptions = this.options = res.data.data
     })
   }
@@ -80,7 +81,7 @@ export default class OwnerChange extends Vue {
         if (valid) {
           this.loading = true
           try {
-            await api.passObjectOp.putAppRecordOwner({
+            await api.paasObjectOp.putAppRecordOwner({
               objectApiName: this.objectApiName,
               recordId: this.recordId.join(','),
               data: {

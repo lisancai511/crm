@@ -29,7 +29,11 @@ import {
   serverLayoutToLocal
 } from '@/views/designer/utils'
 import PCLayout from '@/views/designer/components/PCLayout/index.vue'
-import { DESIGNER_RUNNING_TYPES } from '@/views/designer/config/Designer'
+import {
+  DESIGNER_EXEC_TYPES,
+  DESIGNER_UI_TYPES,
+  DESIGNER_USED_TYPES
+} from '@/views/designer/config/Designer'
 import { arrToMap } from '@/utils'
 import PredefinedFieldApiNames from '@/views/designer/config/PredefinedFieldApiNames'
 import layout1 from '@/views/designer/config/PredefinedLayouts/layout1'
@@ -37,18 +41,16 @@ import { PredefinedButtonApiNames } from '@/sdk/button-sdk/PredefinedButton'
 import pathToRegexp from 'path-to-regexp'
 import AppRecordRecordTypeDialog from '@/views/app/components/AppRecordRecordTypeDialog.vue'
 import { buttonSdk } from '@/sdk/button-sdk'
+import { IDesigner } from '@/views/designer/types'
+import handleClickButton from '@/views/app/mixins/handle-click-button'
 
 @Component({
   name: 'AppDetails',
   components: { AppRecordRecordTypeDialog, PCLayout }
 })
-export default class AppDetails extends mixins(routerParams, appObjects) {
-  @Provide() designer = {
-    object: {},
-    running: {
-      type: DESIGNER_RUNNING_TYPES.DETAILS
-    }
-  }
+export default class AppDetails extends mixins(routerParams, appObjects, handleClickButton) {
+  // @ts-ignore
+  @Provide() designer: IDesigner = 'designer'
 
   loading: boolean = false
 
@@ -58,10 +60,25 @@ export default class AppDetails extends mixins(routerParams, appObjects) {
     children: [],
     type: ComponentTypes.Container
   }
+
   fields: any[] = []
+  // @ts-ignore
+  designer: IDesigner = {
+    object: {},
+    recordTypeId: '',
+    setting: {
+      execType: DESIGNER_EXEC_TYPES.DETAILS,
+      uiType: DESIGNER_UI_TYPES.PC,
+      usedType: DESIGNER_USED_TYPES.PAAS
+    }
+  }
 
   get recordId () {
     return this.$route.params.recordId
+  }
+
+  get recordTypeId () {
+    return this.record?.[PredefinedFieldApiNames.recordTypeId] || null
   }
 
   @Watch('$route')
@@ -71,6 +88,7 @@ export default class AppDetails extends mixins(routerParams, appObjects) {
 
   async created () {
     this.$bus.$on('app/record/details/click', this.handleClickButton)
+    this.designer.recordTypeId = this.record?.[PredefinedFieldApiNames.recordTypeId] || null
     await this.init()
   }
 
@@ -97,11 +115,14 @@ export default class AppDetails extends mixins(routerParams, appObjects) {
           this.objectId,
           LayoutTypes.PC,
           // TODO GET recordTypeId
-          this.record[PredefinedFieldApiNames.recordTypeId] || null
+          this.recordTypeId
         ),
         api.bizObjects.getOperators(
           this.curObject.id,
-          'Button'
+          {
+            type: 'Button',
+            checkAuth: true
+          }
         )
       ])
 
@@ -110,10 +131,11 @@ export default class AppDetails extends mixins(routerParams, appObjects) {
           data: fields
         }
       } = await api.bizObjects.getFields(
-        this.objectId,
-        // TODO
-        null,
-        layoutUi.layoutId
+        {
+          objectId: this.objectId,
+          layoutId: layoutUi.layoutId,
+          containModuleId: true
+        }
       )
       this.fields = fields
       if (!layoutUi.define) {
@@ -132,7 +154,8 @@ export default class AppDetails extends mixins(routerParams, appObjects) {
         serverLayout: JSON.parse(decompressBase64ToString(layoutUi.define)),
         fields,
         uiId: layoutUi.id,
-        needAddFields: layoutUi.needAddFields || []
+        needAddFields: layoutUi.needAddFields || [],
+        auth: true
       })
       if (this.$store.state.app.record) {
         this.$store.unregisterModule(['app', 'record'])
@@ -158,7 +181,7 @@ export default class AppDetails extends mixins(routerParams, appObjects) {
         data: {
           data: record
         }
-      } = await api.passObjectOp.getAppRecord(
+      } = await api.paasObjectOp.getAppRecord(
         this.curObject.apiName,
         this.recordId
       )
@@ -175,8 +198,10 @@ export default class AppDetails extends mixins(routerParams, appObjects) {
 
   handleClickButton (button: any) {
     switch (button.apiName) {
-      case PredefinedButtonApiNames.new:
-        this.newRecord()
+      case PredefinedButtonApiNames.new: {
+        const path = pathToRegexp.compile(this.$route.matched[this.$route.matched.length - 1].path.replace(/\/:recordId$/, '/new'))(this.$route.params)
+        this.newRecord(path)
+      }
         break
       case PredefinedButtonApiNames.edit:
         this.$router.push(`${this.$route.path}/edit`)
@@ -202,25 +227,17 @@ export default class AppDetails extends mixins(routerParams, appObjects) {
           }
         ).then(this.getRecord)
         break
+      case PredefinedButtonApiNames.batchNew: {
+        const path = pathToRegexp.compile(this.$route.matched[this.$route.matched.length - 1].path.replace(/\/:recordId$/, '/batch-new'))(this.$route.params)
+        this.batchNewRecord(path)
+      }
+        break
       default:
         this.$message.info('暂不支持此按钮')
     }
   }
 
   // handle click button start
-
-  async newRecord () {
-    // await this.$router.push(`${this.$route.path}/records/new`)
-    const recordType = await (this.$refs as any).recordTypeDialog.selectRecordType()
-    const query: any = {}
-    if (recordType) {
-      query.recordTypeId = recordType.id
-    }
-    await this.$router.push({
-      path: pathToRegexp.compile(this.$route.matched[this.$route.matched.length - 1].path.replace(/\/:recordId$/, '/new'))(this.$route.params),
-      query
-    })
-  }
 
   // handle click button end
 }

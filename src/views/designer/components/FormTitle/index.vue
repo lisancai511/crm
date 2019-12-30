@@ -1,21 +1,24 @@
 <!--Created by LiuLei on 2019/9/12-->
 <template>
   <div class="form-title p-20"
-       :class="{'designer--mobile':designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.MOBILE}">
+       :class="{
+    'designer--mobile':designer.setting.uiType === DESIGNER_UI_TYPES.MOBILE
+  }">
     <div
-      v-if="designer.setting"
+      v-if="designer.setting.execType === DESIGNER_EXEC_TYPES.DESIGNER"
       :class="{'dd-fence':layout.isSelect}"
       class="dd-fence-mask">
     </div>
-    <template v-if="designer.running || (designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.PC)">
+    <template
+      v-if="[DESIGNER_EXEC_TYPES.DETAILS,DESIGNER_EXEC_TYPES.FORM].includes(designer.setting.execType) || (DESIGNER_EXEC_TYPES.DESIGNER === designer.setting.execType && DESIGNER_UI_TYPES.PC === designer.setting.uiType)">
       <div class="form-title-top">
         <div class="form-title__name__wrap">
           <div class="form-title__name fs-18">
-            <strong v-if="designer.setting">{{designer.object.name}}</strong>
+            <strong v-if="DESIGNER_EXEC_TYPES.DESIGNER === designer.setting.execType">{{designer.object.name}}</strong>
             <strong v-else>{{moduleById[moduleId].name}}</strong>
           </div>
           <div class="form-title__name--sub">
-            <span v-if="designer.setting">xxxxxx</span>
+            <span v-if="DESIGNER_EXEC_TYPES.DESIGNER === designer.setting.execType">xxxxxx</span>
             <span v-else>{{record[PredefinedFieldApiNames.name]}}</span>
           </div>
         </div>
@@ -35,14 +38,15 @@
               {{usedField.name}}
             </div>
             <div class="form-title-info-item__value">
-              <strong v-if="designer.setting">xxxx</strong>
+              <strong v-if="DESIGNER_EXEC_TYPES.DESIGNER === designer.setting.execType">xxxx</strong>
               <strong v-else>{{record[usedField.apiName]}}</strong>
             </div>
           </div>
         </transition-group>
       </div>
     </template>
-    <template v-if="designer.setting && designer.setting.platform === DESIGNER_PLATFORMS.MOBILE">
+    <template
+      v-if="DESIGNER_EXEC_TYPES.DESIGNER === designer.setting.execType && DESIGNER_UI_TYPES.MOBILE === designer.setting.uiType">
       <transition-group
         class="form-title-info-item__title"
         name="list-complete"
@@ -64,9 +68,13 @@
 import { Component, Prop, Vue, Inject } from 'vue-property-decorator'
 import TheButtons from '@/views/designer/components/FormTitle/TheButtons.vue'
 import { IField } from '@/views/designer/config/components'
-import { DESIGNER_PLATFORMS } from '@/views/designer/config/Designer'
+import {
+  DESIGNER_EXEC_TYPES,
+  DESIGNER_UI_TYPES
+} from '@/views/designer/config/Designer'
 import PredefinedFieldApiNames from '@/views/designer/config/PredefinedFieldApiNames'
 import { arrToMap } from '@/utils'
+import { IDesigner } from '@/views/designer/types'
 
 @Component({
   name: 'FdComponentsFormHeader',
@@ -77,14 +85,18 @@ export default class FdComponentsFormHeader extends Vue {
   @Prop({ type: Array, default: () => [] }) readonly usedButtons!: []
   @Prop({ type: Array, default: () => [] }) readonly usedFields!: []
 
-  @Inject('designer') readonly designer!: any
+  @Inject('designer') readonly designer!: IDesigner
 
   get PredefinedFieldApiNames () {
     return PredefinedFieldApiNames
   }
 
-  get DESIGNER_PLATFORMS () {
-    return DESIGNER_PLATFORMS
+  get DESIGNER_EXEC_TYPES () {
+    return DESIGNER_EXEC_TYPES
+  }
+
+  get DESIGNER_UI_TYPES () {
+    return DESIGNER_UI_TYPES
   }
 
   get record () {
@@ -92,7 +104,7 @@ export default class FdComponentsFormHeader extends Vue {
   }
 
   get modules () {
-    if (this.designer.setting) {
+    if (DESIGNER_EXEC_TYPES.DESIGNER === this.designer.setting.execType) {
       return []
     }
     return this.$store.state.app.modules
@@ -103,7 +115,7 @@ export default class FdComponentsFormHeader extends Vue {
   }
 
   get moduleId () {
-    if (this.designer.setting) {
+    if (DESIGNER_EXEC_TYPES.DESIGNER === this.designer.setting.execType) {
       return ''
     }
     return this.$route.params.moduleId_objectId.split('_')[0]

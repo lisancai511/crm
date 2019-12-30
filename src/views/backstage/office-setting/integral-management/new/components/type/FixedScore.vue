@@ -2,19 +2,20 @@
   <div class="businessForm">
     <div class="title">类型</div>
     <el-select style="width: 100%;"
+               @change="chooseType"
                v-model="data.typeInSource"
                placeholder="请选择">
       <el-option v-for="item in options"
-                 :key="item.value"
-                 :label="item.label"
-                 :value="item.value">
+                 :key="item.id"
+                 :label="item.name"
+                 :value="item.id">
       </el-option>
     </el-select>
-    <div class="title">
+    <div v-if="data.typeInSource" class="title">
       赋值目标：<span>对应级别的人</span>
     </div>
 
-    <el-row>
+    <el-row class="m-t-20">
       <el-col :span="3">
         分类
       </el-col>
@@ -67,6 +68,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
+import Api from '@/api'
 
 @Component({
   name: 'EssentialInformation'
@@ -78,16 +80,38 @@ export default class EssentialInformation extends Vue {
     { label: '职称', value: 'Rank' },
     { label: '工龄', value: 'WorkingYears' }
   ]
+
   frequencyType: any = [
-    { label: '每天一次', value: 'ByDay' },
-    { label: '每周一次', value: 'ByWeek' },
-    { label: '每月一次', value: 'ByMounth' },
-    { label: '每季度一次', value: 'BySeason' },
-    { label: '每年一次', value: 'ByYear' }
+    { label: '每天', value: 'ByDay' },
+    { label: '每周', value: 'ByWeek' },
+    { label: '每月', value: 'ByMounth' },
+    { label: '每季度', value: 'BySeason' },
+    { label: '每年', value: 'ByYear' }
   ]
+
   value: any = ''
   input: any = ''
   @Prop() private data: any
+  created () {
+    this.getDictionaries()
+  }
+
+  async chooseType (val:any) {
+    this.$forceUpdate()
+    const res = await Api.globalData.getDictionary(val)
+    console.log(res)
+  }
+
+  async getDictionaries () {
+    try {
+      const {
+        data: { data: dictionaries }
+      } = await Api.globalData.getDictionaries()
+      this.options = dictionaries
+    } catch (e) {
+      console.error(e)
+    }
+  }
 }
 </script>
 

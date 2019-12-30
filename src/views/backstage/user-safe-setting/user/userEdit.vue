@@ -12,17 +12,17 @@
             <el-form-item prop="name"
                           :rules="{required: true, message: '请输入用户姓名'}"
                           label="姓名">
-              <el-input v-model="formLabelAlign.name"></el-input>
+              <el-input v-model="formLabelAlign.name" />
             </el-form-item>
           </el-col>
           <el-col :span="6"
                   :offset="2">
-            <el-form-item prop="roleIds"
+            <el-form-item prop="roles"
                           :rules="{required: true, message: '请选择用户角色'}"
                           label="角色">
               <el-select style="width: 100%"
                          multiple
-                         v-model="formLabelAlign.roleIds"
+                         v-model="formLabelAlign.roles"
                          placeholder="请选择">
                 <el-option v-for="item in roleList"
                            :key="item.id"
@@ -42,15 +42,20 @@
                            style="width:100%;"
                            :show-all-levels="false"
                            :options="organizationsList"
-                           :props="{ expandTrigger: 'hover', label: 'name', value: 'id', checkStrictly: true }"></el-cascader>
+                           :props="{ expandTrigger: 'hover', label: 'name', value: 'id', checkStrictly: true }" />
             </el-form-item>
           </el-col>
-          <el-col :span="6"
-                  :offset="2">
-            <el-form-item prop="mobile"
-                          :rules="{required: true, message: '请输入手机号'}"
-                          label="手机号">
-              <el-input v-model="formLabelAlign.mobile"></el-input>
+          <el-col :offset="2"
+                  :span="6">
+            <el-form-item prop="secondaryOrgs"
+                          :rules="{required: false, message: '请选择辅部门'}"
+                          label="辅部门">
+              <el-cascader v-model="formLabelAlign.secondaryOrgs"
+                           style="width:100%;"
+                           :show-all-levels="false"
+                           :options="organizationsList"
+                           :props="{ label: 'name', value: 'id', checkStrictly: true, multiple: true, emitPath: false }"
+                           clearable></el-cascader>
             </el-form-item>
           </el-col>
         </el-row>
@@ -79,6 +84,15 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-row>
+          <el-col :span="6">
+            <el-form-item prop="mobile"
+                          :rules="{required: true, message: '请输入手机号'}"
+                          label="手机号">
+              <el-input v-model="formLabelAlign.mobile"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div class="m-t-30 m-l-10">
         <el-button @click="saveData"
@@ -100,31 +114,45 @@ export default class Standard extends Vue {
   roleList: any = []
   userList: any = []
   organizationsList: any = []
-  organizations:any = []
+  organizations: any = []
   async created () {
     await this.getData()
     if (this.userId) {
       this.getUser()
     }
   }
+
   async saveData () {
-    const roluForm = this.$refs['ruleForm'] as any
+    const roluForm = this.$refs.ruleForm as any
     roluForm.validate(async (vaild: any) => {
       if (vaild) {
         if (Array.isArray(this.formLabelAlign.orgnization)) {
-          this.formLabelAlign.orgnization = this.formLabelAlign.orgnization[this.formLabelAlign.orgnization.length - 1]
+          this.formLabelAlign.orgnization = this.formLabelAlign.orgnization[
+            this.formLabelAlign.orgnization.length - 1
+          ]
         }
+        this.formLabelAlign.roles = this.formLabelAlign.roles.map(
+          (item: any) => {
+            return { id: item }
+          }
+        )
+        console.log(this.formLabelAlign.secondaryOrgs)
+        this.formLabelAlign.secondaryOrgs = this.formLabelAlign.secondaryOrgs.map((item:any) => {
+          return {
+            organization: item
+          }
+        })
         if (!this.userId) {
           try {
             await Api.mainData.addUser(this.formLabelAlign)
           } catch (err) {
-            throw err
+            console.error(err)
           }
         } else {
           try {
             await Api.mainData.updateUser(this.formLabelAlign)
           } catch (err) {
-            throw err
+            console.error(err)
           }
         }
         this.$router.go(-1)
@@ -141,7 +169,7 @@ export default class Standard extends Vue {
 
   async getData () {
     try {
-      [
+      ;[
         {
           data: { data: this.roleList }
         },
@@ -158,7 +186,7 @@ export default class Standard extends Vue {
       ])
       this.organizationsList = [this.organizationsList]
     } catch (err) {
-      throw err
+      console.error(err)
     }
   }
 
@@ -168,8 +196,14 @@ export default class Standard extends Vue {
         data: { data }
       } = await Api.mainData.getUser(this.userId as any)
       this.formLabelAlign = data
+      this.formLabelAlign.roles = this.formLabelAlign.roles.map((item: any) => {
+        return item.id
+      })
+      this.formLabelAlign.secondaryOrgs = this.formLabelAlign.secondaryOrgs ? this.formLabelAlign.secondaryOrgs.map((item:any) => {
+        return item.organization
+      }) : []
     } catch (err) {
-      throw err
+      console.error(err)
     }
   }
 }
@@ -179,6 +213,6 @@ export default class Standard extends Vue {
 /deep/ .el-form-item__label {
   padding: 0 0 1px 0;
   line-height: 28px;
-  font-weight: 550;
+  font-weight: 500;
 }
 </style>

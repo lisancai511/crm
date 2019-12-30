@@ -25,7 +25,7 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="lastModifier"
+          prop="lastModifierName"
           label="上次修改人信息">
         </el-table-column>
         <el-table-column
@@ -89,7 +89,7 @@ export default class TypeRecord extends mixins(injectObjectId) {
   }
 
   distributeLayout () {
-    this.$router.push(this.$route.path + `/record-type/layout`)
+    this.$router.push(this.$route.path + '/record-type/layout')
   }
 
   async getData (objectId: string) {
@@ -117,7 +117,7 @@ export default class TypeRecord extends mixins(injectObjectId) {
         this.$message.success('删除成功')
         this.getData(this.objectId)
       } catch (err) {
-        throw err
+        console.error(err)
       }
     } else {
       this.$message('请确认是否删除')

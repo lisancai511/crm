@@ -48,7 +48,7 @@ export function updateObjects (data: any) {
 export function addObjects (data: any) {
   return request({
     method: 'post',
-    url: `/`,
+    url: '/',
     data
   })
 }
@@ -62,11 +62,13 @@ export function deleteObjects (id: any) {
 }
 
 // 获取所有记录类型
-export function getAllRecordTypes (objectId: string) {
-  return request({
-    method: 'get',
-    url: `/${objectId}/record-types`
-  })
+export function getAllRecordTypes (
+  objectId: string,
+  params?: {
+    checkAuth?: boolean | string
+  }
+) {
+  return request.get(`/${objectId}/record-types`, { params })
 }
 
 /**
@@ -109,17 +111,24 @@ export function updateRecordTypes (objectId: any, recordTypeId: any, data: any) 
 
 /**
  * @description 获取指定对象的所有字段
- * @param {string} objectId 对象id
- * @param {string} [fieldType] 字段类型
- * @param {string} [layoutId] 布局id
- * @param {string} [cancelToken]
+ * @param {object} payload 对象id
  */
 export function getFields (
-  objectId: string,
-  fieldType?: string | null,
-  layoutId?: string | null,
-  cancelToken?: any
+  payload: {
+    objectId: string,
+    fieldType?: string | null,
+    layoutId?: string | null,
+    cancelToken?: any,
+    containModuleId?: boolean
+  }
 ) {
+  const {
+    objectId,
+    fieldType,
+    layoutId,
+    cancelToken,
+    containModuleId
+  } = payload
   const params: any = {}
   if (fieldType) {
     params.fieldType = fieldType
@@ -127,8 +136,9 @@ export function getFields (
   if (layoutId) {
     params.layoutId = layoutId
   }
-  // TODO 暂时添加size
-  params.size = 10000
+  if (containModuleId) {
+    params.containModuleId = containModuleId
+  }
   const data: any = { params }
   if (cancelToken) {
     data.cancelToken = cancelToken
@@ -378,30 +388,26 @@ export function getLayoutDistribution (objectId: string) {
 /**
  * @description 获得指定对象全部操作列表
  * @param {string} objectId 对象ID
- * @param {string} type
  * @param {string} [cancelToken]
+ * @param {object} [params]
  */
 export function getOperators (
   objectId: string,
-  type?: 'Button' | '',
+  params?: {
+    type?: 'Button' | '',
+    checkAuth?: boolean | string
+  },
   cancelToken?: any
-):any {
+): any {
   // // TODO objectId 暂时只能为1
   // objectId = '1'
-  const params: any = {}
-  if (type) {
-    params.type = type
-  }
+  params = params || {}
   const data: any = { params }
   if (cancelToken) {
     data.cancelToken = cancelToken
   }
   return new Promise((resolve, reject) => {
-    request({
-      method: 'get',
-      url: `/${objectId}/operators`,
-      data
-    }).then((res: any) => {
+    request.get(`/${objectId}/operators`, data).then((res: any) => {
       res.data.data = res.data.data.map((item: any) => {
         return {
           ...item,

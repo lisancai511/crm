@@ -13,7 +13,7 @@
                 v-for="(item, index) in data"
                 :key="index"
                 :label="item.name"
-                :disabled="item.id===dependenceId"
+                :disabled="item.id===dependenceId && !$route.params.controlId"
                 :value="item.id">
               </el-option>
             </el-select>
@@ -72,20 +72,19 @@ export default class FieldDependenceAdd extends Vue {
   }
 
   created () {
-    console.log(this.$route)
     if (this.$route.name === 'customObjectFieldDependenceEdit') {
       this.controlId = this.$route.query.controlId as any
       this.dependenceId = this.$route.query.dependenceId as any
-      // this.toNext = !this.toNext
-    } else {
-      this.getData()
     }
+    this.getData()
   }
 
   async getData () {
     const { data: { data } } = await Api.bizObjects.getFields(
-      this.objectId,
-      ['OptionListField', 'MoreOptionListField'].join(',')
+      {
+        objectId: this.objectId,
+        fieldType: ['OptionListField', 'MoreOptionListField'].join(',')
+      }
     )
     this.data = data
   }

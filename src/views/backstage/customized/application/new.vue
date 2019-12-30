@@ -5,7 +5,9 @@
       <div slot="header">
         <strong class="fs-18">{{app.id ? '编辑':'新建'}}应用程序</strong>
       </div>
-      <el-form ref="appForm" :model="app" :rules="rules">
+      <el-form ref="appForm"
+               :model="app"
+               :rules="rules">
         <!--<el-row :gutter="130">
           <el-col :span="12">
             <el-form-item label="应用程序标签">
@@ -18,11 +20,14 @@
             </el-form-item>
           </el-col>
         </el-row>-->
-        <el-form-item prop="name" label="应用程序名称">
+        <el-form-item prop="name"
+                      label="应用程序名称">
           <el-input v-model="app.name"/>
         </el-form-item>
         <el-form-item label="备注">
-          <el-input type="textarea" rows="6" v-model="app.description"/>
+          <el-input type="textarea"
+                    rows="6"
+                    v-model="app.description"/>
         </el-form-item>
         <div class="m-t-30 m-b-30 fs-16">
           <strong>选择要包括在此自定义应用程序菜单中的模块</strong>
@@ -31,74 +36,63 @@
           <div class="menus__box">
             <p class="m-t-0">
               <span>显示的菜单</span>
-              <el-button
-                @click="newMenuSection()"
-                class="fr button__new p-v-0"
-                type="text">新建分组
+              <el-button @click="newMenuSection()"
+                         class="fr button__new p-v-0 dd-button__text dd-button__text--info"
+                         type="text">新建分组
               </el-button>
             </p>
-            <draggable
-              handle=".draggable-handle"
-              @start="drag = true"
-              @end="drag = false"
-              ghostClass="menu-ghost-class"
-              dragClass="menu-drag-class"
-              :move="moveMenus"
-              v-bind="draggableUsedOptions"
-              v-model="app.menus"
-              tag="div"
-              class="menus__outline">
-              <transition-group
-                tag="div"
-                class="transition-group menus__section__container"
-                type="transition" :name="!drag ? 'flip-list' : null">
-                <template
-                  v-for="node in app.menus"
-                >
-                  <div
-                    :key="node.moduleId"
-                    v-if="node.group"
-                    class="menus__section p-l-15">
+            <draggable handle=".draggable-handle"
+                       @start="drag = true"
+                       @end="drag = false"
+                       ghostClass="menu-ghost-class"
+                       dragClass="menu-drag-class"
+                       :move="moveMenus"
+                       v-bind="draggableUsedOptions"
+                       v-model="app.menus"
+                       tag="div"
+                       class="menus__outline">
+              <transition-group tag="div"
+                                class="transition-group menus__section__container"
+                                type="transition"
+                                :name="!drag ? 'flip-list' : null">
+                <template v-for="node in app.menus">
+                  <div :key="node.moduleId"
+                       v-if="node.group"
+                       class="menus__section p-l-15">
                     <p class="m-b-0 m-t-5">
                       <strong>
                         <dd-icon :full-name="node.iconUrl"/>
                         {{node.name}}
                       </strong>
-                      <dd-icon
-                        @click.native="deleteMenuSection(node)"
-                        name="delete"
-                        class="m-r-15 fr dd-click"/>
-                      <dd-icon
-                        @click.native="newMenuSection(node)"
-                        name="edit"
-                        class="m-r-15 fr dd-click"/>
-                      <dd-icon
-                        name="change1" class="m-r-10 fl draggable-handle"/>
+                      <dd-icon @click.native="deleteMenuSection(node)"
+                               name="delete"
+                               class="m-r-15 fr dd-click"/>
+                      <dd-icon @click.native="newMenuSection(node)"
+                               name="edit"
+                               class="m-r-15 fr dd-click"/>
+                      <dd-icon name="change1"
+                               class="m-r-10 fl draggable-handle"/>
                     </p>
                     <div class="menus__section-body p-l-30">
-                      <div
-                        v-if="node.children.length === 0"
-                        class="menus__section-empty">
+                      <div v-if="node.children.length === 0"
+                           class="menus__section-empty">
                         请拖入模块
                       </div>
-                      <draggable
-                        @start="drag = true"
-                        @end="drag = false"
-                        ghostClass="menu-ghost-class"
-                        dragClass="menu-drag-class"
-                        tag="ul"
-                        v-bind="draggableUsedMenusOptions"
-                        v-model="node.children"
-                        class="menus">
-                        <transition-group
-                          class="transition-group"
-                          tag="div"
-                          type="transition"
-                          :name="!drag ? 'flip-list' : null">
-                          <li
-                            class="menus__item"
-                            :key="menu.moduleId"
-                            v-for="menu in node.children">
+                      <draggable @start="drag = true"
+                                 @end="drag = false"
+                                 ghostClass="menu-ghost-class"
+                                 dragClass="menu-drag-class"
+                                 tag="ul"
+                                 v-bind="draggableUsedMenusOptions"
+                                 v-model="node.children"
+                                 class="menus">
+                        <transition-group class="transition-group"
+                                          tag="div"
+                                          type="transition"
+                                          :name="!drag ? 'flip-list' : null">
+                          <li class="menus__item"
+                              :key="menu.moduleId"
+                              v-for="menu in node.children">
                             <dd-icon :full-name="menu.iconUrl"/>
                             {{menu.name}}
                           </li>
@@ -106,10 +100,9 @@
                       </draggable>
                     </div>
                   </div>
-                  <li
-                    v-else
-                    class="menus__item draggable-handle"
-                    :key="node.moduleId">
+                  <li v-else
+                      class="m-l-25 menus__item draggable-handle"
+                      :key="node.moduleId">
                     <dd-icon :full-name="node.iconUrl"/>
                     {{node.name}}
                   </li>
@@ -125,18 +118,16 @@
                 v-bind="draggableButtonsOptions"
               >
               </draggable>-->
-              <draggable
-                ghostClass="menu-ghost-class"
-                dragClass="menu-drag-class"
-                tag="ul"
-                v-model="modules"
-                v-bind="draggableMenusOptions"
-                style="height: 100%"
-                class="menus">
-                <li
-                  class="menus__item"
-                  :key="module.moduleId"
-                  v-for="module in modules">
+              <draggable ghostClass="menu-ghost-class"
+                         dragClass="menu-drag-class"
+                         tag="ul"
+                         v-model="modules"
+                         v-bind="draggableMenusOptions"
+                         style="height: 100%"
+                         class="menus">
+                <li class="menus__item"
+                    :key="module.moduleId"
+                    v-for="module in modules">
                   <dd-icon :full-name="module.iconUrl"/>
                   {{module.name}}
                 </li>
@@ -144,73 +135,103 @@
             </div>
           </div>
         </div>
-        <div class="m-t-30 m-b-30 fs-16">
-          <strong>分配角色</strong>
-        </div>
-        <div class="roles__wrap">
-          <div
-            class="roles__item roles__tr">
-            <div style="display: flex;align-items: center;justify-content: center">
-              <el-checkbox
-                :indeterminate="isIndeterminate"
-                v-model="checkAll"
-                @change="handleCheckAllChange">
-                (全选) 可见
-              </el-checkbox>
+
+        <div class="cechnologicalProcess">
+          <div class="left">
+            <div class="m-t-30 m-b-30 fs-16">
+              <strong>分配角色</strong>
             </div>
-            <div>角色</div>
+            <div class="roles__wrap">
+              <div class="roles__item roles__tr">
+                <div style="display: flex;align-items: center;justify-content: center">
+                  <el-checkbox :indeterminate="isIndeterminate"
+                               v-model="checkAll"
+                               @change="handleCheckAllChange">
+                    (全选) 可见
+                  </el-checkbox>
+                </div>
+                <div>角色</div>
+              </div>
+            </div>
+            <el-checkbox-group class="roles__wrap"
+                               v-model="app.authorizedRoles">
+              <div class="roles__item  roles__item-content"
+                   v-for="role in roles"
+                   :key="role.id">
+                <el-checkbox :disabled="role.id===-1" :label="role.id">{{role.name}}
+                </el-checkbox>
+                <div v-show="false"></div>
+              </div>
+            </el-checkbox-group>
           </div>
+
+          <div v-if="isPack"
+               class="right m-l-30">
+            <div class="m-t-30 m-b-30 fs-16">
+              <strong>分配流程</strong>
+            </div>
+            <div class="roles__wrap">
+              <div class="roles__item roles__tr">
+                <div style="display: flex;align-items: center;justify-content: center">
+                  <el-checkbox :indeterminate="isIndeterminate1"
+                               v-model="checkAll1"
+                               @change="handleCheckAllChange1">
+                    (全选) 可见
+                  </el-checkbox>
+                </div>
+                <div>流程</div>
+              </div>
+            </div>
+            <el-checkbox-group class="roles__wrap"
+                               v-model="approvalFlowId">
+              <div class="roles__item  roles__item-content"
+                   v-for="role in formList"
+                   :key="role.approvalFlowId">
+                <el-checkbox :label="role.approvalFlowId">{{role.name}}
+                </el-checkbox>
+                <div v-show="false"></div>
+              </div>
+            </el-checkbox-group>
+          </div>
+
         </div>
-        <el-checkbox-group
-          class="roles__wrap"
-          v-model="app.authorizedRoles">
-          <div
-            class="roles__item  roles__item-content"
-            v-for="role in roles"
-            :key="role.id">
-            <el-checkbox
-              :label="role.id">{{role.name}}
-            </el-checkbox>
-            <div v-show="false"></div>
-          </div>
-        </el-checkbox-group>
+
         <div class="dd-text-center">
-          <el-button @click="saveApp" type="primary" :loading="saving">保存</el-button>
+          <el-button @click="saveApp"
+                     type="primary"
+                     :loading="saving">保存
+          </el-button>
           <el-button @click="$router.go(-1)">返回</el-button>
         </div>
       </el-form>
     </el-card>
-    <el-dialog
-      @closed="closedDialog"
-      title="新建分组"
-      width="30%"
-      :visible.sync="visibleDialog">
-      <el-form
-        ref="groupForm"
-        :model="groupForm">
-        <el-form-item
-          :rules="{required: true,message:'请选择分组图标'}"
-          prop="iconUrl"
-          label="请选择分组图标">
-          <icon-select-dialog
-            v-model="groupForm.iconUrl"
-            :icon-names="iconNames">
-            <dd-icon v-if="!groupForm.iconUrl" name="add"></dd-icon>
-            <dd-icon v-else :full-name="groupForm.iconUrl"></dd-icon>
+    <el-dialog @closed="closedDialog"
+               title="新建分组"
+               width="30%"
+               :visible.sync="visibleDialog">
+      <el-form ref="groupForm"
+               :model="groupForm">
+        <el-form-item :rules="{required: true,message:'请选择分组图标'}"
+                      prop="iconUrl"
+                      label="请选择分组图标">
+          <icon-select-dialog v-model="groupForm.iconUrl"
+                              :icon-names="iconNames">
+            <dd-icon v-if="!groupForm.iconUrl"
+                     name="add"></dd-icon>
+            <dd-icon v-else
+                     :full-name="groupForm.iconUrl"></dd-icon>
           </icon-select-dialog>
         </el-form-item>
-        <el-form-item
-          :rules="{required: true,message:'请输入分组名称'}"
-          prop="name"
-          label="请输入分组名称">
+        <el-form-item :rules="{required: true,message:'请输入分组名称'}"
+                      prop="name"
+                      label="请输入分组名称">
           <el-input v-model="groupForm.name"/>
         </el-form-item>
       </el-form>
       <div class="dd-text-center">
         <el-button @click="visibleDialog=false">取消</el-button>
-        <el-button
-          @click="submitNewMenuSection"
-          type="primary">确认
+        <el-button @click="submitNewMenuSection"
+                   type="primary">确认
         </el-button>
       </div>
     </el-dialog>
@@ -225,7 +246,7 @@ import { IDD } from '@/types/common'
 import _ from 'lodash'
 import api from '@/api'
 import IconSelectDialog from '@/components/IconSelectDialog.vue'
-import { app as iconNames } from '@/assets/icon-names'
+import { iconMaps } from '@/assets/icon'
 
 const initGroupForm = {
   moduleId: '',
@@ -249,29 +270,38 @@ export default class NewApplication extends Vue {
     homepageType: 'Cutomized',
     homepageUrl: '',
     standard: false,
-    authorizedRoles: []
+    authorizedRoles: ['-1']
   }
+
+  approvalFlowId: any = []
+
+  formList: any = []
+
   modules: IDD.ISModule[] = []
 
   visibleDialog: boolean = false
 
   drag: boolean = false
   checkAll: boolean = false
+  checkAll1: boolean = false
   isIndeterminate: boolean = true
+  isIndeterminate1: boolean = true
 
   groupForm: any = {
     ...initGroupForm
   }
 
+  iconNames: any[] = []
+
   @Watch('groupForm', { deep: true })
   onGroupFormChange () {
     this.$nextTick(() => {
-      (this.$refs as any).groupForm.validate()
+      ;(this.$refs as any).groupForm.validate()
     })
   }
 
-  get iconNames () {
-    return iconNames
+  get isPack () {
+    return this.$route.path.includes('pack')
   }
 
   get appId () {
@@ -315,33 +345,45 @@ export default class NewApplication extends Vue {
   }
 
   async created () {
-    const modules = this.$store.state.backstage.customized.modules
+    if (this.isPack) {
+      this.getForm()
+    }
+    api.utils.getIconNames(iconMaps.app).then((res: any) => {
+      this.iconNames = res
+    })
+    // const modules = this.$store.state.backstage.customized.modules
     const [
-      , , {
-        data: {
-          data: app
-        }
+      ,
+      ,
+      {
+        data: { data: app }
       }
     ] = await Promise.all([
-      this.roles.length === 0 ? this.$store.dispatch('backstage/getRoles') : Promise.resolve(),
-      modules.length === 0 ? this.$store.dispatch('backstage/customized/getModules') : Promise.resolve(),
-      this.appId ? api.metaData.getApp(this.appId) : Promise.resolve({ data: { data: this.app } })
+      this.$store.dispatch('backstage/getRoles'),
+      this.$store.dispatch('backstage/customized/getModules'),
+      this.appId
+        ? api.metaData.getApp(this.appId)
+        : Promise.resolve({ data: { data: this.app } })
     ])
 
     const menuIds: string[] = []
 
-    this.modules = this.$store.state.backstage.customized.modules
-      .map((module: IDD.ISModule) => {
+    this.modules = this.$store.state.backstage.customized.modules.map(
+      (module: IDD.ISModule) => {
         return {
           ...module,
           moduleId: module.id
         }
-      })
+      }
+    )
 
     const moduleById = this.$store.getters['backstage/customized/moduleById']
 
     app.authorizedRoles = app.authorizedRoles || []
-    app.menus = app.menus.map((node: IDD.IMenu) => {
+    if (app.authorizedRoles.indexOf(-1) === -1) {
+      app.authorizedRoles.push(-1)
+    }
+    app.menus = app.menus.map((node: IDD.ISMenu) => {
       if (!node.moduleId) {
         node.moduleId = nanoid(6)
       } else {
@@ -349,18 +391,22 @@ export default class NewApplication extends Vue {
         node.name = (moduleById[node.moduleId] || {}).name
       }
       if (node.children) {
-        node.children = node.children.map((menu: IDD.IMenu) => {
+        node.children = node.children.map((menu: IDD.ISMenu) => {
           menuIds.push(menu.moduleId as string)
           // TODO 如果 module 被删除了会怎么样
           return {
             ...menu,
-            name: (moduleById[menu.moduleId as string] || {}).name
+            name: (moduleById[menu.moduleId as string] || {}).name,
+            iconUrl: menu.module && menu.module.iconUrl
           }
         })
       }
+      node.iconUrl = node.iconUrl || (node.module && node.module.iconUrl)
       return node
     })
-    this.modules = this.modules.filter((module: IDD.ISModule) => !menuIds.includes(module.id))
+    this.modules = this.modules.filter(
+      (module: IDD.ISModule) => !menuIds.includes(module.id)
+    )
     this.app = app
   }
 
@@ -402,7 +448,7 @@ export default class NewApplication extends Vue {
 
   submitNewMenuSection () {
     this.$nextTick(() => {
-      (this.$refs as any).groupForm.validate((valid: boolean) => {
+      ;(this.$refs as any).groupForm.validate((valid: boolean) => {
         if (valid) {
           if (!this.groupForm.moduleId) {
             this.app.menus.unshift({
@@ -441,12 +487,14 @@ export default class NewApplication extends Vue {
               group: true,
               name: node.name,
               iconUrl: node.iconUrl,
-              children: (node.children as IDD.IMenu[]).map((menu: IDD.IMenu) => {
-                return {
-                  group: false,
-                  moduleId: menu.moduleId
+              children: (node.children as IDD.IMenu[]).map(
+                (menu: IDD.IMenu) => {
+                  return {
+                    group: false,
+                    moduleId: menu.moduleId
+                  }
                 }
-              })
+              )
             }
           }
           return {
@@ -455,6 +503,12 @@ export default class NewApplication extends Vue {
           }
         })
         try {
+          if (this.isPack) {
+            app.packageApp = true
+            app.approvalFlowId = this.approvalFlowId.map((item: any) => {
+              return item
+            })
+          }
           if (isEdit) {
             await this.$store.dispatch('backstage/customized/putApp', app)
           } else {
@@ -475,13 +529,34 @@ export default class NewApplication extends Vue {
     this.isIndeterminate = false
   }
 
-  handleCheckedCitiesChange (value: any) {
-    let checkedCount = value.length
-    this.checkAll = checkedCount === this.app.authorizedRoles.length
-    this.isIndeterminate = checkedCount > 0 && checkedCount < this.roles.length
+  handleCheckAllChange1 (val: any) {
+    this.approvalFlowId = val ? this.formList.map((role: any) => role.approvalFlowId) : []
+    this.isIndeterminate1 = false
+  }
+
+  // handleCheckedCitiesChange (value: any) {
+  //   const checkedCount = value.length
+  //   this.checkAll = checkedCount === this.app.authorizedRoles.length
+  //   this.isIndeterminate = checkedCount > 0 && checkedCount < this.roles.length
+  // }
+
+  async getForm () {
+    const data = await api.paasApprovalFlow.getForms()
+    this.formList = data.data.data.map((item: any) => {
+      return { name: item.categoryName, forms: item.forms }
+    })
+    this.formList = this.formList.map((item: any) => {
+      return item.forms.map((item0: any) => {
+        return {
+          name: item.name + '__' + item0.name,
+          approvalFlowId: item0.approvalFlowId
+        }
+      })
+    })
+    this.formList = this.formList.flat()
+    console.log(this.formList, 786896)
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
@@ -599,14 +674,15 @@ export default class NewApplication extends Vue {
         width: 150px;
         border: 1px solid rgba(230, 230, 230, 1);
         border-bottom: none;
-        border-left: none;
-        height: 40px;
+        overflow: hidden;
+        word-break: break-all;
         line-height: 40px;
       }
     }
 
     &:last-child {
-      /deep/ .el-checkbox__label, /deep/ .el-checkbox__input {
+      /deep/ .el-checkbox__label,
+      /deep/ .el-checkbox__input {
         border-bottom: 1px solid rgba(230, 230, 230, 1);
       }
     }
@@ -624,7 +700,7 @@ export default class NewApplication extends Vue {
 }
 
 .menu-drag-class {
-  background-color: rgba($dd--primary-color, .5);
+  background-color: rgba($dd--primary-color, 0.5);
 }
 
 .menu-ghost-class {
@@ -634,7 +710,7 @@ export default class NewApplication extends Vue {
 
 .button__new {
   &.menu-drag-class {
-    background-color: rgba($dd--primary-color, .5);
+    background-color: rgba($dd--primary-color, 0.5);
   }
 
   &.menu-ghost-class {
@@ -649,5 +725,9 @@ export default class NewApplication extends Vue {
 
 .no-move {
   transition: transform 0s;
+}
+
+.cechnologicalProcess {
+  display: flex;
 }
 </style>

@@ -17,7 +17,8 @@ import { Component, Vue } from 'vue-property-decorator'
 import SideBar from '../components/SideBar/index.vue'
 import BreadCrumb from '../components/Breadcrumb.vue'
 import AppMain from '../components/AppMain.vue'
-import backstageRouter from '@/router/modules/backstage'
+// import backstageRouter from '@/router/modules/backstage'
+import roleModule from '@/store/modules/role'
 
 @Component({
   name: 'Layout',
@@ -28,8 +29,12 @@ import backstageRouter from '@/router/modules/backstage'
   }
 })
 export default class Layout extends Vue {
+  created () {
+    roleModule.getRole()
+  }
+
   get backstageRouter () {
-    return backstageRouter
+    return roleModule.authList[0]
   }
 }
 </script>

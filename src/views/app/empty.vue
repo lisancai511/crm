@@ -2,7 +2,7 @@
 <template>
   <div class="AppEmpty">
     暂无应用
-    <router-link to="/backstage/general-setting/personalSetting">
+    <router-link to="/backstage/general-setting/personal">
       设置应用
     </router-link>
   </div>

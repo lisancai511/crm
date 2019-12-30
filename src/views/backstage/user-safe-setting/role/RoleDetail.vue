@@ -19,10 +19,10 @@
                      label="数据权限">
           <DataRole></DataRole>
         </el-tab-pane>
-        <!-- <el-tab-pane :lazy="true"
+        <el-tab-pane :lazy="true"
                      label="管理权限">
-          5
-        </el-tab-pane> -->
+           <ManagementRole></ManagementRole>
+        </el-tab-pane>
         <el-tab-pane :lazy="true"
                      label="应用程序权限">
           <AppRolr></AppRolr>
@@ -38,6 +38,7 @@ import TypeRecordRole from './components/TypeRecordRole.vue'
 import DataRole from './components/DataRole.vue'
 import ModuleRole from './components/ModuleRole.vue'
 import AppRolr from './components/AppRole.vue'
+import ManagementRole from './components/ManagementRole.vue'
 @Component({
   name: 'StandardDetails',
   components: {
@@ -45,7 +46,8 @@ import AppRolr from './components/AppRole.vue'
     TypeRecordRole,
     DataRole,
     ModuleRole,
-    AppRolr
+    AppRolr,
+    ManagementRole
   }
 })
 export default class StandardDetails extends Vue {

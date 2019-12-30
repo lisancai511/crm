@@ -20,7 +20,7 @@ const objectStandardRouter: RouteConfig = {
   children: [
     {
       name: 'ObjectDetails',
-      path: `/backstage/customized/object-standard/:objectId`,
+      path: '/backstage/customized/object-standard/:objectId',
       props: true,
       component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/details.vue'),
       meta: {
@@ -30,7 +30,7 @@ const objectStandardRouter: RouteConfig = {
     },
     {
       name: 'ObjectDetailsLayout',
-      path: `/backstage/customized/object-standard/:objectId`,
+      path: '/backstage/customized/object-standard/:objectId',
       props: true,
       component: () => import(/* webpackChunkName: "dashboard" */ '@/layout/empty-router-view.vue'),
       meta: {
@@ -40,7 +40,7 @@ const objectStandardRouter: RouteConfig = {
       children: [
         {
           name: 'ObjectRecordTypeAdd',
-          path: `/backstage/customized/object-standard/:objectId/record-type/add`,
+          path: '/backstage/customized/object-standard/:objectId/record-type/add',
           component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/type-record-add.vue'),
           meta: {
             title: '创建记录类型'
@@ -48,7 +48,7 @@ const objectStandardRouter: RouteConfig = {
         },
         {
           name: 'ObjectRecordTypeEdit',
-          path: `/backstage/customized/object-standard/:objectId/record-type/:recordTypeId/edit`,
+          path: '/backstage/customized/object-standard/:objectId/record-type/:recordTypeId/edit',
           props: true,
           component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/type-record-add.vue'),
           meta: {
@@ -57,7 +57,7 @@ const objectStandardRouter: RouteConfig = {
         },
         {
           name: 'ObjectRecordTypeLayout',
-          path: `/backstage/customized/object-standard/:objectId/record-type/layout`,
+          path: '/backstage/customized/object-standard/:objectId/record-type/layout',
           props: true,
           component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/type-record-layout.vue'),
           meta: {
@@ -66,7 +66,7 @@ const objectStandardRouter: RouteConfig = {
         },
         {
           name: 'ObjectFieldAdd',
-          path: `/backstage/customized/object-standard/:objectId/field/add`,
+          path: '/backstage/customized/object-standard/:objectId/field/add',
           props: true,
           component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/field-add.vue'),
           meta: {
@@ -75,7 +75,7 @@ const objectStandardRouter: RouteConfig = {
         },
         {
           name: 'ObjectFieldEdit',
-          path: `/backstage/customized/object-standard/:objectId/field/:fieldId/edit`,
+          path: '/backstage/customized/object-standard/:objectId/field/:fieldId/edit',
           props: true,
           component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/field-add.vue'),
           meta: {
@@ -84,7 +84,7 @@ const objectStandardRouter: RouteConfig = {
         },
         {
           name: 'ObjectFieldDependenceAdd',
-          path: `/backstage/customized/object-standard/:objectId/field-dependence/add`,
+          path: '/backstage/customized/object-standard/:objectId/field-dependence/add',
           props: true,
           component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/field-dependence-add.vue'),
           meta: {
@@ -93,7 +93,7 @@ const objectStandardRouter: RouteConfig = {
         },
         {
           name: 'ObjectFieldDependenceEdit',
-          path: `/backstage/customized/object-standard/:objectId/field-dependence/:fieldDependenceId/edit`,
+          path: '/backstage/customized/object-standard/:objectId/field-dependence/:fieldDependenceId/edit',
           props: true,
           component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/field-dependence-add.vue'),
           meta: {
@@ -102,7 +102,7 @@ const objectStandardRouter: RouteConfig = {
         },
         {
           name: 'ObjectLayoutAdd',
-          path: `/backstage/customized/object-standard/:objectId/layout/add`,
+          path: '/backstage/customized/object-standard/:objectId/layout/add',
           props: true,
           component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/geography-add.vue'),
           meta: {
@@ -111,7 +111,7 @@ const objectStandardRouter: RouteConfig = {
         },
         {
           name: 'ObjectLayoutEdit',
-          path: `/backstage/customized/object-standard/:objectId/layout/:layoutId/edit`,
+          path: '/backstage/customized/object-standard/:objectId/layout/:layoutId/edit',
           props: true,
           component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/customized/object-standard/geography-add.vue'),
           meta: {

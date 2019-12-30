@@ -1,27 +1,31 @@
 <!--Created by LiuLei on 2019/11/12-->
 <template>
-  <div class="AppViewsTerms">
+  <div class="app-views-terms" :class="[type]">
     <div class="terms__label">
       {{'到达'.padEnd((labelLength || label.length || 2),'到达')}}：
       <div class="terms__label--inner">
         {{label}}：
       </div>
     </div>
-    <div class="terms__value m-l-25">
+    <div
+      :class="{'show-all':showAll,[type]:true}"
+      class="terms__value m-l-25">
       <template v-if="type===ComponentTypes.OptionListField">
         <div
-          style="display: flex;align-items: center">
+          :class="{'show-all':showAll}"
+          class="check-box__wrap">
           <el-checkbox
             class="m-r-30"
             :indeterminate="isIndeterminate"
             v-model="checkAll"
-            @change="handleCheckAllChange">全选
+            @change="handleCheckAllChange">全部
           </el-checkbox>
           <el-checkbox-group
             @change="handleCheckedCheckBoxChange"
             v-model="model">
             <el-checkbox
-              v-for="option in OptionList"
+              :ref="'checkbox_'+index"
+              v-for="(option,index) in OptionList"
               :key="option.id"
               :label="option.id">{{option.v}}
             </el-checkbox>
@@ -34,21 +38,46 @@
         ComponentTypes.EmailField,
         ComponentTypes.PhoneField,
         ComponentTypes.WebsiteField,
+        ComponentTypes.AutoNumberField
       ].includes(type)">
         <el-input size="mini" v-model="model"/>
       </template>
       <template v-else-if="type === ComponentTypes.DateField">
         <div style="display: flex;align-items: center">
-          <el-radio-group v-model="model">
+          <!--<el-radio-group v-model="model">
             <el-radio
               :key="dateType.value"
               v-for="dateType in DateTypesList"
               :label="dateType.value">{{dateType.label}}
             </el-radio>
-          </el-radio-group>
-          <div class="m-l-30">
-            <span class="m-r-10">自定义时间段</span>
+          </el-radio-group>-->
+          <div
+            v-if="!showCustomDate"
+            class="check-box__wrap">
+            <el-checkbox
+              class="m-r-30"
+              :indeterminate="isIndeterminate"
+              v-model="checkAll"
+              @change="handleCheckAllChange">全部
+            </el-checkbox>
+            <el-checkbox-group
+              @change="handleCheckedCheckBoxChange"
+              v-model="model">
+              <el-checkbox
+                :ref="'checkbox_'+index"
+                v-for="(option,index) in DateTypesList"
+                :key="option.value"
+                :label="option.value">{{option.label}}
+              </el-checkbox>
+            </el-checkbox-group>
+          </div>
+          <div>
+            <span
+              @click="handleCustomDate"
+              :class="{'is-checked':showCustomDate}"
+              class="m-r-10 custom-date_button">自定义时间段</span>
             <el-date-picker
+              v-if="showCustomDate"
               size="mini"
               v-model="model"
               type="daterange"
@@ -70,13 +99,31 @@
         </el-date-picker>
       </template>
       <template v-else-if="type === ComponentTypes.CheckBoxField">
-        <el-radio-group v-model="model">
+        <!--<el-radio-group v-model="model">
           <el-radio
             :key="type.value"
             v-for="type in CheckBoxTypes"
             :label="type.value">{{type.label}}
           </el-radio>
-        </el-radio-group>
+        </el-radio-group>-->
+        <div class="check-box__wrap">
+          <el-checkbox
+            class="m-r-30"
+            :indeterminate="isIndeterminate"
+            v-model="checkAll"
+            @change="handleCheckAllChange">全部
+          </el-checkbox>
+          <el-checkbox-group
+            @change="handleCheckedCheckBoxChange"
+            v-model="model">
+            <el-checkbox
+              :ref="'checkbox_'+index"
+              v-for="(option,index) in CheckBoxTypes"
+              :key="option.value"
+              :label="option.value">{{option.label}}
+            </el-checkbox>
+          </el-checkbox-group>
+        </div>
       </template>
       <template v-else-if="type === ComponentTypes.LookUpField">
         <el-select
@@ -98,6 +145,13 @@
         </el-select>
       </template>
     </div>
+    <el-button
+      v-if="showHideButton"
+      @click="showAll = !showAll"
+      type="text"
+      class="show-hide-button__wrap p-v-0">
+      {{showAll ? '隐藏' :'显示全部'}}
+    </el-button>
   </div>
 </template>
 
@@ -110,6 +164,7 @@ import { mixins } from 'vue-class-component'
 import axios from 'axios'
 import api from '@/api'
 import PredefinedFieldApiNames from '@/views/designer/config/PredefinedFieldApiNames'
+import { IField } from '@/views/designer/config/components'
 
 const CancelToken = axios.CancelToken
 
@@ -121,7 +176,7 @@ export default class AppViewsTerms extends mixins(routerParams) {
   @Prop({ type: String, required: true }) readonly type !: string
   @Prop({ type: String, required: true }) readonly label !: string
   @Prop({ type: String, required: true }) readonly apiName !: string
-  @Prop({ type: Object, required: true }) readonly field !: any
+  @Prop({ type: Object, required: true }) readonly field !: IField
   @Prop({ type: Number }) readonly labelLength !: string
   @Prop({ type: Object }) readonly optionsByApiName !: { [propName: string]: { id: string, v: string }[] }
   // @Prop({
@@ -139,12 +194,16 @@ export default class AppViewsTerms extends mixins(routerParams) {
   lookupObjectApiName: string = ''
   source = CancelToken.source()
 
+  showAll: boolean = false
+  showHideButton: boolean = false
+  showCustomDate: boolean = false
+
   get model () {
     return this.value
   }
 
   set model (val: any) {
-    if (this.type === ComponentTypes.DateField && Array.isArray(val)) {
+    if (this.type === ComponentTypes.DateField && this.showCustomDate && val.length === 2) {
       val[0] = this.$moment(val[0]).format('YYYY-MM-DD')
       val[1] = this.$moment(val[1]).format('YYYY-MM-DD')
     }
@@ -169,10 +228,6 @@ export default class AppViewsTerms extends mixins(routerParams) {
 
     return [
       {
-        label: '全部',
-        value: types.all
-      },
-      {
         label: '是',
         value: types.yes
       },
@@ -186,36 +241,32 @@ export default class AppViewsTerms extends mixins(routerParams) {
   get DateTypesList () {
     return [
       {
-        label: '全部',
-        value: ''
-      },
-      {
         label: '昨天',
-        value: 'Yesterday'
+        value: 'YESTERDAY'
       },
       {
         label: '今天',
-        value: 'Today'
+        value: 'TODAY'
       },
       {
         label: '明天',
-        value: 'Tomorrow'
+        value: 'TOMORROW'
       },
       {
         label: '本周',
-        value: 'CurrentWeek'
+        value: 'THIS_WEEK'
       },
       {
         label: '本月',
-        value: 'CurrentMonth'
+        value: 'THIS_MONTH'
       },
       {
         label: '本季度',
-        value: 'CurrentSeason'
+        value: 'THIS_QUARTER'
       },
       {
         label: '本年',
-        value: 'CurrentYear'
+        value: 'THIS_YEAR'
       }
     ]
   }
@@ -235,17 +286,53 @@ export default class AppViewsTerms extends mixins(routerParams) {
     }
   }
 
+  updated () {
+    switch (this.type) {
+      case ComponentTypes.OptionListField: {
+        const firstCheckBox: any = this.$refs.checkbox_0
+        const lastCheckBox: any = this.$refs[`checkbox_${this.OptionList.length - 1}`]
+        if (!this.showHideButton && firstCheckBox && lastCheckBox) {
+          this.showHideButton = firstCheckBox[0].$el.offsetTop !== lastCheckBox[0].$el.offsetTop
+        }
+      }
+        break
+      default:
+    }
+  }
+
+  get checkBoxList (): any {
+    switch (this.type) {
+      case ComponentTypes.OptionListField:
+        return this.OptionList
+      case ComponentTypes.CheckBoxField:
+        return this.CheckBoxTypes.map((item: any) => {
+          return {
+            ...item,
+            id: item.value
+          }
+        })
+      case ComponentTypes.DateField:
+        return this.DateTypesList.map((item: any) => {
+          return {
+            ...item,
+            id: item.value
+          }
+        })
+      default:
+        return []
+    }
+  }
+
   handleCheckAllChange (val: boolean) {
     // TODO 更换真实数据
-    this.model = val ? this.OptionList.map((option: any) => option.id) : []
+    this.model = val ? this.checkBoxList.map((option: any) => option.id) : []
     this.isIndeterminate = false
   }
 
   handleCheckedCheckBoxChange (value: string[]) {
-    let checkedCount = value.length
-    // TODO 更换真实 Length
-    this.checkAll = checkedCount === this.OptionList.length
-    this.isIndeterminate = checkedCount > 0 && checkedCount < this.OptionList.length
+    const checkedCount = value.length
+    this.checkAll = checkedCount === this.checkBoxList.length
+    this.isIndeterminate = checkedCount > 0 && checkedCount < this.checkBoxList.length
   }
 
   async remoteMethod (query: string) {
@@ -263,7 +350,7 @@ export default class AppViewsTerms extends mixins(routerParams) {
             }
           }
         } = await api.bizObjects.getObjectById(
-          this.field.lookupConfig.lookupObjectId
+          this.field?.attrs?.lookupConfig?.lookupObjectId as string
         )
         this.lookupObjectApiName = apiName
       }
@@ -271,7 +358,7 @@ export default class AppViewsTerms extends mixins(routerParams) {
         data: {
           data
         }
-      } = await api.passObjectOp.getAppRecords(
+      } = await api.paasObjectOp.getAppRecords(
         this.lookupObjectApiName,
         {
           info: {
@@ -293,11 +380,16 @@ export default class AppViewsTerms extends mixins(routerParams) {
       this.loading = false
     }
   }
+
+  handleCustomDate () {
+    this.model = []
+    this.showCustomDate = !this.showCustomDate
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-.AppViewsTerms {
+.app-views-terms {
   display: flex;
   align-items: center;
 
@@ -316,8 +408,64 @@ export default class AppViewsTerms extends mixins(routerParams) {
         left: 0;
       }
     }
+
+    &__value {
+      &.OptionListField {
+        height: 24px;
+        overflow: hidden;
+      }
+
+      &.show-all {
+        height: auto;
+      }
+
+      .check-box__wrap {
+        display: flex;
+
+        &.show-all {
+          align-items: center;
+        }
+      }
+
+      .el-checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      /deep/ .el-checkbox {
+        margin-right: 12px;
+
+        &__input {
+          display: none;
+
+          &.is-checked {
+            & + .el-checkbox__label {
+              background-color: $dd--primary-color;
+              color: #fff;
+            }
+          }
+        }
+
+        &__label {
+          padding: 0 8px;
+          color: $dd--color-text-primary;
+        }
+      }
+
+      .custom-date_button {
+        cursor: pointer;
+        padding: 0 8px;
+        line-height: 19px;
+        display: inline-block;
+        color: #222222;
+        font-weight: 500;
+
+        &.is-checked {
+          background-color: $dd--primary-color;
+          color: #fff;
+        }
+      }
+    }
   }
 }
 </style>
-
-2019-01-01 2019-02-02

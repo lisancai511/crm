@@ -18,7 +18,7 @@ export default function localFieldToServerField (field: IField) {
     tooltip: field.helpText,
     defaultValue: field.model,
     addToLayouts: field.addToLayouts
-    //  TODO 帮助文本 and 其他属性
+    //  TODO 提示文字 and 其他属性
   }
   switch (field.type) {
     case ComponentTypes.TextField:
@@ -40,7 +40,16 @@ export default function localFieldToServerField (field: IField) {
       return {
         ..._.cloneDeep(baseField),
         decimalDigit: field.attrs.decimalDigit,
-        integerDigit: field.attrs.integerDigit
+        integerDigit: field.attrs.integerDigit,
+        unit: field.attrs.unit
+        // TODO 其他属性
+      }
+    case ComponentTypes.MoneyField:
+      return {
+        ..._.cloneDeep(baseField),
+        decimalDigit: field.attrs.decimalDigit,
+        capital: field.attrs.capital,
+        unit: field.attrs.unit
         // TODO 其他属性
       }
     case ComponentTypes.WebsiteField:
@@ -52,7 +61,7 @@ export default function localFieldToServerField (field: IField) {
     case ComponentTypes.AutoNumberField:
       return {
         ..._.cloneDeep(baseField),
-        maxLength: field.attrs.maxlength + field.autoNumberConfig.prefix.length,
+        maxLength: field.attrs.maxlength,
         autoNumberConfig: field.autoNumberConfig
       }
     case ComponentTypes.OptionListField:
@@ -69,8 +78,17 @@ export default function localFieldToServerField (field: IField) {
         ..._.cloneDeep(baseField),
         lookupConfig: field.attrs.lookupConfig
       }
+    case ComponentTypes.ImageField:
+      return {
+        ..._.cloneDeep(baseField),
+        limitNumber: field.attrs.limitNumber,
+        watermarks: field.attrs.watermarks,
+        onlyUsedCellPhoneCamera: field.attrs.onlyUsedCellPhoneCamera
+      }
     case ComponentTypes.LookUpMoreField:
     default:
-      return {}
+      return {
+        ..._.cloneDeep(baseField)
+      }
   }
 }

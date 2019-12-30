@@ -18,7 +18,7 @@
         <template slot-scope="scope">
           <el-checkbox
             @change="changeCheckbox(scope.row)"
-            v-model="scope.row.show"></el-checkbox>
+            v-model="scope.row.show"/>
         </template>
       </el-table-column>
       <el-table-column
@@ -32,14 +32,14 @@
         label="只读"
         width="80">
         <template slot-scope="scope">
-          <el-checkbox :disabled="!scope.row.show|| scope.row.required" v-model="scope.row.readOnly"></el-checkbox>
+          <el-checkbox :disabled="!scope.row.show|| scope.row.required" v-model="scope.row.readOnly"/>
         </template>
       </el-table-column>
     </el-table>
     <div class="m-t-30 m-l-30 m-b-20">
-      <el-button type="primary" @click="saveData">保存</el-button>
+      <el-button :loading="loading" type="primary" @click="saveData">保存</el-button>
       <el-button type="primary" @click="goBack">返回</el-button>
-      <el-button @click="saveDataAndGoBack">保存并继续添加</el-button>
+      <el-button :loading="loading" @click="saveDataAndGoBack">保存并继续添加</el-button>
     </div>
   </div>
 </template>
@@ -56,6 +56,8 @@ export default class FieldDistributeLayout extends Vue {
   @Prop({ type: String, required: true }) readonly objectId !: string
   @Prop({ required: true }) readonly fieldId !: string | undefined
   private addToLayouts: any = []
+
+  loading: boolean = true
 
   layouts: any[] = []
 
@@ -88,7 +90,7 @@ export default class FieldDistributeLayout extends Vue {
       }
       this.$router.go(-1)
     } catch (err) {
-      throw err
+      console.error(err)
     }
   }
 
@@ -109,19 +111,20 @@ export default class FieldDistributeLayout extends Vue {
       }
       this.$emit('changeShowNext', 'saveAndAdd')
     } catch (err) {
-      throw err
+      console.error(err)
     }
   }
 
   async getData () {
-    let { data: { data } } = await Api.bizObjects.getLayouts(this.objectId)
+    const { data: { data } } = await Api.bizObjects.getLayouts(this.objectId)
     this.layouts = data
     this.initAddToLayouts()
+    this.loading = false
   }
 
   initAddToLayouts () {
     this.addToLayouts = this.layouts.map((item: any) => {
-      let obj = {
+      const obj = {
         show: true,
         readOnly: false,
         required: false,

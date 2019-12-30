@@ -1,108 +1,136 @@
 <template>
   <div class="ScopeOfApplication">
     <el-card class="main">
-      <div class="left">
-        <div>选择</div>
-        <div class="left_main m-t-10">
-          <el-input v-model="input"
-                    placeholder="请输入内容"></el-input>
-          <el-tree :data="tbaleData"
-                   class="m-t-10"
-                   @check-change="handleCheckChange"
-                   show-checkbox
-                   :default-checked-keys="data.applyTargets[0].targetIds"
-                   default-expand-all
-                   node-key="id"
-                   ref="tree"
-                   highlight-current>
-            <span class="custom-tree-node"
-                  slot-scope="{ node, data }">
-              <span>
-                <dd-icon class="m-r-10"
-                         :name="data.type?'Bankcard':'man'"></dd-icon>{{ data.name }}
-              </span>
-            </span>
-          </el-tree>
-        </div>
-      </div>
-      <div class="right">
-        <div>已选{{num}}人</div>
-        <div class="right_main m-t-10">
-          <el-tag :key="tag.id"
-                  class="m-r-5 m-t-5"
-                  v-for="(tag) in peopleList"
-                  closable
-                  :disable-transitions="false"
-                  @close="handleClose(tag)">
-            {{tag.name}}
-          </el-tag>
-        </div>
+      <el-button type="primary"
+                 size="small"
+                 @click="dialogVisible=true">选择适用范围</el-button>
+      <div class="title m-t-20">
+        <el-tag v-if="isAll">全公司</el-tag>
+        <el-tag class="m-r-10 m-b-10"
+                v-for="item in dataSecond.applyTargets.orgIdList"
+                :key="item"><dd-icon class="m-r-5 fs-14" name="home"></dd-icon>{{filterOrg(item)}}</el-tag>
+        <el-tag class="m-r-10 m-b-10"
+                v-for="item in dataSecond.applyTargets.roleIdList"
+                :key="item"><dd-icon name="home"></dd-icon>{{item}}</el-tag>
+        <el-tag class="m-r-10 m-b-10"
+                v-for="item in dataSecond.applyTargets.peopleIdList"
+                :key="item"><dd-icon class="m-r-5 fs-14" name="man"></dd-icon>{{filterUser(item)}}</el-tag>
       </div>
     </el-card>
+
+    <el-dialog width="600px"
+               :visible.sync="dialogVisible">
+      <ChoosePeople mode="orguser"
+                    :orgIdList="dataSecond.applyTargets.orgIdList"
+                    :peopleIdList="dataSecond.applyTargets.peopleIdList"
+                    :roleIdList="dataSecond.applyTargets.roleIdList"
+                    @cancel="cancel"
+                    @chooseDone="chooseDone"></ChoosePeople>
+    </el-dialog>
+
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
+import ChoosePeople from '@/components/UserSelect/index.vue'
 import Api from '@/api'
+import lodash from 'lodash'
 
 @Component({
-  name: 'ScopeOfApplication'
+  name: 'ScopeOfApplication',
+  components: {
+    ChoosePeople
+  }
 })
 export default class ScopeOfApplication extends Vue {
-  tbaleData: any = []
-  async mounted () {
-    await this.getData()
-    const tree = this.$refs['tree'] as any
-    this.peopleList = tree.getCheckedNodes(true)
-    this.num = this.data.applyTargets[0].targetIds ? this.data.applyTargets[0].targetIds.length : 0
-  }
-  peopleList: any = []
-  num: any = 0
   @Prop() private data: any
-  choosePeople: any = []
-  input: any = ''
   static title = '适用范围'
+  dialogVisible: boolean = false
+  peopleList: any = []
+  orgList: any = []
+  dataSecond:any = {
+    applyTargets: {
+      orgIdList: [],
+      peopleIdList: [],
+      roleIdList: []
+    }
+  }
+
+  mounted () {
+    this.dataSecond.applyTargets = Object.keys(this.data.applyTargets).length > 0 ? lodash.cloneDeep(this.data.applyTargets) : {
+      orgIdList: [],
+      peopleIdList: [],
+      roleIdList: []
+    }
+    this.getData()
+  }
+
+  get isAll () {
+    if (
+      this.dataSecond.applyTargets.orgIdList && this.dataSecond.applyTargets.orgIdList.length === 0 &&
+      this.dataSecond.applyTargets.peopleIdList && this.dataSecond.applyTargets.peopleIdList.length === 0 &&
+      this.dataSecond.applyTargets.roleIdList && this.dataSecond.applyTargets.roleIdList.length === 0
+    ) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  cancel () {
+    this.dialogVisible = false
+  }
+
+  get tenantId () {
+    return this.$store.state.user.tenantId
+  }
+
+  filterUser (id: any) {
+    let str = ''
+    this.peopleList.forEach((item: any) => {
+      if (item.id === id) {
+        str = item.name
+      }
+    })
+    return str
+  }
+
+  filterOrg (id: any) {
+    let str = ''
+    this.orgList.forEach((item: any) => {
+      if (item.id === id) {
+        str = item.name
+      }
+    })
+    return str
+  }
+
+  getList (data: any) {
+    this.peopleList = [...this.peopleList, ...data.users]
+    if (data.children) {
+      this.orgList = [...this.orgList, ...data.children]
+      data.children.forEach((item: any) => {
+        if (item.children) {
+          this.getList(item)
+        }
+      })
+    }
+  }
+
   async getData () {
     const {
       data: { data }
-    } = await Api.mainData.getUsersFromOrg()
-    this.tbaleData = [data]
-    this.directData(this.tbaleData)
+    } = await Api.mainData.getUsersFromOrg({ orgId: this.tenantId, all: true })
+    this.getList(data)
   }
-  handleCheckChange () {
-    const tree = this.$refs['tree'] as any
-    this.peopleList = tree.getCheckedNodes(true)
-    this.peopleList = this.peopleList.filter((item:any) => {
-      return !item.type
-    })
-    this.data.applyTargets[0].targetIds = this.peopleList.map((item: any) => {
-      return item.id
-    })
-    this.num = this.data.applyTargets[0].targetIds.length
-  }
-  handleClose (tag: any) {
-    this.peopleList = this.peopleList.filter((item: any) => {
-      return item.id !== tag.id
-    })
-    this.data.applyTargets[0].targetIds = this.data.applyTargets[0].targetIds.filter((item: any) => {
-      return item !== tag.id
-    })
-    const tree = this.$refs['tree'] as any
-    tree.setCheckedKeys(this.data.applyTargets[0].targetIds)
-  }
-  directData (tbaleData:any) {
-    tbaleData.forEach((item:any) => {
-      if (!item.children) {
-        item.children = []
-      }
-      if (item.users) {
-        item.children = item.children.concat(item.users)
-      }
-      if (item.children) {
-        this.directData(item.children)
-      }
-    })
+
+  chooseDone (val: any) {
+    this.dataSecond.applyTargets.orgIdList = val.orgIdList
+    this.dataSecond.applyTargets.peopleIdList = val.peopleIdList
+    this.dataSecond.applyTargets.roleIdList = val.roleIdList
+    this.$emit('choose', this.dataSecond)
+    this.dialogVisible = false
   }
 }
 </script>
@@ -111,37 +139,25 @@ export default class ScopeOfApplication extends Vue {
 .ScopeOfApplication {
   width: 100%;
   display: flex;
-  min-height: 650px;
   justify-content: center;
   .main {
     width: 600px;
+    min-height: 600px;
     margin-top: 20px;
-    .left {
-      width: 300px;
-      height: 550px;
-      min-height: 500px;
-      float: left;
-      &_main {
-        width: 300px;
-        border: 1px solid rgba(217, 217, 217, 1);
-        overflow: auto;
-        height: 100%;
-        padding: 20px;
-      }
-    }
-    .right {
-      width: 250px;
-      height: 550px;
-      min-height: 500px;
-      float: right;
-      &_main {
-        width: 250px;
-        border: 1px solid rgba(217, 217, 217, 1);
-        overflow: auto;
-        height: 100%;
-        padding: 20px;
-      }
+    padding: 10px;
+    padding-bottom: 60px;
+    .title {
+      border: 1px solid #D5D8DE;
+      border-radius: 5px;
+      min-height: 50px;
+      padding: 10px;
     }
   }
+}
+/deep/.el-dialog__body {
+  padding: 0 !important;
+}
+/deep/.el-dialog__header {
+  padding: 0;
 }
 </style>

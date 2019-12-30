@@ -3,45 +3,14 @@ import customizedRouter from '@/router/modules/backstage/customized'
 import userSecuritySettingRouter from '@/router/modules/backstage/user-security-setting'
 import dataManagementRouter from '@/router/modules/backstage/data-management'
 import officeSettingRouter from '@/router/modules/backstage/office-setting'
+import generalSettingRouter from '@/router/modules/backstage/general-setting'
 import Layout from '@/layout/backstage/index.vue'
 
 const router: RouteConfig = {
   path: '/backstage',
   component: Layout,
   children: [
-    {
-      name: 'GeneralSetting',
-      path: '/backstage/general-setting',
-      redirect: 'backstage/general-setting/personalSetting',
-      component: () => import(/* webpackChunkName: "dashboard" */ '@/layout/empty-router-view.vue'),
-      meta: {
-        title: '常规设置',
-        breadcrumb: { title: '常规设置', path: '/' },
-        icon: 'Setup'
-      },
-      children: [
-        {
-          name: 'PersonalSetting',
-          path: '/backstage/general-setting/personalSetting',
-          component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/general-setting/personal-setting.vue'),
-          meta: {
-            title: '个人设置',
-            breadcrumb: { title: '个人设置', path: '/backstage/general-setting/personalSetting' },
-            inNav: true
-          }
-        },
-        {
-          name: 'CompanySetting',
-          path: '/backstage/general-setting/companySetting',
-          component: () => import(/* webpackChunkName: "dashboard" */ '@/views/backstage/general-setting/company-setting.vue'),
-          meta: {
-            title: '公司设置',
-            breadcrumb: { title: '公司设置', path: '/backstage/general-setting/companySetting' },
-            inNav: true
-          }
-        }
-      ]
-    },
+    generalSettingRouter,
     userSecuritySettingRouter,
     customizedRouter,
     {
@@ -49,7 +18,7 @@ const router: RouteConfig = {
       path: '/backstage/business-setting',
       meta: {
         title: '业务参数设置',
-        icon: 'Bankcard'
+        icon: 'dd-icon-Bankcard'
       }
     },
     officeSettingRouter,
@@ -59,7 +28,7 @@ const router: RouteConfig = {
       path: '/backstage/platform-setting',
       meta: {
         title: '平台开发',
-        icon: 'Development'
+        icon: 'dd-icon-Development'
       }
     }
   ]

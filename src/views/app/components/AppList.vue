@@ -16,6 +16,7 @@ import { PredefinedButtonApiNames } from '@/sdk/button-sdk/PredefinedButton'
               :disabled="!showButton(button)"
               :key="button.apiName"
               @click="handleClickButton(button)"
+              class="dd-button__text dd-button__text--info"
               type="text">
               <!--<dd-icon name="edit"/>-->
               {{button.name}}
@@ -29,7 +30,7 @@ import { PredefinedButtonApiNames } from '@/sdk/button-sdk/PredefinedButton'
             @update="updateFields"
             :fields="fields">
             <el-button
-              class="button-setting"
+              class="button-setting dd-button__text dd-button__text--info"
               type="text">
               <dd-icon name="setting"/>
               <span> 设置</span>
@@ -39,6 +40,7 @@ import { PredefinedButtonApiNames } from '@/sdk/button-sdk/PredefinedButton'
       </div>
       <div class="card-body">
         <el-table
+          v-loading="loadingRecords"
           :header-cell-style="{background:'#F8FAFC'}"
           class="dd-table--card"
           v-show="visibleFields.length"
@@ -200,7 +202,7 @@ export default class AppList extends mixins(routerParams, appObjects) {
     if (!this.curObject.apiName) {
       await this.$store.dispatch('app/getObjects')
     }
-    api.passObjectOp.getAppRecords(
+    api.paasObjectOp.getAppRecords(
       this.curObject.apiName,
       {
         info: this.info

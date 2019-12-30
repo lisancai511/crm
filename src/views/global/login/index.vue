@@ -58,6 +58,7 @@ export default class SignIn extends Vue {
       }
     }, 100)
   }
+
   private ruleForm: any = {
     type: 'Password',
     device: {
@@ -72,9 +73,10 @@ export default class SignIn extends Vue {
       storageAllow: true
     }
   }
+
   private rules: any = {
     username: [
-      { required: true, message: '请输入用户名', validator: this.checkPhone, trigger: 'blur' }
+      { required: true, message: '请输入正确的用户名', validator: this.checkPhone, trigger: 'blur' }
     ],
     password: [
       { required: true, message: '请输入用密码' }
@@ -89,7 +91,7 @@ export default class SignIn extends Vue {
     const newRuleForm = this.$refs.newRuleForm as any
     newRuleForm.validate(async (valid: any) => {
       if (valid) {
-        let data = await userModule.login(this.ruleForm)
+        const data = await userModule.login(this.ruleForm)
         if (data.success) {
           this.chooseCompany()
         }
@@ -98,7 +100,7 @@ export default class SignIn extends Vue {
   }
 
   async chooseCompany () {
-    let { data } = await Api.user.getCompany('All')
+    const { data } = await Api.user.getCompany('All')
     if (data.data.length > 1) {
       await this.$router.push('/company-choose')
     } else if (data.data.length === 1) {

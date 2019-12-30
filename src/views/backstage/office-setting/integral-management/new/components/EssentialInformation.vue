@@ -4,24 +4,28 @@
       <el-row>
         <el-col>
           <div class="m-b-10 title">指标名称</div>
-          <el-input :required="true" size="medium"
-                    v-model="data.name"
+          <el-input @change="saveData"
+                    :required="true"
+                    size="medium"
+                    v-model="dataFirst.name"
                     placeholder="请输入内容"></el-input>
         </el-col>
         <el-col>
           <div class="m-t-20 m-b-10 title">上级指标</div>
-          <el-cascader :options="options"
+          <el-cascader @change="handleChange"
+                       :options="options"
                        style="width:100%;"
-                       v-model="data.superiorLevelId"
+                       v-model="dataFirst.superiorLevelId"
                        :props="{ checkStrictly: true, label: 'name', value: 'id' }"
                        clearable></el-cascader>
         </el-col>
         <el-col>
           <div class="m-t-20 m-b-10 title">指标描述</div>
-          <el-input type="textarea"
+          <el-input @change="saveData"
+                    type="textarea"
                     :rows="4"
                     size="medium"
-                    v-model="data.description"
+                    v-model="dataFirst.description"
                     placeholder="请输入内容"></el-input>
         </el-col>
       </el-row>
@@ -41,16 +45,48 @@ export default class EssentialInformation extends Vue {
   input: any = ''
   options: any = []
   @Prop() private data: any
-  async created () {
-    await this.getData()
+  dataFirst: any = {
+    name: '',
+    superiorLevelId: '',
+    description: ''
   }
+
+  async mounted () {
+    await this.getData()
+    this.dataFirst.name = this.data.name
+    this.dataFirst.superiorLevelId = this.data.superiorLevelId || []
+    this.dataFirst.description = this.data.description
+  }
+
   async getData () {
     const newData = await Api.jiliScore.getDataScoreTree()
     this.options = newData.data.data
     this.deleteEmptyChildren(this.options)
   }
+
+  saveData () {
+    this.$emit('choose', this.dataFirst)
+  }
+
+  beforeDestroy () {
+    this.$emit('choose', this.dataFirst)
+  }
+
+  handleChange (val: any) {
+    const arr = this.options.map((item: any) => {
+      return item.id
+    })
+    arr.indexOf(val[val.length - 1]) > -1
+      ? (this.data.type = 1)
+      : (this.data.type = 2)
+    this.$emit('choose', this.dataFirst)
+  }
+
   deleteEmptyChildren (arr: any) {
     arr.forEach((item: any) => {
+      item.children = item.children.filter((item: any) => {
+        return !item.measure
+      })
       if (item.children && item.children.length > 0) {
         this.deleteEmptyChildren(item.children)
       } else {

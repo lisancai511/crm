@@ -20,7 +20,7 @@ export const buttonSdk = {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        api.passObjectOp.deleteAppRecords(
+        api.paasObjectOp.deleteAppRecords(
           objectApiName,
           recordIds
         ).then((res) => {
@@ -153,16 +153,17 @@ export const buttonSdk = {
     if (typeof recordId === 'string') {
       recordId = [recordId]
     }
+    const key = Math.random()
     return new Promise(async (resolve, reject) => {
       await MessageBox({
         title: '批量编辑',
         showConfirmButton: false,
         beforeClose (action: string, instance: any, done: any) {
-          instance.$store.unregisterModule(['app', 'record'])
           done()
           reject(Error('cancel'))
         },
         message: h(BatchEdit, {
+          key,
           props: {
             recordId,
             objectId,

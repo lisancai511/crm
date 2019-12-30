@@ -28,8 +28,12 @@ import EssentialInformationDetails from './Details.vue'
 })
 export default class EssentialInformation extends mixins(injectObjectId) {
   sizeForm: any = {
-    iconUrl: ''
+    iconUrl: '',
+    beginNumber: 0,
+    autoNumberLength: 3,
+    autoNumberFormat: 'yyyyMMdd'
   }
+
   private showEdit: Boolean = false
 
   edit (showEdit: boolean) {

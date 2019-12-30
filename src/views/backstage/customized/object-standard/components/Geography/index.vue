@@ -18,11 +18,11 @@
           label="描述">
         </el-table-column>
         <el-table-column
-          prop="creator"
+          prop="creatorName"
           label="创建人">
         </el-table-column>
         <el-table-column
-          prop="lastModifier"
+          prop="lastModifierName"
           label="最后修改人">
         </el-table-column>
         <el-table-column
@@ -71,7 +71,7 @@ export default class Geography extends mixins(injectObjectId) {
 
   addLayout () {
     this.$router.push({
-      path: this.$route.path + `/layout/add`
+      path: this.$route.path + '/layout/add'
     })
   }
 

@@ -15,6 +15,7 @@ export default class extends Vue {
   get curObject () {
     return this.objectById[this.objectId] || {}
   }
+
   async created () {
     if (this.$store.getters['app/objects'].length === 0) {
       await this.$store.dispatch('app/getObjects')

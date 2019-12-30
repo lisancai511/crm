@@ -8,7 +8,7 @@
         :dynamic-rules="fieldDynamicRules"
         position="top"
         ref="fieldAttrForm"
-        :is="data.type"></component>
+        :is="data.type"/>
       <!--<template v-if="data.type === ComponentTypes.TextField">
         <TextField
           :data="data"
@@ -57,7 +57,7 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { IField, fieldComponents } from '@/views/designer/config/components'
 import _ from 'lodash'
-import basicFieldComponents from '@/views/backstage/customized/object-standard/components/FeildList/components/fields'
+import basicFieldComponents from '@/views/designer/attrs-fields'
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
 import LayoutTypes from '@/views/designer/config/LayoutTypes'
 import designerStore from '@/store/modules/designer'

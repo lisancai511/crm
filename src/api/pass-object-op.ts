@@ -5,7 +5,7 @@ import axios from '@/plugins/axios'
 import { requestFail, requestSuccess, responseFail, responseSuccess } from '@/plugins/axios/interceptors'
 
 const request = axios.create({
-  baseURL: window.TENANT_REGION_ADDRESS + '/paas-object-op/api/v1/'
+  baseURL: window.TENANT_REGION_ADDRESS + '/paas-object-op/api/v1'
 })
 
 request.interceptors.request.use(requestSuccess, requestFail)
@@ -72,14 +72,26 @@ export function deleteAppRecords (
 
 /**
  * 新建记录
- * @param {string} objectApiName
- * @param {object} data
+ * @param payload
  */
-export function newAppRecord (
+export function newAppRecord (payload: {
   objectApiName: string,
-  data: { [propName: string]: any }
-) {
-  return request.post(`/biz-objects/${objectApiName}`, data)
+  record: { [propName: string]: any }
+}) {
+  const { objectApiName, record } = payload
+  return request.post(`/biz-objects/${objectApiName}`, record)
+}
+
+/**
+ * 批量新建记录
+ * @param payload
+ */
+export function batchNewAppRecord (payload: {
+  objectApiName: string,
+  records: any[]
+}) {
+  const { objectApiName, records } = payload
+  return request.post(`/biz-objects/batch/${objectApiName}`, records)
 }
 
 /**

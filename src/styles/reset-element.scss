@@ -1,17 +1,18 @@
-.dd-table{
-	&--card{
-		.el-table{
-			&__header{
-				thead{
-					tr{
-						th{
-							&:first-child{
-								.cell{
+.dd-table {
+	&--card {
+		.el-table {
+			&__header {
+				thead {
+					tr {
+						th {
+							&:first-child {
+								.cell {
 									padding-left: 20px;
 								}
 							}
-							&:nth-last-child(2){
-								.cell{
+
+							&:nth-last-child(2) {
+								.cell {
 									padding-right: 20px;
 								}
 							}
@@ -19,17 +20,19 @@
 					}
 				}
 			}
-			&__body{
-				tbody{
-					tr{
-						td{
-							&:first-child{
-								.cell{
+
+			&__body {
+				tbody {
+					tr {
+						td {
+							&:first-child {
+								.cell {
 									padding-left: 20px;
 								}
 							}
-							&:last-child{
-								.cell{
+
+							&:last-child {
+								.cell {
 									padding-right: 20px;
 								}
 							}
@@ -40,9 +43,11 @@
 		}
 	}
 }
-.el-table .cell{
-  padding-left: 20px !important;
+
+.el-table .cell {
+	padding-left: 20px !important;
 }
+
 .el-tabs__item.is-active {
-  font-weight: bold;
+	font-weight: bold;
 }

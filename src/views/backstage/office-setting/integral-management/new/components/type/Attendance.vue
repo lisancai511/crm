@@ -16,12 +16,12 @@
       赋值目标：<span>操作人</span>
     </div>
     <div class="m-b-10"
-         v-if="this.data.attendanceScoreMeasureConfig.define && this.data.attendanceScoreMeasureConfig.define.computeRules[0] && data.attendanceScoreMeasureConfig.define.computeRules[0].score">
+         v-if="this.data.attendanceScoreMeasureConfig.define.computeRules[0] && data.attendanceScoreMeasureConfig.define.computeRules[0].score">
       <span style="font-weight:600">单次计算：</span>{{this.data.attendanceScoreMeasureConfig.define.computeRules[0].direction==='Add'?'加':'减'}}
       {{this.data.attendanceScoreMeasureConfig.define.computeRules[0].score}} 分
     </div>
     <div class="m-b-10"
-         v-if="this.data.attendanceScoreMeasureConfig.define && this.data.attendanceScoreMeasureConfig.define.computeRules[0]">
+         v-if="this.data.attendanceScoreMeasureConfig.define.computeRules[1] && this.data.attendanceScoreMeasureConfig.define.computeRules[1].ruleItems.length>0">
       <span style="font-weight:600">累计计算频次：</span>
       <el-select class="m-t-10 m-b-10"
                  style="width:100%;"
@@ -74,12 +74,13 @@ import AttendanceRules from './components/AttendanceRules.vue'
 export default class Attendance extends Vue {
   drawer: any = false
   frequencyType: any = [
-    { label: '每天一次', value: 'ByDay' },
-    { label: '每周一次', value: 'ByWeek' },
-    { label: '每月一次', value: 'ByMounth' },
-    { label: '每季度一次', value: 'BySeason' },
-    { label: '每年一次', value: 'ByYear' }
+    { label: '每天', value: 'ByDay' },
+    { label: '每周', value: 'ByWeek' },
+    { label: '每月', value: 'ByMounth' },
+    { label: '每季度', value: 'BySeason' },
+    { label: '每年', value: 'ByYear' }
   ]
+
   options: any = [
     { label: '迟到', value: 'Late' },
     { label: '早退', value: 'LeaveEarly' },
@@ -93,16 +94,17 @@ export default class Attendance extends Vue {
     { label: '出差', value: 'BusinessTravel' },
     { label: '外出', value: 'GoOut' }
   ]
+
   value: any = ''
   @Prop() private data: any
   deleteRule (index:any) {
-    console.log(index)
     this.data.attendanceScoreMeasureConfig.define.computeRules[1].ruleItems.splice(index, 1)
   }
+
   getRoles (item: any) {
-    let add = item.direction === 'Add' ? '加' : '减'
+    const add = item.direction === 'Add' ? '加' : '减'
     if (item.seq !== '介于') {
-      let str =
+      const str =
         item.condition[1].operator +
         item.condition[1].value +
         '天则' +
@@ -110,7 +112,7 @@ export default class Attendance extends Vue {
         item.score
       return str
     }
-    let str1 =
+    const str1 =
       item.condition[0].operator +
       item.condition[0].value +
       '且' +

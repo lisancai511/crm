@@ -8,6 +8,7 @@
           attribute="usedButtons"
           title="使用的按钮">
           <el-button slot="header-right"
+                     class="dd-button__text dd-button__text--info"
                      @click="beforeEdit(editTypes.BUTTON)"
                      type="text">
             <dd-icon name="edit"/>
@@ -22,6 +23,7 @@
           attribute="usedFields"
           title="高亮显示的字段">
           <el-button slot="header-right"
+                     class="dd-button__text dd-button__text--info"
                      @click="beforeEdit(editTypes.FIELD)"
                      type="text">
             <dd-icon name="edit"/>

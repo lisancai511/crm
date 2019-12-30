@@ -86,7 +86,7 @@ const getters: GetterTree<IBackstageCustomizedState, any> = {
 }
 
 const actions: ActionTree<IBackstageCustomizedState, any> = {
-  async getObjects ({ commit, state }, isStandard?: boolean | undefined) {
+  async getObjects ({ commit, state, dispatch }, isStandard?: boolean | undefined) {
     // TODO 暂时请求全部对象的接口
     isStandard = undefined
     try {
@@ -102,20 +102,25 @@ const actions: ActionTree<IBackstageCustomizedState, any> = {
         }
       } = await api.bizObjects.getObjects(isStandard, state.loadingObject.source.token)
       commit('UPDATE_OBJECTS', data)
+      // TODO 优化
+      dispatch('getModules')
     } catch (e) {
       console.error(e)
     } finally {
       state.loadingObject.loading = false
     }
   },
-  async getModules ({ commit }) {
+  async getModules ({ commit, dispatch }, payload: { checkAuth: boolean } = { checkAuth: false }) {
     try {
       const {
         data: {
           data: modules
         }
-      } = await api.metaData.getModules()
+      } = await api.metaData.getModules({ checkAuth: payload.checkAuth })
       commit('UPDATE_MODULES', modules)
+      // 更新应用程序
+      // TODO 优化
+      dispatch('getApps')
     } catch (e) {
       console.error(e)
     }
@@ -124,7 +129,7 @@ const actions: ActionTree<IBackstageCustomizedState, any> = {
     try {
       await api.metaData.newModule(module)
       dispatch('getModules')
-      Message.success(`新建模块成功`)
+      Message.success('新建模块成功')
     } catch (e) {
       console.error(e)
     }
@@ -133,7 +138,7 @@ const actions: ActionTree<IBackstageCustomizedState, any> = {
     try {
       await api.metaData.putModule(module.id as string, module)
       dispatch('getModules')
-      Message.success(`编辑模块成功`)
+      Message.success('编辑模块成功')
     } catch (e) {
       console.error(e)
     }
@@ -150,7 +155,7 @@ const actions: ActionTree<IBackstageCustomizedState, any> = {
           commit('UPDATE_MODULES', state.modules.filter((module: IDD.ISModule) => {
             return `${module.id}` !== `${id}`
           }))
-          Message.success(`删除模块成功`)
+          Message.success('删除模块成功')
           resolve()
         })
       } catch (e) {
@@ -159,13 +164,13 @@ const actions: ActionTree<IBackstageCustomizedState, any> = {
       }
     })
   },
-  async getApps ({ commit }) {
+  async getApps ({ commit }, payload: { checkAuth: boolean } = { checkAuth: false }) {
     try {
       const {
         data: {
           data: apps
         }
-      } = await api.metaData.getApps()
+      } = await api.metaData.getApps({ checkAuth: payload.checkAuth })
       commit('UPDATE_APPS', apps)
     } catch (e) {
       console.error(e)
@@ -175,7 +180,7 @@ const actions: ActionTree<IBackstageCustomizedState, any> = {
     try {
       await api.metaData.newApp(app)
       dispatch('getApps')
-      Message.success(`新建应用程序成功`)
+      Message.success('新建应用程序成功')
     } catch (e) {
       console.error(e)
     }
@@ -184,7 +189,7 @@ const actions: ActionTree<IBackstageCustomizedState, any> = {
     try {
       await api.metaData.putApp(app)
       dispatch('getApps')
-      Message.success(`修改应用程序成功`)
+      Message.success('修改应用程序成功')
     } catch (e) {
       console.error(e)
     }
@@ -201,7 +206,7 @@ const actions: ActionTree<IBackstageCustomizedState, any> = {
           commit('UPDATE_APPS', state.apps.filter((app: IDD.ISApplication) => {
             return `${app.id}` !== `${id}`
           }))
-          Message.success(`删除应用程序成功`)
+          Message.success('删除应用程序成功')
           resolve()
         })
       } catch (e) {

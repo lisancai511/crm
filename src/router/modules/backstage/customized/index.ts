@@ -2,6 +2,7 @@ import { RouteConfig } from 'vue-router'
 import objectStandardRouter, { objectStandardNavRouter } from './object-standard'
 import objectCustomRouter, { objectCustomNavRouter } from './object-custom'
 import appRouter, { appNavRouter } from './application'
+import packAppRouter, { packAppNavRouter } from './packApplication'
 import menuRouter, { menuNavRouter } from './module'
 
 const customizedRouter: RouteConfig = {
@@ -10,7 +11,7 @@ const customizedRouter: RouteConfig = {
   component: () => import(/* webpackChunkName: "dashboard" */ '@/layout/empty-router-view.vue'),
   meta: {
     title: '定制',
-    icon: 'label'
+    icon: 'dd-icon-label'
   },
   children: [
     objectStandardNavRouter,
@@ -20,7 +21,9 @@ const customizedRouter: RouteConfig = {
     menuNavRouter,
     menuRouter,
     appNavRouter,
-    appRouter
+    appRouter,
+    packAppNavRouter,
+    packAppRouter
   ]
 }
 

@@ -52,7 +52,7 @@
                           <span>
                           {{activeCollapseNames.includes(lookup.id) ? '收起':'展开'}}
                           <i :class="{active:activeCollapseNames.includes(lookup.id)}"
-                             class="el-icon-arrow-right collapse-item__title__arrow"></i>
+                             class="el-icon-arrow-right collapse-item__title__arrow"/>
                         </span>
                         </div>
                       </div>
@@ -119,12 +119,19 @@ export default class FormDesignHover extends mixins(initLayout) {
     this.updateLayout({ lookups: val })
   }
 
-  get fieldById () {
-    return arrToMap(this.fields, 'id')
+  get lookupById (): any {
+    return arrToMap(this.lookups, 'id')
   }
 
-  get lookupById (): any {
-    return designerStore.lookupById
+  get fieldByApiName () {
+    return arrToMap(this.fields, 'apiName')
+  }
+
+  // @ts-ignore
+  created () {
+    this.$bus.$on(`designer/saved/${LayoutTypes.Hover}`, () => {
+      this.activeCollapseNames = []
+    })
   }
 
   // 获取全部的相关列表
@@ -161,13 +168,13 @@ export default class FormDesignHover extends mixins(initLayout) {
           designerStore.layoutId
         )
         data.define = JSON.parse(decompressBase64ToString(data.define))
-        data.define.usedFields = data.define.usedFields.map((id: any) => this.fieldById[id])
+        data.define.usedFields = data.define.usedFields.map((id: any) => this.fieldByApiName[id])
         data.define.lookups = data.define.lookups.map((item: any) => {
           return {
             ...item,
             checked: true,
             fields: [],
-            usedFieldIds: item.usedFields,
+            usedFieldApiNames: item.usedFields,
             usedFields: [],
             loadedFields: false,
             loadingFields: false
@@ -204,6 +211,7 @@ export default class FormDesignHover extends mixins(initLayout) {
   }
 
   updateLayout (define: { usedFields?: any[], lookups?: any[] }) {
+    console.log('define', define)
     designerStore.updateLayoutByType({
       layout: {
         ...designerStore.layout[LayoutTypes.Hover],
@@ -236,12 +244,12 @@ export default class FormDesignHover extends mixins(initLayout) {
     designerStore.updateIsStopWatchingLayout(true)
     lookup.loadingFields = true
     try {
-      const { data: { data } } = await api.bizObjects.getFields(objectId)
+      const { data: { data } } = await api.bizObjects.getFields({ objectId })
       lookup.fields = data.map(serverFieldToLocalField)
       // 更新使用到的字段
-      const filedById = arrToMap(lookup.fields, 'id')
-      if (lookup.usedFieldIds && lookup.usedFieldIds.length !== 0 && lookup.usedFields.length === 0) {
-        lookup.usedFields = lookup.usedFieldIds.map((id: string) => filedById[id])
+      const filedByApiName = arrToMap(lookup.fields, 'apiName')
+      if (lookup.usedFieldApiNames && lookup.usedFieldApiNames.length !== 0 && lookup.usedFields.length === 0) {
+        lookup.usedFields = lookup.usedFieldApiNames.map((apiName: string) => filedByApiName[apiName])
       }
       lookup.loadedFields = true
     } catch (e) {
@@ -258,16 +266,17 @@ export default class FormDesignHover extends mixins(initLayout) {
 
 <style lang="scss" scoped>
 .FormDesignHover {
-  height: 100%;
+  min-height: 100%;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
 
   .form-design-hover {
     &__wrap {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      bottom: 20px;
-      left: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     &__inner {
@@ -278,6 +287,7 @@ export default class FormDesignHover extends mixins(initLayout) {
       padding: 20px 20px;
       display: flex;
       flex-direction: column;
+      flex: 1;
 
       .FdTransfer {
         flex: 1;
@@ -317,12 +327,12 @@ export default class FormDesignHover extends mixins(initLayout) {
       }
 
       .lookup__wrap {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        overflow-y: auto;
+        /*position: absolute;*/
+        /*top: 0;*/
+        /*bottom: 0;*/
+        /*left: 0;*/
+        /*right: 0;*/
+        /*overflow-y: auto;*/
 
         &__wrap {
           position: relative;
@@ -358,12 +368,13 @@ export default class FormDesignHover extends mixins(initLayout) {
   }
 
   .collapse-item__title {
-    /*background-color: #FE723F;*/
+    background-color: #FE723F;
     width: 325px;
     height: 28px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    overflow-y: hidden;
 
     &.checked {
       background: rgba(228, 239, 255, 1);

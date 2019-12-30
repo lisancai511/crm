@@ -16,7 +16,7 @@
                  @tab-click="handleClick"
                  tab-position="left">
           <el-tab-pane :lazy="true"
-                       v-for="field in basicFields"
+                       v-for="(field, index) in basicFields"
                        :key="field.type"
                        :name="field.type"
                        :label="field.name">
@@ -24,7 +24,13 @@
               <div class="title">{{field.name}}</div>
               <div class="title_second">{{field.description}}</div>
               <!--            -->
-              <component :is="field.type"
+              <component v-if="!fieldId" :is="field.type"
+                         :ref="field.type"
+                         class="title_public"
+                         @changeShowNext="changeShowNext"
+                         position='right'
+                         :data="newbasicFields[index]"/>
+              <component v-else :is="field.type"
                          :ref="field.type"
                          class="title_public"
                          @changeShowNext="changeShowNext"
@@ -34,15 +40,19 @@
             <el-button type="primary"
                        v-if="showFieldForm"
                        style="margin:40px 80px"
-                       @click="changeTabs">下一步
+                       @click="changeTabs">{{fieldId?'保存':'下一步'}}
             </el-button>
           </el-tab-pane>
         </el-tabs>
         <keep-alive>
-          <template v-if="showFieldForm"></template>
+          <template v-if="showFieldForm"/>
           <div v-else
                class="layout__wrap">
-            <FieldDistributeLayout :data='dataObj'
+            <FieldDistributeLayout v-if="!fieldId" :data='newbasicFields[num]'
+                                   :field-id="fieldId"
+                                   :object-id="objectId"
+                                   @changeShowNext='changeShowNext'/>
+            <FieldDistributeLayout v-else :data='dataObj'
                                    :field-id="fieldId"
                                    :object-id="objectId"
                                    @changeShowNext='changeShowNext'/>
@@ -55,21 +65,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { fieldComponents } from '@/views/designer/config/components'
-import TextField from './components/FeildList/components/fields/TextField.vue'
-import LongTextField from './components/FeildList/components/fields/LongTextField'
-import NumberField from './components/FeildList/components/fields/NumberField.vue'
-import DateField from './components/FeildList/components/fields/DateField.vue'
-import DateTimeField from './components/FeildList/components/fields/DateTimeField'
-import EmailField from './components/FeildList/components/fields/EmailField'
-import PhoneField from './components/FeildList/components/fields/PhoneField'
-import WebsiteField from './components/FeildList/components/fields/WebsiteField.vue'
-import CheckBoxField from './components/FeildList/components/fields/CheckBoxField.vue'
-import LookUpField from './components/FeildList/components/fields/LookUpField.vue'
-import SearchMoreField from './components/FeildList/components/fields/SearchMoreField.vue'
-import OptionListField from './components/FeildList/components/fields/OptionListField.vue'
-import AutoNumberField from './components/FeildList/components/fields/AutoNumberField.vue'
 import FieldDistributeLayout from './components/FeildList/FieldDistributeLayout.vue'
-
+import basicFieldComponents from '@/views/designer/attrs-fields'
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
 import Api from '@/api'
 import {
@@ -78,42 +75,18 @@ import {
 } from '@/views/designer/utils'
 import lodash from 'lodash'
 
-console.log(fieldComponents.reduce((pre: any, cur: any) => {
-  const attrs = {
-    ...pre.attrs,
-    ...(cur.attrs || {})
-  }
-
-  pre = {
-    ...pre,
-    ...cur,
-    attrs
-  }
-  return pre
-}))
-
 @Component({
   name: 'FieldAdd',
   components: {
-    TextField,
-    LongTextField,
-    NumberField,
-    DateField,
-    DateTimeField,
-    EmailField,
-    PhoneField,
-    WebsiteField,
-    CheckBoxField,
-    LookUpField,
-    SearchMoreField,
-    OptionListField,
-    AutoNumberField,
+    ...basicFieldComponents,
     FieldDistributeLayout
   }
 })
 export default class FieldAdd extends Vue {
+  num:any = 0
   private activeName: any = 'TextField'
   private basicFields: any = ''
+  private newbasicFields: any = ''
   private showFieldForm: any = true
   private dataObj: any = fieldComponents.reduce((pre: any, cur: any) => {
     const attrs = {
@@ -130,6 +103,7 @@ export default class FieldAdd extends Vue {
   }, {
     attrs: {}
   })
+
   private title: any = '新建字段'
 
   get objectId () {
@@ -141,13 +115,14 @@ export default class FieldAdd extends Vue {
   }
 
   created () {
+    this.basicFields = lodash.cloneDeep(fieldComponents)
+    this.newbasicFields = lodash.cloneDeep(fieldComponents)
     if (this.fieldId) {
       this.getData()
     } else {
       this.dataObj = lodash.cloneDeep(
         Object.assign(this.dataObj, lodash.cloneDeep(fieldComponents[0]))
       )
-      this.basicFields = fieldComponents
     }
   }
 
@@ -156,6 +131,7 @@ export default class FieldAdd extends Vue {
   }
 
   handleClick (tab: any) {
+    this.num = tab.index
     this.showFieldForm = true
     this.basicFields.forEach((item: any) => {
       if (item.type === tab.name) {
@@ -184,7 +160,6 @@ export default class FieldAdd extends Vue {
   }
 
   changeShowNext (val: any) {
-    console.log(val)
     if (val === 'saveAndAdd') {
       this.dataObj = lodash.cloneDeep(
         Object.assign(this.dataObj, lodash.cloneDeep(fieldComponents[0]))

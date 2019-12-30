@@ -18,7 +18,8 @@ export namespace IDD {
 
   export interface ISModule extends IModule {
     id: string,
-    bizObjectName: string
+    bizObjectName: string,
+    standard: boolean
   }
 
   export interface IMenu {
@@ -26,7 +27,7 @@ export namespace IDD {
     name?: string
     iconUrl?: string
     moduleId?: string
-    children?: IMenu[]
+    children?: IMenu[],
   }
 
   export interface ISMenu extends IMenu {
@@ -36,6 +37,7 @@ export namespace IDD {
     children?: ISMenu[]
     module?: {
       bizObjectId: string
+      iconUrl: string
     }
   }
 
@@ -50,6 +52,8 @@ export namespace IDD {
     uuid: string
     menus: IMenu[]
     authorizedRoles: string[]
+    packageApp?: boolean
+    approvalFlowId?: any
   }
 
   export interface ISApplication {

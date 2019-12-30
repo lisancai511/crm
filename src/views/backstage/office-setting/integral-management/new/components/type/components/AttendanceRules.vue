@@ -145,24 +145,10 @@ export default class EssentialInformation extends Vue {
       eventType: 'Created',
       frequencyType: 'ByDay',
       ruleItems: [
-        {
-          seq: '<',
-          condition: [
-            {
-              operator: '<',
-              value: '3'
-            },
-            {
-              operator: '<',
-              value: '8'
-            }
-          ],
-          direction: 'Add',
-          score: 100
-        }
       ]
     }
   ]
+
   drawer: any = false
   choose: any = false
   less: any = '小于'
@@ -174,24 +160,28 @@ export default class EssentialInformation extends Vue {
     { label: '≥', value: '≥' },
     { label: '介于', value: '介于' }
   ]
+
   frequencyType: any = [
-    { label: '每天一次', value: 'ByDay' },
-    { label: '每周一次', value: 'ByWeek' },
-    { label: '每月一次', value: 'ByMounth' },
-    { label: '每季度一次', value: 'BySeason' },
-    { label: '每年一次', value: 'ByYear' }
+    { label: '每天', value: 'ByDay' },
+    { label: '每周', value: 'ByWeek' },
+    { label: '每月', value: 'ByMounth' },
+    { label: '每季度', value: 'BySeason' },
+    { label: '每年', value: 'ByYear' }
   ]
+
   option: any = [{ label: '合同' }, { label: '迟到' }, { label: '早退' }]
   value: any = ''
   options1: any = [
     { label: '加', value: 'Add' },
     { label: '减', value: 'Reduce' }
   ]
+
   options2: any = [{ label: '<' }, { label: '≤' }]
   @Prop() private data: any
   deleteRules (index: any) {
     this.computeRules[1].ruleItems.splice(index, 1)
   }
+
   addRules () {
     this.computeRules[1].ruleItems.push({
       seq: '<',
@@ -209,6 +199,7 @@ export default class EssentialInformation extends Vue {
       score: 100
     })
   }
+
   saveData () {
     this.data.attendanceScoreMeasureConfig.define.computeRules = lodash.cloneDeep(this.computeRules)
     console.log(this.computeRules)

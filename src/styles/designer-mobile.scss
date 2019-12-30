@@ -22,6 +22,8 @@
 		overflow-y: auto;
 		flex: 1;
 		position: relative;
+		border-bottom-left-radius: 10px;
+		border-bottom-right-radius: 10px;
 		//美化滚动条
 		/*整体部分*/
 		&::-webkit-scrollbar {
@@ -51,7 +53,7 @@
 
 		/deep/ .Ghost_FormField {
 			border: 1px dashed $dd--primary-color;
-			height: 46px;
+			height: $dd-design-mobile-item-height;
 			overflow: hidden;
 			width: 100%;
 

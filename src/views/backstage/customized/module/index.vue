@@ -42,11 +42,11 @@ export default class CustomizedModule extends Vue {
   }
 
   get standardModules (): IDD.ISModule[] {
-    return this.modules.filter((module: IDD.ISModule) => module.type === 'BizObject')
+    return this.modules.filter((module: IDD.ISModule) => module.standard)
   }
 
   get customizedModules (): IDD.ISModule[] {
-    return this.modules.filter((module: IDD.ISModule) => module.type === 'Customized')
+    return this.modules.filter((module: IDD.ISModule) => !module.standard)
   }
 
   get rules () {

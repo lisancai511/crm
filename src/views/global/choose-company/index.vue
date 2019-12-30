@@ -30,7 +30,7 @@ export default class SignIn extends Vue {
   }
 
   async getData () {
-    let { data } = await Api.user.getCompany('All')
+    const { data } = await Api.user.getCompany('All')
     this.data = data.data
   }
 

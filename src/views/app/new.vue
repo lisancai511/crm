@@ -34,50 +34,48 @@ import {
   compressStringToBase64,
   decompressBase64ToString,
   getLocalLayoutUsedFields,
-  localLayoutToServer,
+  localLayoutToServer, serverFieldToLocalField,
   serverLayoutToLocal
 } from '@/views/designer/utils'
 import getFormLayoutFromLayout from '@/views/designer/utils/getFormLayoutFromLayout'
 import PCLayout from '@/views/designer/components/PCLayout/index.vue'
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
 import api from '@/api'
-import { DESIGNER_RUNNING_TYPES } from '@/views/designer/config/Designer'
+import {
+  DESIGNER_EXEC_TYPES,
+  DESIGNER_UI_TYPES,
+  DESIGNER_USED_TYPES
+} from '@/views/designer/config/Designer'
 import LayoutTypes from '@/views/designer/config/LayoutTypes'
 import PredefinedFieldApiNames from '@/views/designer/config/PredefinedFieldApiNames'
 import layout1 from '@/views/designer/config/PredefinedLayouts/layout1'
 import { arrToMap } from '@/utils'
 import pathToRegexp from 'path-to-regexp'
-
-const exceptApiNames = [
-  PredefinedFieldApiNames.recordType,
-  PredefinedFieldApiNames.createTime,
-  PredefinedFieldApiNames.lastModifiedTime,
-  PredefinedFieldApiNames.createdBy,
-  PredefinedFieldApiNames.lastModifiedBy,
-  PredefinedFieldApiNames.owner,
-  PredefinedFieldApiNames.recordType,
-  PredefinedFieldApiNames.recordTypeId
-]
-
-const exceptFieldTypes = [
-  ComponentTypes.AutoNumberField
-]
+import { IDesigner } from '@/views/designer/types'
+import { EXCEPT_FORM_FIELD_API_NAMES, EXCEPT_FORM_FIELD_TYPES } from '@/views/app/const'
+import { toFormApiName, toNormalApiName } from '@/views/app/utils'
+// import { formatFormApiName } from '@/views/app/utils'
 
 @Component({
   name: 'NewAppRecord',
   components: { PCLayout }
 })
 export default class NewAppRecord extends mixins(routerParams, appObjects) {
-  @Provide() designer = {
-    running: {
-      type: DESIGNER_RUNNING_TYPES.FORM
+  @Provide() designer: IDesigner = {
+    object: {},
+    setting: {
+      execType: DESIGNER_EXEC_TYPES.FORM,
+      uiType: DESIGNER_UI_TYPES.PC,
+      usedType: DESIGNER_USED_TYPES.PAAS
     }
   }
+
   layout: any = {
     attrs: {},
     children: [],
     type: ComponentTypes.InfoTabDetails
   }
+
   fields: any[] = []
 
   saving: boolean = false
@@ -103,18 +101,18 @@ export default class NewAppRecord extends mixins(routerParams, appObjects) {
         await this.$store.dispatch('app/getObjects')
       }
       if (this.recordId) {
-        const recordRes = await api.passObjectOp.getAppRecord(
+        const recordRes = await api.paasObjectOp.getAppRecord(
           this.curObject.apiName,
           this.recordId
         )
         initRecord = (recordRes as any).data.data
       }
-      let layoutUi: any
-      let fields: any[]
-      let fieldDependencies: any[];
+      // let layoutUi: any
+      // let fields: any[]
+      // let fieldDependencies: any[];
       // fieldDependencies
       //  获取布局UI
-      [
+      const [
         {
           data: {
             data: layoutUi
@@ -133,16 +131,16 @@ export default class NewAppRecord extends mixins(routerParams, appObjects) {
           this.$route.query.recordTypeId || initRecord[PredefinedFieldApiNames.recordTypeId] || null
         ),
         api.bizObjects.getFieldDependencies(this.objectId)
-      ]);
-      ({
+      ])
+      const {
         data: {
           data: fields
         }
-      } = await api.bizObjects.getFields(
-        this.objectId,
-        null,
-        layoutUi.layoutId
-      ))
+      } = await api.bizObjects.getFields({
+        objectId: this.objectId,
+        layoutId: layoutUi.layoutId,
+        containModuleId: true
+      })
       if (!layoutUi.define) {
         layoutUi.define = compressStringToBase64(
           JSON.stringify(
@@ -150,8 +148,8 @@ export default class NewAppRecord extends mixins(routerParams, appObjects) {
               layout1({
                 buttons: [],
                 fields: fields,
-                exceptApiNames,
-                exceptFieldTypes
+                exceptApiNames: EXCEPT_FORM_FIELD_API_NAMES,
+                exceptFieldTypes: EXCEPT_FORM_FIELD_TYPES
               })[LayoutTypes.PC].define
             )
           )
@@ -169,20 +167,15 @@ export default class NewAppRecord extends mixins(routerParams, appObjects) {
           needAddFields: layoutUi.needAddFields || [],
           fields: this.fields,
           uiId: layoutUi.id,
-          exceptApiNames,
-          exceptFieldTypes
+          exceptApiNames: EXCEPT_FORM_FIELD_API_NAMES,
+          exceptFieldTypes: EXCEPT_FORM_FIELD_TYPES,
+          auth: true
         })
       } else {
         layout = getFormLayoutFromLayout(layoutUi.define)
       }
       const usedFieldApiNames = getLocalLayoutUsedFields(layout).map((field: any) => {
-        switch (field.type) {
-          case ComponentTypes.OptionListField:
-          case ComponentTypes.LookUpField:
-            return field.apiName + '__id'
-          default:
-            return field.apiName
-        }
+        return toFormApiName(field.apiName, field.type)
       })
       // 注册嵌套模块 `nested/myModule`
       this.$store.registerModule(['app', 'record'], {
@@ -195,8 +188,7 @@ export default class NewAppRecord extends mixins(routerParams, appObjects) {
             return pre
           }, {}),
           fieldDependencies,
-          fields,
-          fieldById: arrToMap(fields, 'id')
+          fields: fields.map(serverFieldToLocalField)
         },
         mutations: {
           UPDATE_FORM (state, payload) {
@@ -223,24 +215,22 @@ export default class NewAppRecord extends mixins(routerParams, appObjects) {
     (this.$refs as any).recordForm.validate(async (valid: boolean) => {
       if (valid) {
         try {
-          this.saving = false
+          this.saving = true
           const recordForm: any = {}
           Object.entries(this.recordForm).forEach(([k, v]: [string, any]) => {
-            if (k.includes('__id')) {
-              k = k.replace('__id', '')
-            }
+            k = toNormalApiName(k)
             recordForm[k] = v
           })
           if (!this.recordId) {
             if (this.$route.query.recordTypeId) {
               recordForm[PredefinedFieldApiNames.recordType] = this.$route.query.recordTypeId
             }
-            await api.passObjectOp.newAppRecord(
-              this.curObject.apiName,
-              recordForm
-            )
+            await api.paasObjectOp.newAppRecord({
+              objectApiName: this.curObject.apiName,
+              record: recordForm
+            })
           } else {
-            await api.passObjectOp.putAppRecord(
+            await api.paasObjectOp.putAppRecord(
               this.recordId,
               this.curObject.apiName,
               recordForm

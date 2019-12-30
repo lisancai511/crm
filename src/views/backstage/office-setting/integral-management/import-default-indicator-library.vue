@@ -75,7 +75,11 @@
                 width="250"
                 label="操作">
                 <template slot-scope="scope">
-                  <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
+                  <el-button
+                    class="dd-button__text dd-button__text--info"
+                    @click="handleClick(scope.row)"
+                    type="text" size="small">查看
+                  </el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -99,176 +103,194 @@ import { Component, Vue } from 'vue-property-decorator'
   name: 'CustomizedApplication'
 })
 export default class CustomizedApplication extends Vue {
-  flag:boolean = false
-  treeData:any = [{
-    'id': 111,
-    'name': '公司',
-    'type': 'Company',
-    'parentId': -1,
-    'creator': 123,
-    'seq': 98,
-    'createdTime': '2019-10-22T18:04:42Z',
-    'lastModifier': 123,
-    'lastModifiedTime': '2019-10-24T06:28:45Z',
-    'children': [ {
-      'id': 6592349401824497664,
-      'name': '财务部',
-      'type': 'Department',
-      'parentId': 111,
-      'creator': 1,
-      'seq': 100,
-      'createdTime': '2019-10-22T10:02:57Z',
-      'lastModifier': 123,
-      'lastModifiedTime': '2019-10-31T09:13:22Z',
-      'children': [ {
-        'id': 659234940182449765,
-        'name': '外贸部',
-        'type': 'Department',
-        'parentId': 6592349401824497664,
-        'creator': 123,
-        'seq': 99,
-        'createdTime': '2019-10-23T13:17:48Z',
-        'lastModifier': 123,
-        'lastModifiedTime': '2019-10-24T06:52:16Z',
-        'children': [ {
-          'id': 6593017068990369792,
-          'name': '咋说的',
-          'type': 'Department',
-          'parentId': 659234940182449765,
-          'creator': 123,
-          'seq': 91,
-          'createdTime': '2019-10-24T06:16:02Z',
-          'lastModifier': 123,
-          'lastModifiedTime': '2019-10-28T06:06:32Z',
-          'children': null
+  flag: boolean = false
+  treeData: any = [{
+    id: 111,
+    name: '公司',
+    type: 'Company',
+    parentId: -1,
+    creator: 123,
+    seq: 98,
+    createdTime: '2019-10-22T18:04:42Z',
+    lastModifier: 123,
+    lastModifiedTime: '2019-10-24T06:28:45Z',
+    children: [{
+      id: 6592349401824497664,
+      name: '财务部',
+      type: 'Department',
+      parentId: 111,
+      creator: 1,
+      seq: 100,
+      createdTime: '2019-10-22T10:02:57Z',
+      lastModifier: 123,
+      lastModifiedTime: '2019-10-31T09:13:22Z',
+      children: [{
+        id: 659234940182449765,
+        name: '外贸部',
+        type: 'Department',
+        parentId: 6592349401824497664,
+        creator: 123,
+        seq: 99,
+        createdTime: '2019-10-23T13:17:48Z',
+        lastModifier: 123,
+        lastModifiedTime: '2019-10-24T06:52:16Z',
+        children: [{
+          id: 6593017068990369792,
+          name: '咋说的',
+          type: 'Department',
+          parentId: 659234940182449765,
+          creator: 123,
+          seq: 91,
+          createdTime: '2019-10-24T06:16:02Z',
+          lastModifier: 123,
+          lastModifiedTime: '2019-10-28T06:06:32Z',
+          children: null
         }, {
-          'id': 6593017146199117824,
-          'name': '小心点是否',
-          'type': 'Department',
-          'parentId': 659234940182449765,
-          'creator': 123,
-          'seq': 93,
-          'createdTime': '2019-10-24T06:16:20Z',
-          'lastModifier': 123,
-          'lastModifiedTime': '2019-10-30T02:07:37Z',
-          'children': null
+          id: 6593017146199117824,
+          name: '小心点是否',
+          type: 'Department',
+          parentId: 659234940182449765,
+          creator: 123,
+          seq: 93,
+          createdTime: '2019-10-24T06:16:20Z',
+          lastModifier: 123,
+          lastModifiedTime: '2019-10-30T02:07:37Z',
+          children: null
         }, {
-          'id': 6593080935179227136,
-          'name': '撒打发斯蒂芬',
-          'type': 'Department',
-          'parentId': 659234940182449765,
-          'creator': 123,
-          'seq': 94,
-          'createdTime': '2019-10-24T10:29:48Z',
-          'lastModifier': 123,
-          'lastModifiedTime': '2019-10-30T02:07:37Z',
-          'children': null
+          id: 6593080935179227136,
+          name: '撒打发斯蒂芬',
+          type: 'Department',
+          parentId: 659234940182449765,
+          creator: 123,
+          seq: 94,
+          createdTime: '2019-10-24T10:29:48Z',
+          lastModifier: 123,
+          lastModifiedTime: '2019-10-30T02:07:37Z',
+          children: null
         }, {
-          'id': 6593081194630483968,
-          'name': '阿萨德大所多',
-          'type': 'Department',
-          'parentId': 659234940182449765,
-          'creator': 123,
-          'seq': 95,
-          'createdTime': '2019-10-24T10:30:50Z',
-          'lastModifier': 123,
-          'lastModifiedTime': '2019-10-31T09:11:36Z',
-          'children': null
+          id: 6593081194630483968,
+          name: '阿萨德大所多',
+          type: 'Department',
+          parentId: 659234940182449765,
+          creator: 123,
+          seq: 95,
+          createdTime: '2019-10-24T10:30:50Z',
+          lastModifier: 123,
+          lastModifiedTime: '2019-10-31T09:11:36Z',
+          children: null
         }, {
-          'id': 6593080918083244032,
-          'name': '撒打发斯蒂芬',
-          'type': 'Department',
-          'parentId': 659234940182449765,
-          'creator': 123,
-          'seq': 96,
-          'createdTime': '2019-10-24T10:29:44Z',
-          'lastModifier': 123,
-          'lastModifiedTime': '2019-11-01T10:15:21Z',
-          'children': null
+          id: 6593080918083244032,
+          name: '撒打发斯蒂芬',
+          type: 'Department',
+          parentId: 659234940182449765,
+          creator: 123,
+          seq: 96,
+          createdTime: '2019-10-24T10:29:44Z',
+          lastModifier: 123,
+          lastModifiedTime: '2019-11-01T10:15:21Z',
+          children: null
         }, {
-          'id': 6593081088191631360,
-          'name': '阿萨德',
-          'type': 'Department',
-          'parentId': 659234940182449765,
-          'creator': 123,
-          'seq': 97,
-          'createdTime': '2019-10-24T10:30:25Z',
-          'lastModifier': 123,
-          'lastModifiedTime': '2019-11-01T10:15:21Z',
-          'children': null
-        } ]
-      } ]
+          id: 6593081088191631360,
+          name: '阿萨德',
+          type: 'Department',
+          parentId: 659234940182449765,
+          creator: 123,
+          seq: 97,
+          createdTime: '2019-10-24T10:30:25Z',
+          lastModifier: 123,
+          lastModifiedTime: '2019-11-01T10:15:21Z',
+          children: null
+        }]
+      }]
     }, {
-      'id': 6593026286053101568,
-      'name': '了开讲啦首付款',
-      'type': 'Department',
-      'parentId': 111,
-      'creator': 123,
-      'seq': 101,
-      'createdTime': '2019-10-24T06:52:39Z',
-      'lastModifier': 123,
-      'lastModifiedTime': '2019-10-31T09:13:22Z',
-      'children': null
-    } ]
+      id: 6593026286053101568,
+      name: '了开讲啦首付款',
+      type: 'Department',
+      parentId: 111,
+      creator: 123,
+      seq: 101,
+      createdTime: '2019-10-24T06:52:39Z',
+      lastModifier: 123,
+      lastModifiedTime: '2019-10-31T09:13:22Z',
+      children: null
+    }]
   }]
-  chaneseArr:any = ['一', '二', '三', '四', '五', '六']
-  levelList:any = []
-  tableData:any = [
-  ]
-  multipleSelection:any = []
-  handleSelectionChange (val:any) {
+
+  chaneseArr: any = ['一', '二', '三', '四', '五', '六']
+  levelList: any = []
+  tableData: any = []
+  multipleSelection: any = []
+
+  handleSelectionChange (val: any) {
     this.multipleSelection = val
     console.log(this.multipleSelection)
   }
+
   showMore () {
     this.flag = !this.flag
   }
+
   goToImportDefault () {
     this.$router.push({
       path: this.$route.path + '/importDefaultIndicatorLibrary'
     })
   }
-  rederButton (h:any, { column }:any) {
-    return this.flag ? h('span', [h('span', column.label), h('el-tag', { style: 'float:right', on: { click: this.showMore } }, '收起')]) : h('span', [h('span', column.label), h('el-tag', { style: 'float:right', on: { click: this.showMore } }, '展开')])
+
+  rederButton (h: any, { column }: any) {
+    return this.flag ? h('span', [h('span', column.label), h('el-tag', {
+      style: 'float:right',
+      on: { click: this.showMore }
+    }, '收起')]) : h('span', [h('span', column.label), h('el-tag', {
+      style: 'float:right',
+      on: { click: this.showMore }
+    }, '展开')])
   }
 }
 </script>
 
 <style lang="scss" scoped>
-/deep/.el-card__header{
+/deep/ .el-card__header {
   border: 0 !important;
 }
+
 .nav {
   display: flex;
   justify-content: space-between;
 }
+
 .body {
   display: flex;
-  &_left{
+
+  &_left {
     width: 20%;
     overflow: auto !important;
     min-height: calc(100vh - 170px);
   }
-  &_right{
+
+  &_right {
     width: 80%;
   }
 }
+
 .custom-tree-node {
- .icon {
-   opacity: 0;
- }
+  .icon {
+    opacity: 0;
+  }
 }
+
 /deep/ .el-tree-node__content:hover {
   .icon {
     opacity: 1;
   }
 }
+
 .iconfont:hover {
   color: $dd--primary-color;
-  transform:scale(1.4);
+  transform: scale(1.4);
 }
-/deep/.el-tree>.el-tree-node{
-    min-width:100%;
-    display: inline-block;
+
+/deep/ .el-tree > .el-tree-node {
+  min-width: 100%;
+  display: inline-block;
 }
 </style>

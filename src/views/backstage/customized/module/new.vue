@@ -15,10 +15,11 @@ import { ModuleType } from '@/types/common'
             :disabled="!!menuModule.id"
             placeholder="请选择"
             v-model="menuModule.bizObjectId">
-            <el-option v-for="object in filterObjects"
-                       :key="object.id"
-                       :value="object.id"
-                       :label="object.name"
+            <el-option
+              v-for="object in filterObjects"
+              :key="object.id"
+              :value="object.id"
+              :label="object.name"
             >{{object.name}}
             </el-option>
           </el-select>
@@ -26,7 +27,7 @@ import { ModuleType } from '@/types/common'
         <el-form-item prop="name" label="模块名称">
           <el-input v-model="menuModule.name"/>
         </el-form-item>
-        <el-form-item label="图标">
+        <el-form-item prop="iconUrl" label="图标">
           <icon-select-dialog
             v-model="menuModule.iconUrl"
             :icon-names="iconNames">
@@ -47,16 +48,18 @@ import { ModuleType } from '@/types/common'
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import { IServerObject } from '@/store/modules/backstage/modules/customized'
 import { IDD } from '@/types/common'
 import IconSelectDialog from '@/components/IconSelectDialog.vue'
-import { app as iconNames } from '@/assets/icon-names'
+import api from '@/api'
+import { iconMaps } from '@/assets/icon'
+import PredefinedObjectApiNames from '@/views/designer/config/PredefinedObjectApiNames'
 
 const initModule: IDD.IModule = {
   name: '',
   description: '',
-  type: 'Customized',
+  type: 'BizObject',
   bizObjectId: '',
   custPageUri: null,
   iconUrl: '',
@@ -64,15 +67,13 @@ const initModule: IDD.IModule = {
 }
 
 @Component({
-  name: 'NewMenu',
+  name: 'NewModule',
   components: { IconSelectDialog }
 })
-export default class NewMenu extends Vue {
+export default class NewModule extends Vue {
   saving: boolean = false
 
-  get iconNames () {
-    return iconNames
-  }
+  iconNames: any[] = []
 
   get modules () {
     return this.$store.state.backstage.customized.modules
@@ -97,6 +98,13 @@ export default class NewMenu extends Vue {
           message: '请输入名称',
           trigger: 'change'
         }
+      ],
+      iconUrl: [
+        {
+          required: true,
+          message: '请选择图标',
+          trigger: 'change'
+        }
       ]
     }
   }
@@ -110,10 +118,26 @@ export default class NewMenu extends Vue {
   }
 
   get filterObjects (): IServerObject[] {
-    return this.objects.filter((object: IServerObject) => !this.usedObjectIds.includes(object.id))
+    if (this.menuModule.id) {
+      return this.objects
+    }
+    return this.objects
+      .filter((object: IServerObject) =>
+        !this.usedObjectIds.includes(object.id) &&
+        ![PredefinedObjectApiNames.user as string].includes(object.apiName))
+  }
+
+  @Watch('menuModule.iconUrl', { deep: true })
+  onGroupFormChange () {
+    this.$nextTick(() => {
+      (this.$refs as any).menuForm.validate()
+    })
   }
 
   created () {
+    api.utils.getIconNames(iconMaps.app).then((res: any) => {
+      this.iconNames = res
+    })
     try {
       if (this.modules.length === 0) {
         this.$store.dispatch('backstage/customized/getModules')

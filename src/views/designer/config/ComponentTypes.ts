@@ -39,7 +39,12 @@ enum ComponentTypes {
   InfoTabFollowUp = 'InfoTabFollowUp',
   // Tab相关列表页面单个相关列表组件
   InfoTabRelatedListItem = 'InfoTabRelatedListItem',
-  // 字段类型
+
+  // 明细容器
+  Detailed = 'Detailed',
+  /********************************/
+  /** **********字段类型************/
+  /********************************/
   // 单行文本
   TextField = 'TextField',
   // 长文本
@@ -69,9 +74,16 @@ enum ComponentTypes {
   OptionListField = 'OptionListField',
   // 选项列表（多选）
   MoreOptionListField = 'MoreOptionListField',
-
+  // 金额
+  MoneyField = 'MoneyField',
+  // 图片
+  ImageField = 'ImageField',
   //  按钮
-  // ButtonField = 'ButtonField'
+  // ButtonField = 'ButtonField',
+  // 定位
+  LocationField = 'LocationField',
+  // 标点
+  TagField = 'TagField'
 }
 
 export default ComponentTypes

@@ -136,3 +136,37 @@ a {
 .list-complete-leave-active {
 	position: absolute;
 }
+
+// text-color
+.dd-button__text {
+	&.is-disabled {
+		color: #999 !important;
+	}
+
+	$types: (
+					"primary":(
+									"key":"primary",
+									"color":$dd--primary-color
+					),
+					"success":(
+									"key":"success",
+									"color":$dd--success-color
+					),
+					"warning":(
+									"key":"warning",
+									"color":$dd--warning-color
+					),
+					"info":(
+									"key":"info",
+									"color":$dd--info-color
+					)
+	);
+	@each $type in map_values($types) {
+		&--#{map-get($type,"key")} {
+			color: map-get($type,"color") !important;
+			&:hover {
+				color: lighten(map-get($type,"color"), 5%) !important;
+			}
+		}
+	}
+}

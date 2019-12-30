@@ -9,6 +9,7 @@
       attribute="children"
       title="显示的相关列表">
       <el-button slot="header-right"
+                 class="dd-button__text dd-button__text--info"
                  @click="edit(data,'children','id')"
                  type="text">
         <dd-icon name="edit"/>

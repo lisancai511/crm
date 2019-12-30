@@ -5,7 +5,7 @@
     <img
       style="height: 800px"
       alt="应用主页"
-      src="https://qzonestyle.gtimg.cn/qzone/qzactStatics/imgs/20171123181522_c48800.jpg">
+      src="https://qzonestyle.gtimg.cn/qzone/qzactStatics/imgs/20171122191532_f2975b.jpg">
   </div>
 </template>
 

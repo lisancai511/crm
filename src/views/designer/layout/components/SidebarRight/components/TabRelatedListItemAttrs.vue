@@ -11,6 +11,7 @@
           item-key="apiName"
           title="显示字段设置">
           <el-button slot="header-right"
+                     class="dd-button__text dd-button__text--info"
                      @click="beforeEdit"
                      type="text">
             <dd-icon name="edit"/>

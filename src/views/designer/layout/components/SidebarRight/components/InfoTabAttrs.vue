@@ -26,6 +26,7 @@
       :filter="filterTabs"
       :data="data">
       <el-button slot="header-right"
+                 class="dd-button__text dd-button__text--info"
                  @click="edit(data,'children','type')"
                  type="text">
         <dd-icon name="edit"/>

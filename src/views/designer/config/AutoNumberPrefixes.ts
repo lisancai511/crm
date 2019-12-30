@@ -3,15 +3,15 @@
  */
 export const AutoNumberPrefixesList = [
   {
-    label: 'YYYY-MM-DD',
-    value: 'yyyy-MM-dd'
+    label: 'YYYYMMDD',
+    value: 'yyyyMMdd'
   },
   {
-    label: 'MM-DD',
-    value: 'MM-dd'
+    label: 'YYYYMM',
+    value: 'yyyyMM'
   },
   {
-    label: 'DD',
-    value: 'dd'
+    label: 'YYYY',
+    value: 'yyyy'
   }
 ]

@@ -1,9 +1,12 @@
 import ComponentTypes from '@/views/designer/config/ComponentTypes'
+import DraggableGroupTypes from '@/views/designer/config/DraggableGroupTypes'
+import DraggableClassNames from '@/views/designer/config/DraggableClassNames'
 
 export interface IButton {
   id: string,
   key: string,
-  name: string
+  name: string,
+  apiName: string
 }
 
 // export interface IRelated {
@@ -12,6 +15,36 @@ export interface IButton {
 //   usedButtons: IButton[],
 //   sort: {}
 // }
+
+export enum WATERMARK_TYPES {
+  // 用户名
+  USERNAME = 'USERNAME',
+  // 系统时间
+  SYS_TIME = 'SYS_TIME',
+  // 用户定位
+  LOCATION = 'LOCATION',
+  // 手机号码
+  PHONE_NUMBER = 'PHONE_NUMBER'
+}
+
+export const WATERMARK_LIST = [
+  {
+    type: WATERMARK_TYPES.USERNAME,
+    name: '水印显示用户名'
+  },
+  {
+    type: WATERMARK_TYPES.SYS_TIME,
+    name: '水印显示系统时间'
+  },
+  {
+    type: WATERMARK_TYPES.LOCATION,
+    name: '水印显示用户定位'
+  },
+  {
+    type: WATERMARK_TYPES.PHONE_NUMBER,
+    name: '水印显示用户手机号'
+  }
+]
 
 export interface IAttrs {
   maxlength?: number | string | null
@@ -37,6 +70,7 @@ export interface IAttrs {
   valueCandidateConfig?: any,
   lookupConfig?: {
     lookupObjectId: string,
+    moduleId: string,
     relatedListTitle: string,
     canCreateRelatedObject: boolean
   }
@@ -45,6 +79,24 @@ export interface IAttrs {
   objectId?: string
   sortOrderBy?: string
   sortDirection?: 'DESC' | 'ASC'
+
+  // 金额大小写
+  capital?: boolean
+
+  // 数字单位
+  unit?: string
+
+  // 图片
+  // 图片最大文件数量
+  limitNumber?: number
+  // 图片水印
+  watermarks?: WATERMARK_TYPES[]
+  // 只能通过手机拍照
+  onlyUsedCellPhoneCamera?: boolean
+
+  // 明细
+  // 按钮名称
+  actionName?: string
 
   // defaultValue?: number | string | null,
   [propName: string]: any
@@ -64,6 +116,7 @@ export interface IBasicComponent {
   key: string,
   attrs: IAttrs,
   children?: IField[],
+  draggable?: IDraggableOptions
 }
 
 export interface ILayoutComponent extends IBasicComponent {
@@ -84,7 +137,6 @@ export interface IField extends IBasicComponent {
     otherUsedFieldNames: string[],
     otherUsedFieldApiNames: string[]
   }) => {},
-  draggable?: IDraggableOptions,
   show?: boolean,
   isEdit?: boolean
   isSelect?: boolean,
@@ -265,6 +317,26 @@ export const basicComponents: ILayoutComponent[] = [
     show: true
   }
 ]
+// 明细组件
+export const detailedComponents: ILayoutComponent[] = [
+  {
+    type: ComponentTypes.Detailed,
+    key: ComponentTypes.Detailed,
+    icon: 'Bankcard',
+    name: '明细',
+    show: true,
+    draggable: {
+      group: DraggableGroupTypes.FormField,
+      ghostClass: DraggableClassNames.FormField,
+      animation: 200,
+      disabled: false
+    },
+    children: [],
+    attrs: {
+      actionName: '增加明细'
+    }
+  }
+]
 
 // export const headerComponents: IField[] = [
 //   {
@@ -315,6 +387,15 @@ function dynamicConfigRules (
   }
 }
 
+const basicConfigRules = {
+  name: [
+    { required: true, message: '请输入字段名称' }
+  ],
+  apiName: [
+    { required: true, message: '请输入API名称' }
+  ]
+}
+
 // 字段组件
 export const fieldComponents: IField[] = [
   {
@@ -333,17 +414,12 @@ export const fieldComponents: IField[] = [
       required: false
     },
     configRules: {
-      name: [
-        { required: true, message: '请输入标签' }
-      ],
+      ...basicConfigRules,
       attrs: {
         maxlength: [
           { type: 'number', required: true, message: '请输入数字类型的长度' }
         ]
-      },
-      apiName: [
-        { required: true, message: '请输入API名称' }
-      ]
+      }
     },
     dynamicConfigRules,
     description: '适用于填写简短的文字，如“姓名”'
@@ -364,17 +440,12 @@ export const fieldComponents: IField[] = [
       required: false
     },
     configRules: {
-      name: [
-        { required: true, message: '请输入标签' }
-      ],
+      ...basicConfigRules,
       attrs: {
         maxlength: [
           { type: 'number', required: true, message: '请输入数字类型的长度' }
         ]
-      },
-      apiName: [
-        { required: true, message: '请输入API名称' }
-      ]
+      }
     },
     dynamicConfigRules,
     description: '用于填写大段的文字，如“备注”、“建议”'
@@ -390,18 +461,18 @@ export const fieldComponents: IField[] = [
     helpText: '',
     remark: '',
     attrs: {
-      integerDigit: 8
+      integerDigit: 8,
+      decimalDigit: 2,
+      unit: ''
     },
     configRules: {
-      name: [
-        { required: true, message: '请输入标签' }
-      ],
-      apiName: [
-        { required: true, message: '请输入API名称' }
-      ],
+      ...basicConfigRules,
       attrs: {
         integerDigit: [
           { type: 'number', required: true, message: '请输入数字类型的整数位数' }
+        ],
+        decimalDigit: [
+          { type: 'number', required: true, message: '请输入数字类型的小数位数' }
         ]
       }
     },
@@ -422,12 +493,7 @@ export const fieldComponents: IField[] = [
       required: false
     },
     configRules: {
-      name: [
-        { required: true, message: '请输入标签' }
-      ],
-      apiName: [
-        { required: true, message: '请输入API名称' }
-      ]
+      ...basicConfigRules
     },
     dynamicConfigRules,
     description: '用于选择特定的日期，比如2088-08-08'
@@ -447,12 +513,7 @@ export const fieldComponents: IField[] = [
       required: false
     },
     configRules: {
-      name: [
-        { required: true, message: '请输入标签' }
-      ],
-      apiName: [
-        { required: true, message: '请输入API名称' }
-      ]
+      ...basicConfigRules
     },
     dynamicConfigRules,
     description: '用于选择特定的时间，比如2088-08-08 18:08:08'
@@ -472,12 +533,7 @@ export const fieldComponents: IField[] = [
       required: false
     },
     configRules: {
-      name: [
-        { required: true, message: '请输入标签' }
-      ],
-      apiName: [
-        { required: true, message: '请输入API名称' }
-      ]
+      ...basicConfigRules
     },
     dynamicConfigRules,
     description: '允许用户输入任何电话号码，可直接拨打。'
@@ -499,12 +555,7 @@ export const fieldComponents: IField[] = [
       required: false
     },
     configRules: {
-      name: [
-        { required: true, message: '请输入标签' }
-      ],
-      apiName: [
-        { required: true, message: '请输入API名称' }
-      ]
+      ...basicConfigRules
     },
     dynamicConfigRules
   },
@@ -525,17 +576,12 @@ export const fieldComponents: IField[] = [
       urlModel: '_self'
     },
     configRules: {
-      name: [
-        { required: true, message: '请输入标签' }
-      ],
+      ...basicConfigRules,
       attrs: {
         maxlength: [
           { type: 'number', required: true, message: '请输入数字类型的长度' }
         ]
-      },
-      apiName: [
-        { required: true, message: '请输入API名称' }
-      ]
+      }
     },
     dynamicConfigRules
   },
@@ -554,12 +600,7 @@ export const fieldComponents: IField[] = [
       required: false
     },
     configRules: {
-      name: [
-        { required: true, message: '请输入标签' }
-      ],
-      apiName: [
-        { required: true, message: '请输入API名称' }
-      ]
+      ...basicConfigRules
     },
     dynamicConfigRules
   },
@@ -577,18 +618,14 @@ export const fieldComponents: IField[] = [
       disabled: false,
       required: false,
       lookupConfig: {
+        moduleId: '',
         lookupObjectId: '',
         relatedListTitle: '',
         canCreateRelatedObject: true
       }
     },
     configRules: {
-      name: [
-        { required: true, message: '请输入标签' }
-      ],
-      apiName: [
-        { required: true, message: '请输入API名称' }
-      ],
+      ...basicConfigRules,
       attrs: {
         lookupConfig: {
           lookupObjectId: [
@@ -636,12 +673,7 @@ export const fieldComponents: IField[] = [
       valueCandidates: ''
     },
     configRules: {
-      name: [
-        { required: true, message: '请输入标签' }
-      ],
-      apiName: [
-        { required: true, message: '请输入API名称' }
-      ],
+      ...basicConfigRules,
       attrs: {
         valueCandidates: [
           { required: true, message: '请输入选项列表值' }
@@ -688,12 +720,7 @@ export const fieldComponents: IField[] = [
       beginNumber: 1
     },
     configRules: {
-      name: [
-        { required: true, message: '请输入标签' }
-      ],
-      apiName: [
-        { required: true, message: '请输入API名称' }
-      ],
+      ...basicConfigRules,
       attrs: {
         maxlength: [
           { type: 'number', required: true, message: '请输入数字类型的长度' }
@@ -714,6 +741,95 @@ export const fieldComponents: IField[] = [
           }
         ]
       }
+    },
+    dynamicConfigRules
+  },
+  {
+    id: '',
+    apiName: '',
+    model: '',
+    type: ComponentTypes.MoneyField,
+    key: ComponentTypes.MoneyField,
+    // TODO 更换图标
+    icon: 'number',
+    name: '金额',
+    helpText: '',
+    remark: '',
+    attrs: {
+      disabled: false,
+      required: false,
+      decimalDigit: 8,
+      capital: true,
+      unit: ''
+    },
+    configRules: {
+      ...basicConfigRules,
+      attrs: {
+        decimalDigit: [
+          { type: 'number', required: true, message: '请输入数字类型的小数位数' }
+        ]
+      }
+    },
+    dynamicConfigRules
+  },
+  {
+    id: '',
+    apiName: '',
+    model: '',
+    type: ComponentTypes.ImageField,
+    key: ComponentTypes.ImageField,
+    // TODO 更换图标
+    icon: 'number',
+    name: '图片',
+    helpText: '',
+    remark: '',
+    attrs: {
+      disabled: false,
+      required: false,
+      onlyUsedCellPhoneCamera: false,
+      watermarks: [],
+      limitNumber: 5
+    },
+    configRules: {
+      ...basicConfigRules
+    },
+    dynamicConfigRules
+  },
+  {
+    id: '',
+    apiName: '',
+    model: '',
+    type: ComponentTypes.LocationField,
+    key: ComponentTypes.LocationField,
+    // TODO 更换图标
+    icon: 'number',
+    name: '定位',
+    helpText: '',
+    remark: '',
+    attrs: {},
+    configRules: {
+      ...basicConfigRules
+    },
+    dynamicConfigRules
+  },
+  {
+    id: '',
+    apiName: '',
+    model: '',
+    type: ComponentTypes.TagField,
+    key: ComponentTypes.TagField,
+    // TODO 更换图标
+    icon: 'number',
+    name: '标签',
+    helpText: '',
+    remark: '',
+    description: '可以给数据添加标签，并支持按照标签搜索',
+    attrs: {
+      disabled: false,
+      required: false
+    },
+    configRules: {
+      ...basicConfigRules
     },
     dynamicConfigRules
   }
